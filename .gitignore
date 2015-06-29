@@ -1,0 +1,3 @@
+# We leave out the components directory here since we wish to deploy by git
+# commit to app engine and these are needed for web app.
+

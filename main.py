@@ -1,5 +1,5 @@
 from bottle import Bottle
-from bottle import template
+from bottle import static_file
 
 bottle = Bottle()
 
@@ -8,9 +8,8 @@ bottle = Bottle()
 
 
 @bottle.route('/')
-def hello():
-    """Return a friendly HTTP greeting."""
-    return 'Hello World!'
+def main():
+    return static_file('main.html', root='views')
 
 
 # Define an handler for 404 errors.
