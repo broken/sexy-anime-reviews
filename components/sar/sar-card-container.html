@@ -1,4 +1,6 @@
-<link href="../polymer/polymer.html" rel="import">
+<link href="..//polymer/polymer.html" rel="import">
+
+<link href="../firebase-element/firebase-collection.html">
 
 <link href="../sar/sar-card.html" rel="import">
 
@@ -7,9 +9,13 @@
   <style is="custom-style">
   </style>
   <template>
-      <span>something</span>
-      <template is="dom-repeat" items="{{reviews}}">
-        <sar-card review="{{item}}"></sar-card>
+      <firebase-collection
+          order-by-child="title"
+          log="true"
+          location="https://sexy-anime-reviews.firebaseio.com/reviews"
+          data="{{reviews}}"></firebase-collection>
+      <template is="dom-repeat" items="[[reviews]]">
+        <sar-card review="[[item]]"></sar-card>
       </template>
   </template>
 </dom-module>
@@ -21,9 +27,6 @@
     is: 'sar-card-container',
     properties: {
       reviews: Object
-    },
-    setReviews: function(data) {
-      this.reviews = data;
     }
   });
 </script>
