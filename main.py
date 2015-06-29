@@ -1,4 +1,5 @@
 from bottle import Bottle
+from bottle import template
 
 bottle = Bottle()
 

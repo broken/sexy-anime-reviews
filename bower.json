@@ -1,0 +1,24 @@
+{
+  "name": "sexy-anime-reviews",
+  "version": "0.0.0",
+  "homepage": "https://github.com/broken/sexy-anime-reviews",
+  "authors": [
+    "sexy-anime-reviewsb@robertneale.com"
+  ],
+  "description": "Simple app engine app that utilizes polymer to display my anime reviews.",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "~1.0.5",
+    "iron-elements": "PolymerElements/iron-elements#~1.0.1",
+    "paper-elements": "PolymerElements/paper-elements#~1.0.1",
+    "gold-elements": "PolymerElements/gold-elements#~1.0.1",
+    "neon-elements": "PolymerElements/neon-elements#~1.0.0"
+  }
+}
