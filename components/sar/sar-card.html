@@ -5,15 +5,17 @@
 
 <dom-module id="sar-card">
   <style is="custom-style">
-    :host {
+    paper-material section {
       height: 320px;
       width: 256px;
-      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjOWU5ZTllIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiM4ODgiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=");
+      @apply(--sar-card-theme)
     }
   </style>
   <template>
-    <paper-material elevation="2">
-      <span>{{review.title}}</span>
+    <paper-material elevation="5">
+      <section>
+        <span>{{review.title}}</span>
+      </section>
     </paper-material>
   </template>
 </dom-module>
