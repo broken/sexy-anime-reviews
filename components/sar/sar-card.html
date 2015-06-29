@@ -1,0 +1,28 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../paper-material/paper-material.html" rel="import">
+
+
+<dom-module id="sar-card">
+  <style is="custom-style">
+    :host {
+      height: 320px;
+      width: 256px;
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjOWU5ZTllIj48L3JlY3Q+CjxwYXRoIGQ9Ik0wIDVMNSAwWk02IDRMNCA2Wk0tMSAxTDEgLTFaIiBzdHJva2U9IiM4ODgiIHN0cm9rZS13aWR0aD0iMSI+PC9wYXRoPgo8L3N2Zz4=");
+    }
+  </style>
+  <template>
+    <paper-material elevation="2">
+      <span>{{review.title}}</span>
+    </paper-material>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'sar-card',
+    properties: {
+      review: Object
+    }
+  });
+</script>

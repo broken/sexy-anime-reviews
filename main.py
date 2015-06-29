@@ -9,11 +9,19 @@ bottle = Bottle()
 
 @bottle.route('/')
 def main():
-    return static_file('main.html', root='views')
+  return static_file('main.html', root='views')
+
+@bottle.route('/components/sar/<filepath:path>')
+def sar(filepath):
+  return static_file(filepath, root='components/sar')
+
+@bottle.route('/components/<filepath:path>')
+def components(filepath):
+  return static_file(filepath, root='bower_components')
 
 
 # Define an handler for 404 errors.
 @bottle.error(404)
 def error_404(error):
-    """Return a custom 404 error."""
-    return 'Sorry, nothing at this URL.'
+  """Return a custom 404 error."""
+  return 'Sorry, nothing at this URL.'

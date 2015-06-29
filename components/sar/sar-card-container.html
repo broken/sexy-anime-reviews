@@ -1,0 +1,29 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../sar/sar-card.html" rel="import">
+
+
+<dom-module id="sar-card-container">
+  <style is="custom-style">
+  </style>
+  <template>
+      <span>something</span>
+      <template is="dom-repeat" items="{{reviews}}">
+        <sar-card review="{{item}}"></sar-card>
+      </template>
+  </template>
+</dom-module>
+
+<script>
+</script>
+<script>
+  Polymer({
+    is: 'sar-card-container',
+    properties: {
+      reviews: Object
+    },
+    setReviews: function(data) {
+      this.reviews = data;
+    }
+  });
+</script>

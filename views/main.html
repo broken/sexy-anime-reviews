@@ -1,10 +1,12 @@
+<!DOCTYPE html>
 <html>
   <head>
+    <title>Sexy Anime Reviews</title>
     <style type="text/css">
       body {
         background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNSI+CjxyZWN0IHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iIzI4MjgyOCI+PC9yZWN0Pgo8Y2lyY2xlIGN4PSIzIiBjeT0iNC4zIiByPSIxLjgiIGZpbGw9IiMzOTM5MzkiPjwvY2lyY2xlPgo8Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMS44IiBmaWxsPSJibGFjayI+PC9jaXJjbGU+CjxjaXJjbGUgY3g9IjEwLjUiIGN5PSIxMi41IiByPSIxLjgiIGZpbGw9IiMzOTM5MzkiPjwvY2lyY2xlPgo8Y2lyY2xlIGN4PSIxMC41IiBjeT0iMTEuMyIgcj0iMS44IiBmaWxsPSJibGFjayI+PC9jaXJjbGU+Cjwvc3ZnPg==");
       }
-      
+
       header h1 {
         color: white;
         font: normal normal 60px PT Sans Narrow;
@@ -12,8 +14,24 @@
     </style>
   </head>
   <body>
+    <script src="/components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link href="/components/sar/sar-card-container.html" rel="import">
     <header>
       <h1>Sexy Anime Reviews</h1>
     </header>
+    <main>
+      <sar-card-container></sar-card-container>
+    </main>
+    <script>
+      var data = [
+        {
+          title: 'mirrai nikki',
+          rating: 'epic',
+          review: 'random text here',
+          hashtags: [ 'tag' ]
+        }
+      ];
+      document.querySelector("sar-card-container").setReviews(data);
+    </script>
   </body>
 </html>
