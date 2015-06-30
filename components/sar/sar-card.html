@@ -5,18 +5,36 @@
 
 <dom-module id="sar-card">
   <style is="custom-style">
-    paper-material section {
+    :host {
+      margin: 2px;
+      height: 390px;
+      width: 280px;
+      text-align: center;
+      color: var(--sar-card-text-color);
+    }
+    img {
+      border: 0;
       height: 320px;
-      width: 256px;
-      @apply(--sar-card-theme)
+    }
+    .cover {
+      height: 320px;
+      box-sizing: border-box;
+      display: inline-block;
+    }
+    .title {
+      margin-top: 10px;
+      padding: 4px 14px;
+      box-sizing: border-box;
+      display: inline-block;
+      border-radius: 3px;
+      @apply(--sar-card-caption-theme)
     }
   </style>
   <template>
-    <paper-material elevation="5">
-      <section>
-        <span>{{review.title}}</span>
-      </section>
+    <paper-material elevation="5" class="cover">
+      <a href="#"><img src="{{review.cover}}"></img></a>
     </paper-material>
+    <paper-material elevation="5" class="title">{{review.title}}</paper-material>
   </template>
 </dom-module>
 
