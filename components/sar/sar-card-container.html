@@ -17,21 +17,14 @@
     }
   </style>
   <template>
-      <!--<firebase-collection-->
-      <!--    order-by-child="title"-->
-      <!--    log="true"-->
-      <!--    location="https://sexy-anime-reviews.firebaseio.com/reviews"-->
-      <!--    data="{{reviews}}"></firebase-collection>-->
-      <!--<template is="dom-repeat" items="[[reviews]]">-->
-      <!--  <sar-card review="[[item]]" class="card"></sar-card>-->
-      <!--</template>-->
-
-    <div>
-      <div class="card">HIDF</div>
-      <div class="card">sfdkj</div>
-      <div class="card">adsfad</div>
-      <div class="card">asdff</div>
-    </div>
+      <firebase-collection
+          order-by-child="title"
+          log="true"
+          location="https://sexy-anime-reviews.firebaseio.com/reviews"
+          data="{{reviews}}"></firebase-collection>
+      <template is="dom-repeat" items="[[reviews]]">
+        <sar-card review="[[item]]" class="card"></sar-card>
+      </template>
   </template>
 </dom-module>
 

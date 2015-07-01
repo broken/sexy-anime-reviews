@@ -6,11 +6,11 @@
       body {
         padding: 0 10%;
         font-family: RobotoDraft, Helvetica, Arial, sans-serif;
-        background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNSIgaGVpZ2h0PSIxNSI+CjxyZWN0IHdpZHRoPSI1MCIgaGVpZ2h0PSI1MCIgZmlsbD0iIzI4MjgyOCI+PC9yZWN0Pgo8Y2lyY2xlIGN4PSIzIiBjeT0iNC4zIiByPSIxLjgiIGZpbGw9IiMzOTM5MzkiPjwvY2lyY2xlPgo8Y2lyY2xlIGN4PSIzIiBjeT0iMyIgcj0iMS44IiBmaWxsPSJibGFjayI+PC9jaXJjbGU+CjxjaXJjbGUgY3g9IjEwLjUiIGN5PSIxMi41IiByPSIxLjgiIGZpbGw9IiMzOTM5MzkiPjwvY2lyY2xlPgo8Y2lyY2xlIGN4PSIxMC41IiBjeT0iMTEuMyIgcj0iMS44IiBmaWxsPSJibGFjayI+PC9jaXJjbGU+Cjwvc3ZnPg==");
+        background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+");
       }
 
       header h1 {
-        color: white;
+        color: silver;
         font: normal normal 60px PT Sans Narrow;
       }
       neon-animated-pages {
@@ -20,8 +20,8 @@
   </head>
   <body class="fullbleed">
     <script src="/components/webcomponentsjs/webcomponents-lite.min.js"></script>
-    <link heft="/components/neon-animated/neon-animated-pages.html" rel="import">
-    <link heft="/components/neon-animated/neon-animations.html" rel="import">
+    <link href="/components/neon-animation/neon-animated-pages.html" rel="import">
+    <link href="/components/neon-animation/neon-animations.html" rel="import">
     <link href="/components/sar/sar-card-container.html" rel="import">
     <link href="/components/sar/sar-review.html" rel="import">
     <link href="/components/sar/theme-carbon-fiber.html" rel="import">
@@ -38,8 +38,8 @@
       <script>
         var scope = document.querySelector('template[is="dom-bind"]');
         scope.onCardClick = function(event) {
-          this.$.pages.selected = 1;
           this.$.review.review = event.detail.review;
+          this.$.pages.selected = 1;
         };
         scope.onExitClick = function(event) {
           this.$.pages.selected = 0;
