@@ -25,7 +25,7 @@
   </style>
   <template>
     <paper-button class="text" on-click="_onClick"><iron-icon icon="clear"></iron-icon></paper-button>
-    <paper-material id="cover" elevation="0" animated="true">
+    <paper-material id="cover" elevation="[[elevation]]" animated="true">
       <img src="[[review.cover]]" on-click="_onClick">
     </paper-material>
     <div class="title text">[[review.title]]</div>
@@ -41,6 +41,10 @@
     ],
     properties: {
       review: Object,
+      elevation: {
+        type: Number,
+        value: 4
+      },
       sharedElements: {
         value: function() {
           return {
@@ -69,6 +73,13 @@
               }
             }],
             'exit': [{
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this,
+              timing: {
+                delay: 50
+              }
+            }, {
               name: 'slide-up-animation',
               node: this.$.cover
             }, {

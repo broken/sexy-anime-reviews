@@ -40,14 +40,21 @@
       reviews: Object,
       animationConfig: {
         value: function() {
-          var cards = Polymer.dom(this.root).querySelectorAll('.card');
-          var cardsArray = Array.prototype.slice.call(cards);
+          // var cards = Polymer.dom(this.root).querySelectorAll('.card');
+          // var cardsArray = Array.prototype.slice.call(cards);
           return {
             'entry': [{
+              name: 'hero-animation',
+              id: 'hero',
+              toPage: this,
+              timing: {
+                delay: 50
+              }
+            }, {
               name: 'cascaded-animation',
+              // nodes: cardsArray,
               animation: 'transform-animation',
-              transformFrom: 'translateY(100%)',
-              nodes: cardsArray
+              transformFrom: 'translateY(100%)'
             }],
             'exit': [{
               name: 'hero-animation',
@@ -78,6 +85,7 @@
           nodesToExit.push(node);
         }
       }
+      this.animationConfig['entry'][1].nodes = nodesToExit;
       this.animationConfig['exit'][1].nodes = nodesToExit;
 
       this.fire('card-selected', {review: event.detail.review});
