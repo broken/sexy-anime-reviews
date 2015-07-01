@@ -1,6 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../firebase-element/firebase-collection.html" rel="import">
+<link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
 
 <link href="../sar/sar-card.html" rel="import">
 
@@ -16,14 +17,21 @@
     }
   </style>
   <template>
-      <firebase-collection
-          order-by-child="title"
-          log="true"
-          location="https://sexy-anime-reviews.firebaseio.com/reviews"
-          data="{{reviews}}"></firebase-collection>
-      <template is="dom-repeat" items="[[reviews]]">
-        <sar-card review="[[item]]"></sar-card>
-      </template>
+      <!--<firebase-collection-->
+      <!--    order-by-child="title"-->
+      <!--    log="true"-->
+      <!--    location="https://sexy-anime-reviews.firebaseio.com/reviews"-->
+      <!--    data="{{reviews}}"></firebase-collection>-->
+      <!--<template is="dom-repeat" items="[[reviews]]">-->
+      <!--  <sar-card review="[[item]]" class="card"></sar-card>-->
+      <!--</template>-->
+
+    <div>
+      <div class="card">HIDF</div>
+      <div class="card">sfdkj</div>
+      <div class="card">adsfad</div>
+      <div class="card">asdff</div>
+    </div>
   </template>
 </dom-module>
 
@@ -32,8 +40,53 @@
 <script>
   Polymer({
     is: 'sar-card-container',
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
     properties: {
-      reviews: Object
+      reviews: Object,
+      animationConfig: {
+        value: function() {
+          var cards = Polymer.dom(this.root).querySelectorAll('.card');
+          var cardsArray = Array.prototype.slice.call(cards);
+          return {
+            'entry': [{
+              name: 'cascaded-animation',
+              animation: 'scale-up-animation',
+              nodes: cardsArray
+            }],
+            'exit': [{
+              name: 'hero-animation',
+              id: 'hero',
+              fromPage: this
+            }, {
+              name: 'cascaded-animation',
+              animation: 'scale-down-animation'
+            }]
+          };
+        }
+      }
+    },
+    listeners: {
+      'click': '_onClick'
+    },
+    _onClick: function(event) {
+      var target = event.target;
+      if (target.classList.contains('card')) {
+        this.sharedElements = {
+          'hero': target
+        };
+        var nodesToScale = [];
+        var cards = Polymer.dom(this.root).querySelectorAll('.card');
+        for (var node, index = 0; node = cards[index]; index++) {
+          if (node !== target) {
+            nodesToScale.push(node);
+          }
+        }
+        this.animationConfig['exit'][1].nodes = nodesToScale;
+        
+        this.fire('card-click', {review: target.review});
+      }
     }
   });
 </script>

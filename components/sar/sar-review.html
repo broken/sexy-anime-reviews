@@ -1,0 +1,84 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
+
+
+<dom-module id="sar-review">
+  <style is="custom-style">
+    :host {
+      margin: 2px;
+      height: 390px;
+      width: 280px;
+      text-align: center;
+    }
+    img {
+      border: 0;
+      height: 460px;
+      float: right;
+    }
+    .cover {
+      height: 460px;
+      box-sizing: border-box;
+      display: inline-block;
+    }
+    .title {
+      margin-top: 10px;
+      padding: 4px 14px;
+      box-sizing: border-box;
+      display: inline-block;
+      border-radius: 3px;
+      @apply(--sar-card-caption-theme)
+    }
+  </style>
+  <template>
+    <img src="{{review.cover}}" id="cover">
+    <div class="title text">{{review.title}}</div>
+    <div class="text">{{review.review}}</div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'sar-review',
+    behaviors: [
+      Polymer.NeonSharedElementAnimatableBehavior
+    ],
+    properties: {
+      review: Object,
+      sharedElements: {
+        value: function() {
+          return {
+            'hero': this.$.cover
+          }
+        }
+      },
+      animationConfig: {
+        value: function() {
+          var text = Polymer.dom(this.root).querySelectorAll('.text');
+          var textArray = Array.prototype.slice.call(text);
+          return {
+            'entry': [{
+              name: 'hero-animation',
+              id: 'hero',
+              toPage: this
+            }, {
+              name: 'cascaded-animation',
+              animation: 'transform-animation',
+              transformFrom: 'translateY(100%)',
+              nodes: textArray
+            }],
+            'exit': [{
+              name: 'slide-up-animation',
+              node: this.$.cover
+            }, {
+              name: 'cascaded-animation',
+              animation: 'transform-animation',
+              transformTo: 'translateY(60vh)',
+              nodes: textArray
+            }]
+          };
+        }
+      }
+    }
+  });
+</script>
