@@ -1,20 +1,35 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-icon/iron-icon.html" rel="import">
+<link href="../iron-icons/iron-icons.html" rel="import">
 <link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
+<link href="../paper-button/paper-button.html" rel="import">
+<link href="../paper-material/paper-material.html" rel="import">
 
 
 <dom-module id="sar-review">
   <style is="custom-style">
+    paper-button {
+      color: var(--primary-text-color);
+    }
     img {
       border: 0;
       height: 460px;
+    }
+    paper-material {
       float: right;
+      height: 460px;
+      box-sizing: border-box;
+      display: inline-block;
     }
   </style>
   <template>
-    <img src="{{review.cover}}" id="cover">
-    <div class="title text">{{review.title}}</div>
-    <div class="text">{{review.review}}</div>
+    <paper-button class="text" on-click="_onClick"><iron-icon icon="clear"></iron-icon></paper-button>
+    <paper-material id="cover" elevation="0" animated="true">
+      <img src="[[review.cover]]" on-click="_onClick">
+    </paper-material>
+    <div class="title text">[[review.title]]</div>
+    <div class="text">[[review.review]]</div>
   </template>
 </dom-module>
 
@@ -41,25 +56,32 @@
             'entry': [{
               name: 'hero-animation',
               id: 'hero',
-              toPage: this
+              toPage: this,
+              timing: {
+                delay: 50
+              }
             }, {
               name: 'cascaded-animation',
-              animation: 'transform-animation',
-              transformFrom: 'translateY(100%)',
-              nodes: textArray
+              animation: 'slide-from-left-animation',
+              nodes: textArray,
+              timing: {
+                delay: 50
+              }
             }],
             'exit': [{
               name: 'slide-up-animation',
               node: this.$.cover
             }, {
               name: 'cascaded-animation',
-              animation: 'transform-animation',
-              transformTo: 'translateY(60vh)',
+              animation: 'slide-left-animation',
               nodes: textArray
             }]
           };
         }
       }
+    },
+    _onClick: function(event) {
+      this.fire('exit-click');
     }
   });
 </script>

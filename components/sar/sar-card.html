@@ -16,12 +16,12 @@
       border: 0;
       height: 320px;
     }
-    .cover {
+    #cover {
       height: 320px;
       box-sizing: border-box;
       display: inline-block;
     }
-    .title {
+    #title {
       margin-top: 10px;
       padding: 4px 14px;
       box-sizing: border-box;
@@ -31,10 +31,10 @@
     }
   </style>
   <template>
-    <paper-material elevation="5" class="cover">
-      <img src="{{review.cover}}">
+    <paper-material id="cover" elevation="[[elevation]]" animated="true" on-click="_onClick">
+      <img src="[[review.cover]]">
     </paper-material>
-    <paper-material elevation="5" class="title">{{review.title}}</paper-material>
+    <paper-material id="title" elevation="[[elevation]]" on-click="_onClick">[[review.title]]</paper-material>
   </template>
 </dom-module>
 
@@ -42,7 +42,17 @@
   Polymer({
     is: 'sar-card',
     properties: {
-      review: Object
+      review: Object,
+      elevation: {
+        type: Number,
+        value: 4
+      }
+    },
+    _onClick: function(event) {
+      this.elevation = 0;
+      this.fire('card-click', { review: this.review,
+                                cover: this.$.cover,
+                                title: this.$.title });
     }
   });
 </script>

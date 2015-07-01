@@ -23,7 +23,7 @@
           location="https://sexy-anime-reviews.firebaseio.com/reviews"
           data="{{reviews}}"></firebase-collection>
       <template is="dom-repeat" items="[[reviews]]">
-        <sar-card review="[[item]]" class="card"></sar-card>
+        <sar-card review="[[item]]" on-card-click="_onCardClick"></sar-card>
       </template>
   </template>
 </dom-module>
@@ -45,41 +45,42 @@
           return {
             'entry': [{
               name: 'cascaded-animation',
-              animation: 'scale-up-animation',
+              animation: 'transform-animation',
+              transformFrom: 'translateY(100%)',
               nodes: cardsArray
             }],
             'exit': [{
               name: 'hero-animation',
               id: 'hero',
-              fromPage: this
+              fromPage: this,
+              timing: {
+                delay: 50
+              }
             }, {
               name: 'cascaded-animation',
-              animation: 'scale-down-animation'
+              animation: 'transform-animation',
+              transformTo: 'translateY(100%)',
+              nodedelay: 50
             }]
           };
         }
       }
     },
-    listeners: {
-      'click': '_onClick'
-    },
-    _onClick: function(event) {
-      var target = event.target;
-      if (target.classList.contains('card')) {
-        this.sharedElements = {
-          'hero': target
-        };
-        var nodesToScale = [];
-        var cards = Polymer.dom(this.root).querySelectorAll('.card');
-        for (var node, index = 0; node = cards[index]; index++) {
-          if (node !== target) {
-            nodesToScale.push(node);
-          }
+    _onCardClick: function(event) {
+      var target = Polymer.dom(event).localTarget;
+      this.sharedElements = {
+        'hero': event.detail.cover
+      };
+      var nodesToExit = [];
+      var cards = Polymer.dom(this.root).querySelectorAll('sar-card');
+      for (var node, idx = 0; node = cards[idx]; idx++) {
+        if (node !== target) {
+          nodesToExit.push(node);
         }
-        this.animationConfig['exit'][1].nodes = nodesToScale;
-        
-        this.fire('card-click', {review: target.review});
       }
+      this.animationConfig['exit'][1].nodes = nodesToExit;
+
+      this.fire('card-selected', {review: event.detail.review});
     }
   });
 </script>
