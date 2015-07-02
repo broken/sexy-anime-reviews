@@ -46,28 +46,34 @@
             'entry': [{
               name: 'hero-animation',
               id: 'hero',
-              toPage: this,
-              timing: {
-                delay: 50
-              }
+              toPage: this
             }, {
               name: 'cascaded-animation',
               // nodes: cardsArray,
-              animation: 'transform-animation',
-              transformFrom: 'translateY(100%)'
+              animation: 'transform-animation'
+            }, {
+              name: 'fade-in-animation',
+              timing: {
+                delay: 500,
+                duration: 100
+              }
             }],
             'exit': [{
               name: 'hero-animation',
               id: 'hero',
               fromPage: this,
               timing: {
-                delay: 50
+                delay: 100
               }
             }, {
               name: 'cascaded-animation',
               animation: 'transform-animation',
-              transformTo: 'translateY(100%)',
               nodedelay: 50
+            }, {
+              name: 'fade-out-animation',
+              timing: {
+                duration: 100
+              }
             }]
           };
         }
@@ -80,15 +86,28 @@
       };
       var nodesToExit = [];
       var cards = Polymer.dom(this.root).querySelectorAll('sar-card');
+      var farthestDistance = 0;  // card top relative to viewport bottom edge
+      var viewportHeight = window.document.body.clientHeight;
       for (var node, idx = 0; node = cards[idx]; idx++) {
-        if (node !== target) {
+        if (node !== target && this._isNodeInViewport(node)) {
           nodesToExit.push(node);
+          // distance of node's top to viewport bottom edge
+          var d = viewportHeight - this.getBoundingClientRect().top;
+          farthestDistance = d > farthestDistance ? d : farthestDistance;
         }
       }
+      this.animationConfig['entry'][1].transformFrom = 'translateY(' + farthestDistance + 'px)';
+      this.animationConfig['exit'][1].transformTo = 'translateY(' + farthestDistance + 'px)';
       this.animationConfig['entry'][1].nodes = nodesToExit;
       this.animationConfig['exit'][1].nodes = nodesToExit;
+      this.animationConfig['entry'][2].node = event.detail.title;
+      this.animationConfig['exit'][2].node = event.detail.title;
 
       this.fire('card-selected', {review: event.detail.review});
+    },
+    _isNodeInViewport: function(node) {
+      return node.getBoundingClientRect().bottom > 0 &&
+          node.getBoundingClientRect().top < window.document.body.clientHeight;
     }
   });
 </script>

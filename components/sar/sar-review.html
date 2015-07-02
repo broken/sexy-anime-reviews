@@ -1,34 +1,59 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-icon/iron-icon.html" rel="import">
 <link href="../iron-icons/iron-icons.html" rel="import">
 <link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
 <link href="../paper-button/paper-button.html" rel="import">
 <link href="../paper-material/paper-material.html" rel="import">
+<link href="../paper-ripple/paper-ripple.html" rel="import">
 
 
 <dom-module id="sar-review">
   <style is="custom-style">
-    paper-button {
-      color: var(--primary-text-color);
+    :host {
+      width: 640px;
+    }
+    #close {
+      position: absolute;
+      right: -46px;
+      top: -46px;
+      color: var(--secondary-text-color);
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+    }
+    #close paper-material {
+      border-radius: inherit;
+      @apply(--layout-fit);
+      @apply(--layout-vertical);
+      @apply(--layout-center-center);
     }
     img {
       border: 0;
       height: 460px;
     }
-    paper-material {
+    #cover {
       float: right;
       height: 460px;
       box-sizing: border-box;
       display: inline-block;
     }
+    #title {
+      font-size: larger;
+    }
   </style>
   <template>
-    <paper-button class="text" on-click="_onClick"><iron-icon icon="clear"></iron-icon></paper-button>
-    <paper-material id="cover" elevation="[[elevation]]" animated="true">
+    <div id="close" on-click="_onClick">
+      <paper-ripple></paper-ripple>
+      <paper-material elevation="0">
+        <iron-icon icon="clear"></iron-icon>
+      </paper-material>
+    </div>
+    <paper-material id="cover" elevation="[[elevation]]" animated="">
       <img src="[[review.cover]]" on-click="_onClick">
     </paper-material>
-    <div class="title text">[[review.title]]</div>
+    <div id="title" class="text" style="width:80px">[[review.title]]</div>
     <div class="text">[[review.review]]</div>
   </template>
 </dom-module>
@@ -60,32 +85,29 @@
             'entry': [{
               name: 'hero-animation',
               id: 'hero',
-              toPage: this,
-              timing: {
-                delay: 50
-              }
+              toPage: this
             }, {
               name: 'cascaded-animation',
               animation: 'slide-from-left-animation',
               nodes: textArray,
               timing: {
-                delay: 50
+                delay: 100
               }
+            }, {
+              name: 'fade-in-animation',
+              node: this.$.close
             }],
             'exit': [{
               name: 'hero-animation',
               id: 'hero',
-              fromPage: this,
-              timing: {
-                delay: 50
-              }
-            }, {
-              name: 'slide-up-animation',
-              node: this.$.cover
+              fromPage: this
             }, {
               name: 'cascaded-animation',
               animation: 'slide-left-animation',
               nodes: textArray
+            }, {
+              name: 'fade-out-animation',
+              node: this.$.close
             }]
           };
         }

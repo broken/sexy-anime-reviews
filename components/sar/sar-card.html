@@ -12,29 +12,21 @@
       text-align: center;
       color: var(--sar-card-text-color);
     }
-    img {
-      border: 0;
-      height: 320px;
-    }
     #cover {
       height: 320px;
       box-sizing: border-box;
       display: inline-block;
     }
-    #title {
-      margin-top: 10px;
-      padding: 4px 14px;
-      box-sizing: border-box;
-      display: inline-block;
-      border-radius: 3px;
-      @apply(--sar-card-caption-theme)
+    #cover img {
+      border: 0;
+      height: 320px;
     }
   </style>
   <template>
-    <paper-material id="cover" elevation="[[elevation]]" animated="true" on-click="_onClick">
+    <paper-material id="cover" elevation="[[elevation]]" animated on-click="_onClick">
       <img src="[[review.cover]]">
     </paper-material>
-    <paper-material id="title" elevation="[[elevation]]" on-click="_onClick">[[review.title]]</paper-material>
+    <div id="title">[[review.title]]</div>
   </template>
 </dom-module>
 
