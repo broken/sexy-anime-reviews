@@ -2,6 +2,7 @@
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-icon/iron-icon.html" rel="import">
+<link href="../iron-icons/av-icons.html" rel="import">
 <link href="../iron-icons/iron-icons.html" rel="import">
 <link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
 <link href="../paper-button/paper-button.html" rel="import">
@@ -16,12 +17,12 @@
     }
     #close {
       position: absolute;
-      right: -46px;
-      top: -46px;
+      right: -39px;
+      top: -9px;
       color: var(--secondary-text-color);
       border-radius: 50%;
-      width: 40px;
-      height: 40px;
+      width: 44px;
+      height: 44px;
     }
     #close paper-material {
       border-radius: inherit;
@@ -31,16 +32,25 @@
     }
     img {
       border: 0;
-      height: 460px;
+      height: 420px;
     }
     #cover {
       float: right;
-      height: 460px;
+      height: 420px;
       box-sizing: border-box;
-      display: inline-block;
+      margin: 0 0 16px 20px;
     }
     #title {
-      font-size: larger;
+      font-size: 28px;
+    }
+    #meta {
+      @apply(--layout-horizontal);
+    }
+    .meta {
+      margin: 0 5px;
+    }
+    #view_method {
+      height: 16px;
     }
   </style>
   <template>
@@ -50,11 +60,21 @@
         <iron-icon icon="clear"></iron-icon>
       </paper-material>
     </div>
-    <paper-material id="cover" elevation="[[elevation]]" animated="">
-      <img src="[[review.cover]]" on-click="_onClick">
-    </paper-material>
-    <div id="title" class="text" style="width:80px">[[review.title]]</div>
-    <div class="text">[[review.review]]</div>
+    <div id="title" class="article">[[review.title]]</div>
+    <section>
+      <paper-material id="cover" elevation="[[elevation]]" animated="">
+        <img src="[[review.cover]]" on-click="_onClick">
+      </paper-material>
+      <div id="meta" class="article">
+        <iron-icon id="view_method" icon="[[_viewMethodIcon(review)]]"></iron-icon>
+        <div class="meta">[[review.rating]]</div>
+        <template is="dom-repeat" items="[[_getGenreArray(review)]]">
+          <div class="meta">[[item]]</div>
+        </template>
+      </div>
+      <br>
+      <div class="article">[[review.review]]</div>
+    </section>
   </template>
 </dom-module>
 
@@ -79,8 +99,8 @@
       },
       animationConfig: {
         value: function() {
-          var text = Polymer.dom(this.root).querySelectorAll('.text');
-          var textArray = Array.prototype.slice.call(text);
+          var article = Polymer.dom(this.root).querySelectorAll('.article');
+          var articleArray = Array.prototype.slice.call(article);
           return {
             'entry': [{
               name: 'hero-animation',
@@ -89,7 +109,7 @@
             }, {
               name: 'cascaded-animation',
               animation: 'slide-from-left-animation',
-              nodes: textArray,
+              nodes: articleArray,
               timing: {
                 delay: 100
               }
@@ -104,7 +124,7 @@
             }, {
               name: 'cascaded-animation',
               animation: 'slide-left-animation',
-              nodes: textArray
+              nodes: articleArray
             }, {
               name: 'fade-out-animation',
               node: this.$.close
@@ -115,6 +135,19 @@
     },
     _onClick: function(event) {
       this.fire('exit-click');
+    },
+    _viewMethodIcon: function(review) {
+      if (review.viewMethod === 'dub') {
+        return 'av:mic';
+      } else if (review.viewMethod === 'sub') {
+        return 'av:subtitle';
+      } else {
+        return 'av:not-interested';
+      }
+    },
+    _getGenreArray: function(review) {
+      var genres = review.genres || '';
+      return genres.split(',');
     }
   });
 </script>

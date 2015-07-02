@@ -87,7 +87,7 @@
       var nodesToExit = [];
       var cards = Polymer.dom(this.root).querySelectorAll('sar-card');
       var farthestDistance = 0;  // card top relative to viewport bottom edge
-      var viewportHeight = window.document.body.clientHeight;
+      var viewportHeight = window.document.documentElement.clientHeight;
       for (var node, idx = 0; node = cards[idx]; idx++) {
         if (node !== target && this._isNodeInViewport(node)) {
           nodesToExit.push(node);
@@ -107,7 +107,7 @@
     },
     _isNodeInViewport: function(node) {
       return node.getBoundingClientRect().bottom > 0 &&
-          node.getBoundingClientRect().top < window.document.body.clientHeight;
+          node.getBoundingClientRect().top < window.document.documentElement.clientHeight;
     }
   });
 </script>
