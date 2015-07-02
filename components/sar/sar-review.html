@@ -13,12 +13,19 @@
 <dom-module id="sar-review">
   <style is="custom-style">
     :host {
-      width: 640px;
+      box-sizing: content-box;
+      max-width: 720px;
+      min-width: 540px;
+    }
+    #header {
+      color: silver;
+      font-size: 32px;
+      font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
     }
     #close {
       position: absolute;
-      right: -39px;
-      top: -9px;
+      right: -10px;
+      top: 10px;
       color: var(--secondary-text-color);
       border-radius: 50%;
       width: 44px;
@@ -45,6 +52,7 @@
     }
     #meta {
       @apply(--layout-horizontal);
+      @apply(--layout-wrap);
     }
     .meta {
       margin: 0 5px;
@@ -52,29 +60,43 @@
     #view_method {
       height: 16px;
     }
+    .paper-header {
+      padding: 0 10%;
+      white-space: nowrap;
+      @apply(--layout);
+    }
+    .content {
+      padding: 0 10%;
+      margin-top: 48px;
+    }
   </style>
   <template>
-    <div id="close" on-click="_onClick">
-      <paper-ripple center></paper-ripple>
-      <paper-material elevation="0">
-        <iron-icon icon="clear"></iron-icon>
-      </paper-material>
+    <div class="paper-header">
+      <div id="header">Sexy Anime Reviews</div>
     </div>
-    <div id="title" class="article">[[review.title]]</div>
-    <section>
-      <paper-material id="cover" elevation="[[elevation]]" animated="">
-        <img src="[[review.cover]]" on-click="_onClick">
-      </paper-material>
-      <div id="meta" class="article">
-        <iron-icon id="view_method" icon="[[_viewMethodIcon(review)]]"></iron-icon>
-        <div class="meta">[[review.rating]]</div>
-        <template is="dom-repeat" items="[[_getGenreArray(review)]]">
-          <div class="meta">[[item]]</div>
-        </template>
+    <div class="content">
+      <div id="close" on-click="_onClick">
+        <paper-ripple center></paper-ripple>
+        <paper-material elevation="0">
+          <iron-icon icon="clear"></iron-icon>
+        </paper-material>
       </div>
-      <br>
-      <div class="article">[[review.review]]</div>
-    </section>
+      <div id="title" class="article">[[review.title]]</div>
+      <section>
+        <paper-material id="cover" elevation="[[elevation]]" animated="">
+          <img src="[[review.cover]]" on-click="_onClick">
+        </paper-material>
+        <div id="meta" class="article">
+          <iron-icon id="view_method" icon="[[_viewMethodIcon(review)]]"></iron-icon>
+          <div class="meta">[[review.rating]]</div>
+          <template is="dom-repeat" items="[[_getGenreArray(review)]]">
+            <div class="meta">[[item]]</div>
+          </template>
+        </div>
+        <br>
+        <div class="article">[[review.review]]</div>
+      </section>
+    </div>
   </template>
 </dom-module>
 
@@ -93,7 +115,8 @@
       sharedElements: {
         value: function() {
           return {
-            'hero': this.$.cover
+            'hero': this.$.cover,
+            'hero-header': this.$.header
           }
         }
       },
@@ -116,6 +139,11 @@
             }, {
               name: 'fade-in-animation',
               node: this.$.close
+            }, {
+              name: 'hero-animation',
+              id: 'hero-header',
+              toPage: this,
+              node: this.$.header
             }],
             'exit': [{
               name: 'hero-animation',
@@ -128,6 +156,11 @@
             }, {
               name: 'fade-out-animation',
               node: this.$.close
+            }, {
+              name: 'hero-animation',
+              id: 'hero-header',
+              fromPage: this,
+              node: this.$.header
             }]
           };
         }
@@ -140,7 +173,7 @@
       if (review.viewMethod === 'dub') {
         return 'av:mic';
       } else if (review.viewMethod === 'sub') {
-        return 'av:subtitle';
+        return 'av:subtitles';
       } else {
         return 'av:not-interested';
       }
