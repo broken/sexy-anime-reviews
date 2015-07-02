@@ -22,7 +22,7 @@
     }
     #header {
       color: silver;
-      font-size: 48px;
+      font-size: 54px;
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
       @apply(--layout-self-end);
     }
@@ -69,9 +69,6 @@
     behaviors: [
       Polymer.NeonSharedElementAnimatableBehavior
     ],
-    listeners: {
-      'paper-header-transform': '_onPaperHeaderTransform'
-    },
     properties: {
       reviews: Object,
       animationConfig: {
@@ -153,13 +150,6 @@
     _isNodeInViewport: function(node) {
       return node.getBoundingClientRect().bottom > 0 &&
           node.getBoundingClientRect().top < window.document.documentElement.clientHeight;
-    },
-    // custom transformation: scale header's title
-    _onPaperHeaderTransform: function(event) {
-      var detail = event.detail;
-      var max = detail.height - detail.condensedHeight;
-      var scale = Math.max(0.75, (max - detail.y) / (max / 0.25) + 0.75);
-      Polymer.Base.transform('scale(' + scale + ') translateZ(0)', this.$.header);
     }
   });
 </script>
