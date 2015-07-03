@@ -19,6 +19,10 @@ def sar(filepath):
 def components(filepath):
   return static_file(filepath, root='bower_components')
 
+@bottle.route('/add')
+def add():
+  return static_file('add.html', root='views')
+  
 
 # Define an handler for 404 errors.
 @bottle.error(404)

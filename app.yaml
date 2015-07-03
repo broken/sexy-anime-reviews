@@ -5,5 +5,10 @@ api_version: 1
 threadsafe: yes
 
 handlers:
+- url: /add
+  script: main.bottle
+  login: admin
+  secure: always
 - url: .*
   script: main.bottle
+  secure: optional

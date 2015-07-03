@@ -1,0 +1,85 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
+<link href="../iron-icon/iron-icon.html" rel="import">
+<link href="../iron-icons/av-icons.html" rel="import">
+<link href="../iron-icons/iron-icons.html" rel="import">
+<link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
+<link href="../paper-button/paper-button.html" rel="import">
+<link href="../paper-input/paper-input.html" rel="import">
+<link href="../paper-material/paper-material.html" rel="import">
+<link href="../paper-ripple/paper-ripple.html" rel="import">
+
+
+<dom-module id="sar-author-form">
+  <style is="custom-style">
+    .paper-header {
+      white-space: nowrap;
+      height: 168px;
+      @apply(--layout);
+    }
+    #header {
+      color: silver;
+      font-size: 54px;
+      font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
+      @apply(--layout-self-end);
+    }
+    #card {
+      padding: 20px 48px 40px;
+    }
+    .vertical {
+      @apply(--layout-vertical);
+    }
+  </style>
+  <template>
+    <div class="paper-header">
+      <div id="header">Sexy Anime Reviews</div>
+    </div>
+    <br>
+    <paper-material id="card">
+      <paper-input label="Title" value="{{title}}"></paper-input>
+      <paper-input label="Genres" value="{{genres}}"></paper-input>
+      <paper-radio-group class="vertical" selected="{{viewMethod}}">
+        <paper-radio-button name="dub">Dub</paper-radio-button>
+        <paper-radio-button name="sub">Sub</paper-radio-button>
+      </paper-radio-group>
+      <paper-input label="Rating" value="{{rating}}"></paper-input>
+      <paper-input label="Review" value="{{review}}"></paper-input>
+      <paper-button raised on-click="_onClick">Submit</paper-button>
+    </paper-material>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'sar-author-form',
+    properties: {
+      title: String,
+      rating: String,
+      ratingNum: Number,
+      genres: String,
+      viewMethod: String,
+      review: String
+    },
+    _onClick: function(event) {
+      var ref = new Firebase('https://sexy-anime-reviews.firebaseio.com');
+      ref.authWithOAuthPopup('google', function(error, authData) {
+        if (error) {
+          window.console.log('Login Failed!', error);
+        } else {
+          window.console.log('Authenticated successfully with payload:', authData);
+          var reviewsRef = ref.child('reviews');
+          var review = {};
+          review[this.title] = {
+              'title': this.title,
+              'rating': this.rating,
+              'genres': this.genres,
+              'viewMethod': this.viewMethod,
+              'review': this.review
+            };
+          reviewsRef.update(review);
+        }
+      }.bind(this));
+    }
+  });
+</script>
