@@ -72,15 +72,15 @@
   </style>
   <template>
     <div class="paper-header">
-      <div id="header">Sexy Anime Reviews</div>
-    </div>
-    <div class="content">
       <div id="close" on-click="_onClick">
         <paper-ripple center></paper-ripple>
         <paper-material elevation="0">
-          <iron-icon icon="clear"></iron-icon>
+          <iron-icon icon="back-arrow"></iron-icon>
         </paper-material>
       </div>
+      <div id="header">Sexy Anime Reviews</div>
+    </div>
+    <div class="content">
       <div id="title" class="article">[[review.title]]</div>
       <section>
         <paper-material id="cover" elevation="[[elevation]]" animated="">

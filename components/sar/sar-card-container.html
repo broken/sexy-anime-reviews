@@ -3,7 +3,11 @@
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../firebase-element/firebase-collection.html" rel="import">
 <link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
+<link href="../paper-radio-button/paper-radio-button.html" rel="import">
+<link href="../paper-radio-group/paper-radio-group.html" rel="import">
 <link href="../paper-scroll-header-panel/paper-scroll-header-panel.html" rel="import">
+<link href="../paper-slider/paper-slider.html" rel="import">
+<link href="../paper-toggle-button/paper-toggle-button.html" rel="import">
 
 <link href="../sar/sar-card.html" rel="import">
 
@@ -37,14 +41,62 @@
     }
     .content {
       padding: 0 10%;
-      margin-top: 48px;
+      @apply(--layout-vertical);
+    }
+    #filters {
+      margin: 30px 0;
+    }
+    .cards {
       @apply(--layout-horizontal);
       @apply(--layout-wrap);
+    }
+    .horizontal {
+      @apply(--layout-horizontal);
+    }
+    .vertical {
+      @apply(--layout-vertical);
+    }
+    .spacer {
+      @apply(--layout-flex);
+    }
+    paper-radio-group {
+      margin-top: -2px;
+    }
+    paper-radio-button {
+      padding: 0 10px 5px;
+    }
+    paper-radio-button::shadow #radioLabel {
+      margin-left: 3px;
+    }
+    paper-toggle-button {
+      padding: 2px 5px 9px 10px;
+    }
+    paper-toggle-button::shadow #ink {
+      top: -2px;
+      left: -2px;
+      height: 24px;
+      width: 24px;
+    }
+    paper-toggle-button {
+      --paper-toggle-button-checked-bar-color: var(--default-primary-color);
+      --paper-toggle-button-checked-button-color: var(--default-primary-color);
+      --paper-toggle-button-checked-ink-color: var(--default-primary-color);
+    }
+    paper-slider {
+      --paper-slider-active-color: var(--default-primary-color);
+      --paper-slider-knob-color: var(--default-primary-color);
+    }
+    #minRatingSlider {
+      margin-top: -7px;
+    }
+    #minRatingText {
+      text-align: right;
+      margin-right: 12px;
+      margin-top: -5px;
     }
   </style>
   <template>
     <firebase-collection
-        order-by-child="title"
         log="true"
         location="https://sexy-anime-reviews.firebaseio.com/reviews"
         data="{{reviews}}"></firebase-collection>
@@ -53,9 +105,44 @@
         <div id="header">Sexy Anime Reviews</div>
       </div>
       <div class="content">
-        <template is="dom-repeat" items="[[reviews]]">
-          <sar-card review="[[item]]" on-card-click="_onCardClick"></sar-card>
-        </template>
+        <div class="horizontal" id="filters">
+          <div class="horizontal">
+            <div>Order by</div>
+            <paper-radio-group class="vertical" selected="{{orderBy}}">
+              <paper-radio-button name="title">Title</paper-radio-button>
+              <paper-radio-button name="rating">Rating</paper-radio-button>
+            </paper-radio-group>
+          </div>
+          <div class="spacer"></div>
+          <div class="horizontal">
+            <div>Show</div>
+            <div class="vertical">
+              <div class="horizontal">
+                <paper-toggle-button checked="{{showDub}}"></paper-toggle-button>
+                <div>Dubs</div>
+              </div>
+              <div class="horizontal">
+                <paper-toggle-button checked="{{showSub}}"></paper-toggle-button>
+                <div>Subs</div>
+              </div>
+            </div>
+          </div>
+          <div class="spacer"></div>
+          <div class="vertical">
+            <div class="horizontal">
+              <div>Min rating</div>
+              <div class="vertical">
+                <paper-slider id="minRatingSlider" value="{{minRating}}" min="1" max="10" snaps on-value-change="_minRatingChanged"></paper-slider>
+                <div id="minRatingText">[[minRatingText]]</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cards">
+          <template is="dom-repeat" items="[[reviews]]" sort="[[sortFunction]]" filter="[[filterFunction]]">
+            <sar-card review="[[item]]" on-card-click="_onCardClick"></sar-card>
+          </template>
+        </div>
       </div>
     </paper-scroll-header-panel>
   </template>
@@ -69,8 +156,42 @@
     behaviors: [
       Polymer.NeonSharedElementAnimatableBehavior
     ],
+    listeners: {
+      'immediate-value-change': '_immediateMinRatingChanged'
+    },
     properties: {
       reviews: Object,
+      sortFunction: Function,
+      filterFunction: Function,
+      orderBy: {
+        type: String,
+        value: 'title',
+        observer: '_orderByChanged'
+      },
+      showDub: {
+        type: Boolean,
+        value: true,
+        observer: '_updateFilterFunction'
+      },
+      showSub: {
+        type: Boolean,
+        value: true,
+        observer: '_updateFilterFunction'
+      },
+      minRating: {
+        type: Number,
+        value: 0,
+        observer: '_updateFilterFunction'
+      },
+      minRatingText: {
+        type: String,
+        value: 'abysmal'
+      },
+      ratingValuesInverted: {
+        type: Array,
+        readOnly: true,
+        value: function() { return ['n/a', 'abysmal', 'terrible', 'bad', 'poor', 'meh', 'fair', 'good', 'great', 'superb', 'epic']; }
+      },
       animationConfig: {
         value: function() {
           // var cards = Polymer.dom(this.root).querySelectorAll('.card');
@@ -94,6 +215,9 @@
               name: 'hero-animation',
               id: 'hero-header',
               toPage: this
+            }, {
+              name: 'fade-in-animation',
+              node: this.$.filters
             }],
             'exit': [{
               name: 'hero-animation',
@@ -115,6 +239,9 @@
               name: 'hero-animation',
               id: 'hero-header',
               fromPage: this
+            }, {
+              name: 'fade-out-animation',
+              node: this.$.filters
             }]
           };
         }
@@ -150,6 +277,53 @@
     _isNodeInViewport: function(node) {
       return node.getBoundingClientRect().bottom > 0 &&
           node.getBoundingClientRect().top < window.document.documentElement.clientHeight;
+    },
+    _orderByChanged: function(newOrderBy) {
+      this.sortFunction = this._sortFunctions[newOrderBy];
+    },
+    _sortFunctions: {
+      'title': function(a, b) {
+        return a.title.localeCompare(b.title);
+      },
+      'rating': function() {
+        var ratingValues = this._ratingValues;
+        return function(a, b) {
+            return ratingValues[b.rating] - ratingValues[a.rating];
+        };
+      }
+    },
+    _updateFilterFunction: function() {
+      var showDub = this.showDub, showSub = this.showSub;
+      var ratingValues = this._ratingValues;
+      var minRating = this.minRating;
+      if (showDub === undefined || showSub === undefined || ratingValues === undefined || minRating === undefined) {
+        return;
+      }
+      this.filterFunction = function(x) {
+        var filtered =
+            (!showDub && x.viewMethod === 'dub') ||
+            (!showSub && x.viewMethod === 'sub') ||
+            (minRating > ratingValues[x.rating]);
+        return !filtered;
+      };
+    },
+    _immediateMinRatingChanged: function() {
+      this.minRatingText = this.ratingValuesInverted[this.$.minRatingSlider.immediateValue];
+    },
+    _minRatingChanged: function() {
+      this.minRatingText = this.ratingValuesInverted[this.minRating];
+    },
+    _ratingValues: {
+        'epic': 10,
+        'superb': 9,
+        'great': 8,
+        'good': 7,
+        'fair': 6,
+        'meh': 5,
+        'poor': 4,
+        'bad': 3,
+        'terrible': 2,
+        'abysmal': 1
     }
   });
 </script>
