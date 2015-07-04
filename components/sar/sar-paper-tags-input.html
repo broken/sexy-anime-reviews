@@ -1,0 +1,33 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
+<link href="../paper-slider/paper-slider.html" rel="import">
+<link href="../paper-slider/paper-slider.html" rel="import">
+
+
+<dom-module id="sar-paper-tags-input">
+  <style is="custom-style">
+    :host {
+    }
+  </style>
+  <template>
+    <paper-input label="[[label]]"></paper-input>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'sar-paper-tags-input',
+    properties: {
+      label: String,
+      value: {
+        type: Array,
+        notify: true,
+        observer: '_valuesChanged'
+      },
+      options: {
+        type: Array
+      }
+    }
+  });
+</script>

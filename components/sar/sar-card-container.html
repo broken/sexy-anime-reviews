@@ -1,7 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../firebase-element/firebase-collection.html" rel="import">
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
 <link href="../paper-radio-button/paper-radio-button.html" rel="import">
 <link href="../paper-radio-group/paper-radio-group.html" rel="import">
@@ -160,7 +160,7 @@
       'immediate-value-change': '_immediateMinRatingChanged'
     },
     properties: {
-      reviews: Object,
+      reviews: Array,
       sortFunction: Function,
       filterFunction: Function,
       orderBy: {

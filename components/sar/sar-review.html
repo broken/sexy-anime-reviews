@@ -179,8 +179,8 @@
       }
     },
     _getGenreArray: function(review) {
-      var genres = review.genres || '';
-      return genres.split(',');
+      var genres = review.genres || {};
+      return Object.keys(genres);
     }
   });
 </script>
