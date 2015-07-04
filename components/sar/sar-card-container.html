@@ -45,6 +45,7 @@
     }
     #filters {
       margin: 30px 0;
+      @apply(--layout-wrap);
     }
     .cards {
       @apply(--layout-horizontal);
@@ -57,7 +58,7 @@
       @apply(--layout-vertical);
     }
     .spacer {
-      @apply(--layout-flex);
+      width: 28px;
     }
     paper-radio-group {
       margin-top: -2px;
@@ -87,6 +88,9 @@
       --paper-slider-active-color: var(--default-primary-color);
       --paper-slider-knob-color: var(--default-primary-color);
     }
+    .sliderContainer, .sliderContainer paper-slider {
+      width: 200px;
+    }
     #minRatingSlider {
       margin-top: -7px;
     }
@@ -94,6 +98,22 @@
       text-align: right;
       margin-right: 12px;
       margin-top: -5px;
+    }
+    #titleSearch {
+      margin-top: -28px;
+      --paper-input-container-input: {
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        color: inherit;
+      };
+      --paper-input-container-label: {
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+      };
     }
   </style>
   <template>
@@ -132,12 +152,14 @@
           <div class="vertical">
             <div class="horizontal">
               <div>Min rating</div>
-              <div class="vertical">
+              <div class="vertical sliderContainer">
                 <paper-slider id="minRatingSlider" value="{{minRating}}" min="1" max="10" snaps on-value-change="_minRatingChanged"></paper-slider>
                 <div id="minRatingText">[[minRatingText]]</div>
               </div>
             </div>
           </div>
+          <div class="spacer"></div>
+          <paper-input id="titleSearch" label="Search by title" value="{{searchString}}"></paper-input>
         </div>
         <div class="cards">
           <template is="dom-repeat" items="[[reviews]]" sort="[[sortFunction]]" filter="[[filterFunction]]">
@@ -177,6 +199,10 @@
       showSub: {
         type: Boolean,
         value: true,
+        observer: '_updateFilterFunction'
+      },
+      searchString: {
+        type: String,
         observer: '_updateFilterFunction'
       },
       minRating: {
@@ -297,14 +323,16 @@
       var showDub = this.showDub, showSub = this.showSub;
       var ratingValues = this._ratingValues;
       var minRating = this.minRating;
-      if (showDub === undefined || showSub === undefined || ratingValues === undefined || minRating === undefined) {
+      var searchString = this.searchString;
+      if (showDub === undefined || showSub === undefined || ratingValues === undefined || minRating === undefined || searchString === undefined) {
         return;
       }
       this.filterFunction = function(x) {
         var filtered =
             (!showDub && x.viewMethod === 'dub') ||
             (!showSub && x.viewMethod === 'sub') ||
-            (minRating > ratingValues[x.rating]);
+            (minRating > ratingValues[x.rating]) ||
+            (!!searchString && x.title.toLowerCase().indexOf(searchString.toLowerCase()) < 0);
         return !filtered;
       };
     },
