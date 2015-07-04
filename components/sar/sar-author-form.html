@@ -7,28 +7,39 @@
 <link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
 <link href="../paper-button/paper-button.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
+<link href="../paper-input/paper-textarea.html" rel="import">
 <link href="../paper-material/paper-material.html" rel="import">
+<link href="../paper-radio-button/paper-radio-button.html" rel="import">
+<link href="../paper-radio-group/paper-radio-group.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
+
+<link href="../sar/sar-rating-slider.html" rel="import">
 
 
 <dom-module id="sar-author-form">
   <style is="custom-style">
     .paper-header {
       white-space: nowrap;
-      height: 168px;
       @apply(--layout);
     }
     #header {
       color: silver;
-      font-size: 54px;
+      font-size: 32px;
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
-      @apply(--layout-self-end);
     }
     #card {
       padding: 20px 48px 40px;
+      margin-bottom: 48px;
+    }
+    .horizontal {
+      @apply(--layout-horizontal);
     }
     .vertical {
       @apply(--layout-vertical);
+    }
+    paper-button {
+      --paper-button-flat-focus-color: var(--accent-color);
+      @apply(--layout-end);
     }
   </style>
   <template>
@@ -36,15 +47,17 @@
       <div id="header">Sexy Anime Reviews</div>
     </div>
     <br>
-    <paper-material id="card">
+    <paper-material id="card" elevation="2">
       <paper-input label="Title" value="{{title}}"></paper-input>
+      <paper-input label="Cover URL" value="{{cover}}"></paper-input>
       <paper-input label="Genres" value="{{genres}}"></paper-input>
-      <paper-radio-group class="vertical" selected="{{viewMethod}}">
+      <paper-radio-group class="horizontal" selected="{{viewMethod}}">
         <paper-radio-button name="dub">Dub</paper-radio-button>
         <paper-radio-button name="sub">Sub</paper-radio-button>
       </paper-radio-group>
-      <paper-input label="Rating" value="{{rating}}"></paper-input>
-      <paper-input label="Review" value="{{review}}"></paper-input>
+      <sar-rating-slider rating="{{rating}}"></sar-rating-slider>
+      <paper-textarea label="Review" value="{{review}}"></paper-textarea>
+      <br>
       <paper-button raised on-click="_onClick">Submit</paper-button>
     </paper-material>
   </template>
@@ -56,6 +69,7 @@
     properties: {
       title: String,
       rating: String,
+      cover: String,
       ratingNum: Number,
       genres: String,
       viewMethod: String,
@@ -73,6 +87,7 @@
           review[this.title] = {
               'title': this.title,
               'rating': this.rating,
+              'cover': this.cover,
               'genres': this.genres,
               'viewMethod': this.viewMethod,
               'review': this.review

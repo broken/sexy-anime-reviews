@@ -1,0 +1,94 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
+<link href="../paper-slider/paper-slider.html" rel="import">
+
+
+<dom-module id="sar-rating-slider">
+  <style is="custom-style">
+    :host {
+      @apply(--layout);
+    }
+    #slider {
+      margin-top: -7px;
+    }
+    #ratingText {
+      text-align: right;
+      margin-right: 12px;
+      margin-top: -5px;
+    }
+    paper-slider {
+      --paper-slider-active-color: var(--default-primary-color);
+      --paper-slider-knob-color: var(--default-primary-color);
+    }
+    .horizontal {
+      @apply(--layout-horizontal);
+    }
+    .vertical {
+      @apply(--layout-vertical);
+    }
+  </style>
+  <template>
+    <div class="horizontal">
+      <div>[[label]]</div>
+      <div class="vertical">
+        <paper-slider id="slider" min="1" max="10" value="{{ratingNum}}" snaps
+            on-value-change="_ratingNumChanged"
+            on-immediate-value-change="_immediateRatingChanged"></paper-slider>
+        <div id="ratingText">[[ratingText]]</div>
+      </div>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'sar-rating-slider',
+    properties: {
+      label: {
+        typs: String,
+        value: 'Rating'
+      },
+      rating: {
+        type: String,
+        notify: true,
+        value: 'abysmal',
+        observer: '_ratingChanged'
+      },
+      ratingValuesInverted: {
+        type: Array,
+        readOnly: true,
+        value: function() { return ['n/a', 'abysmal', 'terrible', 'bad', 'poor', 'meh', 'fair', 'good', 'great', 'superb', 'epic']; }
+      }
+    },
+    _immediateRatingChanged: function() {
+      window.console.log('_immediateRatingChanged');
+      this.ratingText = this.ratingValuesInverted[this.$.slider.immediateValue];
+    },
+    _ratingNumChanged: function() {
+      window.console.log('_ratingNumChanged');
+      if (!this.ratingNum || !this.ratingValuesInverted) {
+        return;
+      }
+      this.ratingText = this.ratingValuesInverted[this.ratingNum];
+      this.rating = this.ratingText;
+    },
+    _ratingChanged: function() {
+      window.console.log('_ratingChanged');
+      this.ratingText = this.rating;
+      this.ratingNum = this._ratingValues[this.rating];
+    },
+    _ratingValues: {
+        'epic': 10,
+        'superb': 9,
+        'great': 8,
+        'good': 7,
+        'fair': 6,
+        'meh': 5,
+        'poor': 4,
+        'bad': 3,
+        'terrible': 2,
+        'abysmal': 1
+    }
+  });
+</script>
