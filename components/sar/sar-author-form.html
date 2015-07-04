@@ -14,6 +14,7 @@
 <link href="../paper-radio-group/paper-radio-group.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 <link href="../paper-select/paper-select.html" rel="import">
+<link href="../paper-toast/paper-toast.html" rel="import">
 
 <link href="../sar/sar-rating-slider.html" rel="import">
 
@@ -71,6 +72,7 @@
         <paper-button raised on-click="_onClick">Submit</paper-button>
       </div>
     </paper-material>
+    <paper-toast id="toast"></paper-toast>
   </template>
 </dom-module>
 
@@ -96,8 +98,10 @@
       ref.authWithOAuthPopup('google', function(error, authData) {
         if (error) {
           window.console.log('Login Failed!', error);
+          this.$.toast.text = 'Login failed.';
+          this.$.toast.show();
         } else {
-          window.console.log('Authenticated successfully with payload:', authData);
+          window.console.log('Authenticated successfully with payload: ', authData);
           var reviewsRef = ref.child('reviews');
           var review = {};
           review[this.title] = {
@@ -108,7 +112,21 @@
               'viewMethod': this.viewMethod,
               'review': this.review
             };
-          reviewsRef.update(review);
+          reviewsRef.update(review, function(err) {
+              if (err) {
+                window.console.log('Data could not be saved. ' + err);
+                this.$.toast.text = 'Review could not be saved.';
+                this.$.toast.show();
+              } else {
+                window.console.log('Data saved successfully.');
+                this.$.toast.text = 'Review saved successfully.';
+                this.$.toast.show();
+                this.title = '';
+                this.cover = '';
+                this.genres = [];
+                this.review = '';
+              }
+            }.bind(this));
         }
       }.bind(this));
     },
