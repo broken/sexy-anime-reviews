@@ -14,8 +14,9 @@
   <style is="custom-style">
     :host {
       box-sizing: content-box;
-      max-width: 720px;
-      min-width: 540px;
+      @apply(--layout);
+      @apply(--layout-fit);
+      @apply(--layout-vertical);
     }
     #close {
       position: absolute;
@@ -56,9 +57,9 @@
       height: 16px;
     }
     .paper-header {
-      padding: 0 10%;
+      padding: 0 6%;
       white-space: nowrap;
-      @apply(--layout);
+      @apply(--layout-horizontal);
     }
     #header {
       color: silver;
@@ -66,8 +67,12 @@
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
     }
     .content {
-      padding: 0 10%;
+      padding: 0 6%;
       margin-top: 48px;
+      margin-right: auto;
+      margin-left: auto;
+      max-width: 720px;
+      min-width: 40px;
     }
     .pre {
       white-space: pre-wrap;
