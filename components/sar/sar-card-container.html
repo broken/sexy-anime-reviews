@@ -289,7 +289,7 @@
         if (node !== target && this._isNodeInViewport(node)) {
           nodesToExit.push(node);
           // distance of node's top to viewport bottom edge
-          var d = viewportHeight - this.getBoundingClientRect().top;
+          var d = viewportHeight - node.getBoundingClientRect().top;
           farthestDistance = d > farthestDistance ? d : farthestDistance;
         }
       }
