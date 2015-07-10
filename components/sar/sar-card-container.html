@@ -119,7 +119,6 @@
   </style>
   <template>
     <firebase-collection
-        log="true"
         location="https://sexy-anime-reviews.firebaseio.com/reviews"
         data="{{reviews}}"></firebase-collection>
     <paper-scroll-header-panel id="paper-scroll-header-panel" noReveal no-reveal>
@@ -175,6 +174,19 @@
 <script>
 </script>
 <script>
+  var RATING_VALUES = {
+    'epic': 10,
+    'superb': 9,
+    'great': 8,
+    'good': 7,
+    'fair': 6,
+    'meh': 5,
+    'poor': 4,
+    'bad': 3,
+    'terrible': 2,
+    'abysmal': 1
+  };
+
   Polymer({
     is: 'sar-card-container',
     behaviors: [
@@ -313,26 +325,22 @@
       'title': function(a, b) {
         return a.title.localeCompare(b.title);
       },
-      'rating': function() {
-        var ratingValues = this._ratingValues;
-        return function(a, b) {
-            return ratingValues[b.rating] - ratingValues[a.rating];
-        };
+      'rating': function(a, b) {
+        return RATING_VALUES[b.rating] - RATING_VALUES[a.rating];
       }
     },
     _updateFilterFunction: function() {
       var showDub = this.showDub, showSub = this.showSub;
-      var ratingValues = this._ratingValues;
       var minRating = this.minRating;
       var searchString = this.searchString;
-      if (showDub === undefined || showSub === undefined || ratingValues === undefined || minRating === undefined || searchString === undefined) {
+      if (showDub === undefined || showSub === undefined || minRating === undefined || searchString === undefined) {
         return;
       }
       this.filterFunction = function(x) {
         var filtered =
             (!showDub && x.viewMethod === 'dub') ||
             (!showSub && x.viewMethod === 'sub') ||
-            (minRating > ratingValues[x.rating]) ||
+            (minRating > RATING_VALUES[x.rating]) ||
             (!!searchString && x.title.toLowerCase().indexOf(searchString.toLowerCase()) < 0);
         return !filtered;
       };
@@ -342,18 +350,6 @@
     },
     _minRatingChanged: function() {
       this.minRatingText = this.ratingValuesInverted[this.minRating];
-    },
-    _ratingValues: {
-        'epic': 10,
-        'superb': 9,
-        'great': 8,
-        'good': 7,
-        'fair': 6,
-        'meh': 5,
-        'poor': 4,
-        'bad': 3,
-        'terrible': 2,
-        'abysmal': 1
     }
   });
 </script>
