@@ -19,9 +19,7 @@
       @apply(--layout-vertical);
     }
     #close {
-      position: absolute;
-      right: -10px;
-      top: 10px;
+      position: relative;
       color: var(--secondary-text-color);
       border-radius: 50%;
       width: 44px;
@@ -83,7 +81,7 @@
       <div id="close" on-click="_onClick">
         <paper-ripple center></paper-ripple>
         <paper-material elevation="0">
-          <iron-icon icon="back-arrow"></iron-icon>
+          <iron-icon icon="arrow-back"></iron-icon>
         </paper-material>
       </div>
       <div id="header">Sexy Anime Reviews</div>
