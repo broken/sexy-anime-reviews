@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-a11y-keys/iron-a11y-keys.html" rel="import">
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-icon/iron-icon.html" rel="import">
 <link href="../iron-icons/av-icons.html" rel="import">
@@ -77,6 +78,7 @@
     }
   </style>
   <template>
+    <iron-a11y-keys keys="esc" on-keys-pressed="_onClick" target="[[keyEventTarget]]"></iron-a11y-keys>
     <div class="paper-header">
       <div id="close" on-click="_onClick">
         <paper-ripple center></paper-ripple>
@@ -117,6 +119,10 @@
       elevation: {
         type: Number,
         value: 4
+      },
+      keyEventTarget: {
+        type: Object,
+        value: function() { return document.body; }
       },
       sharedElements: {
         value: function() {
