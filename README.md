@@ -1,5 +1,6 @@
 # sexy-anime-reviews
-Simple app engine app that utilizes polymer to display my anime reviews developed completely online.
+Simple app engine app that utilizes polymer & firebase to display my anime reviews.
+Site: http://animereviews.link
 
 Few things I wanted to play with:
 * complete project developement on a Chromebook (start to finish)
