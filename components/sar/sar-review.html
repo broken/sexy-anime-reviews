@@ -90,17 +90,17 @@
     </div>
     <div class="content">
       <div id="title" class="article">[[review.title]]</div>
+      <div id="meta" class="article">
+        <iron-icon id="view_method" icon="[[_viewMethodIcon(review)]]"></iron-icon>
+        <div class="meta">[[review.rating]]</div>
+        <template is="dom-repeat" items="[[_getGenreArray(review)]]">
+          <div class="meta">[[item]]</div>
+        </template>
+      </div>
       <section>
         <paper-material id="cover" elevation="[[elevation]]" animated="">
           <img src="[[review.cover]]" on-click="_onClick">
         </paper-material>
-        <div id="meta" class="article">
-          <iron-icon id="view_method" icon="[[_viewMethodIcon(review)]]"></iron-icon>
-          <div class="meta">[[review.rating]]</div>
-          <template is="dom-repeat" items="[[_getGenreArray(review)]]">
-            <div class="meta">[[item]]</div>
-          </template>
-        </div>
         <br>
         <div class="article pre">[[review.review]]</div>
       </section>
