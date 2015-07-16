@@ -144,7 +144,6 @@
             }, {
               name: 'cascaded-animation',
               animation: 'transform-animation',
-              transformFrom: 'translateX(-200%)',
               nodes: articleArray,
               timing: {
                 delay: 100
@@ -165,7 +164,6 @@
             }, {
               name: 'cascaded-animation',
               animation: 'transform-animation',
-              transformTo: 'translateX(-200%)',
               nodes: articleArray
             }, {
               name: 'fade-out-animation',
@@ -180,7 +178,26 @@
         }
       }
     },
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        var viewportWidth = window.document.documentElement.clientWidth;
+        var maxContentWidth = 720;
+        var minContentWidth = 40;
+        var padding = 0.06;
+        var contentWidth = viewportWidth * (1 - padding * 2);
+        if (contentWidth < minContentWidth) {
+          contentWidth = minContentWidth;
+        } else if (contentWidth > maxContentWidth) {
+          contentWidth = maxContentWidth;
+        }
+        var dist = viewportWidth / 2 + maxContentWidth / 2;
+        this.animationConfig['entry'][1].transformFrom = 'translateX(-' + dist + 'px)';
+        this.animationConfig['exit'][1].transformTo = 'translateX(-' + dist + 'px)';
+      }.bind(this));
+    },
     _onClick: function(event) {
+      // we keep this computation on click just in case they resize the window
       var rect = this.$.title.getBoundingClientRect();
       this.animationConfig['entry'][1].transformFrom = 'translateX(-' + rect.right + 'px)';
       this.animationConfig['exit'][1].transformTo = 'translateX(-' + rect.right + 'px)';
