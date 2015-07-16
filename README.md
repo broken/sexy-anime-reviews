@@ -10,9 +10,9 @@ Few things I wanted to play with:
 * bonus: Google authentication in GAE & Firebase
 
 
-# My notes so I don't forget...
-# Can push to appengine via git or script
-git push appengine
-appcfg.py update .
-# not sure what happened with upgrade of tools, but now have to use
-../google-cloud-sdk/.install/.backup/bin/appcfg.py update .
+My notes so I don't forget...
+Can push to appengine via git or script
+ git push appengine
+ appcfg.py update .
+not sure what happened with upgrade of tools, but now have to use
+ ../google-cloud-sdk/.install/.backup/bin/appcfg.py update .
