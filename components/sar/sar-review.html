@@ -143,7 +143,8 @@
               toPage: this
             }, {
               name: 'cascaded-animation',
-              animation: 'slide-from-left-animation',
+              animation: 'transform-animation',
+              transformFrom: 'translateX(-200%)',
               nodes: articleArray,
               timing: {
                 delay: 100
@@ -163,7 +164,8 @@
               fromPage: this
             }, {
               name: 'cascaded-animation',
-              animation: 'slide-left-animation',
+              animation: 'transform-animation',
+              transformTo: 'translateX(-200%)',
               nodes: articleArray
             }, {
               name: 'fade-out-animation',
@@ -179,6 +181,9 @@
       }
     },
     _onClick: function(event) {
+      var rect = this.$.title.getBoundingClientRect();
+      this.animationConfig['entry'][1].transformFrom = 'translateX(-' + rect.right + 'px)';
+      this.animationConfig['exit'][1].transformTo = 'translateX(-' + rect.right + 'px)';
       this.fire('exit-click');
     },
     _viewMethodIcon: function(review) {
