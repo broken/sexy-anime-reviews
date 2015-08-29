@@ -8,7 +8,8 @@ bottle = Bottle()
 
 
 @bottle.route('/')
-def main():
+@bottle.route('/a/<name>')
+def main(name=''):
   return static_file('main.html', root='views')
 
 @bottle.route('/components/sar/<filepath:path>')

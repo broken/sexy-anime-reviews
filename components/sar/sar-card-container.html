@@ -204,10 +204,6 @@
         value: 'title',
         observer: '_orderByChanged'
       },
-      redirected: {
-        type: Boolean,
-        value: false,
-      },
       showDub: {
         type: Boolean,
         value: true,
@@ -292,20 +288,9 @@
       }
     },
     _domChanged: function() {
-      this.async(function() {
-        if (window.location.hash && !this.redirected) {
-          var hash = window.location.hash;
-          var card = Polymer.dom(this.root).querySelector(hash);
-          if (!!card) {
-            // we only redirect once. the dom can change when editing search queries
-            // TODO use history
-            this.redirected = true;
-            // the timeout fixes a bug in linux chrome that tries to animate the
-            // an object before it's available
-            this.async(function() { card.$.cover.click() }, 300);
-          }
-        }
-      });
+      if (window.location.pathname.length > 3) {
+        this.async(this.selectCard);
+      }
     },
     _onCardClick: function(event) {
       var target = Polymer.dom(event).localTarget;
@@ -373,6 +358,16 @@
     },
     _cleanTitle: function(title) {
       return title.replace(/[ |\-|']/g, '');
+    },
+    selectCard: function() {
+      var title = window.location.pathname.substr(3);
+      var card = Polymer.dom(this.root).querySelector('#' + title);
+      if (!!card) {
+        // the timeout fixes a bug in linux chrome that tries to animate the
+        // an object before it's available. However, it's somewhat nice
+        // having the page load and then animate in anyway
+        this.async(function() { card.$.cover.click() }, 300);
+      }
     },
   });
 </script>
