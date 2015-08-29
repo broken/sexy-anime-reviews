@@ -10,6 +10,7 @@
 <link href="../paper-toggle-button/paper-toggle-button.html" rel="import">
 
 <link href="../sar/sar-card.html" rel="import">
+<link href="../sar/util.html" rel="import">
 
 
 <dom-module id="sar-card-container">
@@ -357,7 +358,7 @@
       this.minRatingText = this.ratingValuesInverted[this.minRating];
     },
     _cleanTitle: function(title) {
-      return title.replace(/[ |\-|']/g, '');
+      return cleanTitle(title);
     },
     selectCard: function() {
       var title = window.location.pathname.substr(3);
