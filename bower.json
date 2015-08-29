@@ -15,13 +15,13 @@
     "tests"
   ],
   "dependencies": {
-    "polymer": "~1.0.5",
-    "iron-elements": "PolymerElements/iron-elements#~1.0.1",
-    "paper-elements": "PolymerElements/paper-elements#~1.0.1",
+    "polymer": "~1.1.1",
+    "iron-elements": "~1.0.3",
+    "paper-elements": "PolymerElements/paper-elements#~1.0.4",
     "gold-elements": "PolymerElements/gold-elements#~1.0.1",
     "neon-elements": "PolymerElements/neon-elements#~1.0.0",
-    "firebase-element": "GoogleWebComponents/firebase-element#~1.0.1",
-    "firebase": "~2.2.7",
+    "firebase-element": "GoogleWebComponents/firebase-element#~1.0.3",
+    "firebase": "~2.2.9",
     "paper-select": "~0.2.0"
   }
 }
