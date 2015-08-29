@@ -162,8 +162,8 @@
           <paper-input id="titleSearch" label="Search by title" value="{{searchString}}"></paper-input>
         </div>
         <div class="cards">
-          <template is="dom-repeat" items="[[reviews]]" sort="[[sortFunction]]" filter="[[filterFunction]]">
-            <sar-card review="[[item]]" on-card-click="_onCardClick"></sar-card>
+          <template is="dom-repeat" items="[[reviews]]" sort="[[sortFunction]]" filter="[[filterFunction]]" on-dom-change="_domChanged">
+            <sar-card review="[[item]]" on-card-click="_onCardClick" id="[[_cleanTitle(item.title)]]"></sar-card>
           </template>
         </div>
       </div>
@@ -203,6 +203,10 @@
         type: String,
         value: 'title',
         observer: '_orderByChanged'
+      },
+      redirected: {
+        type: Boolean,
+        value: false,
       },
       showDub: {
         type: Boolean,
@@ -287,6 +291,22 @@
         }
       }
     },
+    _domChanged: function() {
+      this.async(function() {
+        if (window.location.hash && !this.redirected) {
+          var hash = window.location.hash;
+          var card = Polymer.dom(this.root).querySelector(hash);
+          if (!!card) {
+            // we only redirect once. the dom can change when editing search queries
+            // TODO use history
+            this.redirected = true;
+            // the timeout fixes a bug in linux chrome that tries to animate the
+            // an object before it's available
+            this.async(function() { card.$.cover.click() }, 300);
+          }
+        }
+      });
+    },
     _onCardClick: function(event) {
       var target = Polymer.dom(event).localTarget;
       this.sharedElements = {
@@ -350,6 +370,9 @@
     },
     _minRatingChanged: function() {
       this.minRatingText = this.ratingValuesInverted[this.minRating];
-    }
+    },
+    _cleanTitle: function(title) {
+      return title.replace(/[ |\-|']/g, '');
+    },
   });
 </script>
