@@ -1,6 +1,10 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../firebase-element/firebase-document.html" rel="import">
+<link rel="import" href="../polymerfire/firebase-app.html">
+<link rel="import" href="../polymerfire/firebase-auth.html">
+<link rel="import" href="../polymerfire/firebase-database-script.html">
+<link rel="import" href="../polymerfire/firebase-storage-script.html">
+<link rel="import" href="../file-input/file-input.html">
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-icon/iron-icon.html" rel="import">
 <link href="../iron-icons/av-icons.html" rel="import">
@@ -52,17 +56,22 @@
     }
   </style>
   <template>
-    <firebase-document
-        log="true"
-        location="https://sexy-anime-reviews.firebaseio.com/reviews"
-        data="{{reviews}}"></firebase-document>
+    <firebase-app app="{{firebase}}"
+                  auth-domain="sexy-anime-reviews.firebaseapp.com"
+                  database-url="https://sexy-anime-reviews.firebaseio.com"
+                  api-key="AIzaSyAocDkU-CPiuuPMv-qlBlkrz8LISeT64Iw"
+                  storage-bucket="firebase-sexy-anime-reviews.appspot.com"
+                  messaging-sender-id="927545895739"></firebase-app>
+    <firebase-auth id="auth" provider="google"></firebase-auth>
     <div class="paper-header">
       <div id="header">Sexy Anime Reviews</div>
     </div>
     <br>
     <paper-material id="card" elevation="2">
       <paper-input label="Title" value="{{title}}"></paper-input>
-      <paper-input label="Cover URL" value="{{cover}}"></paper-input>
+      <paper-button raised on-click="_uploadCover">
+        <file-input accept="image/*" invalidText="Invalid Image" on-change="_uploadCover">Upload Cover Image</file-input>
+      </paper-button>
       <paper-select label="Genres" bind-value="{{genres}}" on-input-changed="_genreInputChanged" multiple nonmatching unique></paper-select>
       <paper-radio-group class="horizontal" selected="{{viewMethod}}">
         <paper-radio-button name="dub">Dub</paper-radio-button>
@@ -85,7 +94,7 @@
     properties: {
       title: String,
       rating: String,
-      cover: String,
+      cover: Object,
       ratingNum: Number,
       genres: Array,
       viewMethod: String,
@@ -96,41 +105,58 @@
       },
       tags: Array
     },
-    _onClick: function(event) {
-      var ref = new Firebase('https://sexy-anime-reviews.firebaseio.com');
-      ref.authWithOAuthPopup('google', function(error, authData) {
-        if (error) {
-          window.console.log('Login Failed!', error);
-          this.$.toast.text = 'Login failed.';
-          this.$.toast.show();
-        } else {
-          window.console.log('Authenticated successfully with payload: ', authData);
-          var reviewsRef = ref.child('reviews');
-          var review = {};
-          review[this.title] = {
-              'title': this.title,
-              'rating': this.rating,
-              'cover': this.cover,
-              'genres': this.genres.reduce(function(obj, val) { obj[val] = val; return obj; }, {}),
-              'viewMethod': this.viewMethod,
-              'review': this.review
-            };
-          reviewsRef.update(review, function(err) {
-              if (err) {
-                window.console.log('Data could not be saved. ' + err);
-                this.$.toast.text = 'Review could not be saved.';
-                this.$.toast.show();
-              } else {
-                window.console.log('Data saved successfully.');
+    _saveReview: function(authInfo) {
+      let token = authInfo.credential.accessToken;
+      let user = authInfo.user;
+      if (!this.title) return;
+      let key = this.title;
+      let review = {
+        'title': this.title,
+        'rating': this.rating,
+        'genres': this.genres.reduce(function(obj, val) { obj[val] = val; return obj; }, {}),
+        'viewMethod': this.viewMethod,
+        'review': this.review
+      };
+      // upload cover image first
+      let uploadTask = this.firebase.storage().ref('covers').child(key).put(this.cover);
+      uploadTask.on('state_changed',
+        function progress(snapshot) {
+          var percentage = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+          console.info(percentage + '%');
+          // TODO uploader.value = percentage;
+        },
+        function error(err) {
+          console.warn('Unable to upload cover image file.');
+          console.error(err);
+        },
+        function complete() {
+          console.info('Cover image upload completed.');
+          review.cover = uploadTask.snapshot.downloadURL;
+          this.firebase.database().ref('reviews').child(this.title).set(review)
+              .then(function() {
+                console.log('Synchronization succeeded');
                 this.$.toast.text = 'Review saved successfully.';
                 this.$.toast.show();
-                this.title = '';
-                this.cover = '';
-                this.genres = [];
-                this.review = '';
-              }
-            }.bind(this));
-        }
+              }.bind(this))
+              .catch(function(error) {
+                console.warn('Synchronization failed');
+                this.$.toast.text = 'Failed to save review.';
+                this.$.toast.show();
+                console.error(error);
+              }.bind(this));
+          this.title = '';
+          this.genres = [];
+          this.review = '';
+          this.cover = null;
+        }.bind(this)
+      );
+    },
+    _onClick: function(event) {
+      this.$.auth.signInWithPopup('google').then(this._saveReview.bind(this)).catch(function(err) {
+        console.warn('Authentication failed.');
+        console.warn(err);
+        this.$.toast.text = 'Review could not be saved.';
+        this.$.toast.show();
       }.bind(this));
     },
     _reviewsChanged: function(newValue, oldValue) {
@@ -155,6 +181,14 @@
           });
       else
         event.target.options = [];
-    }
+    },
+    _uploadCover: function(e) {
+      var valid = e.detail.valid,
+          invalid = e.detail.invalid;
+      if (valid.length) {
+        this.cover = valid[0];
+        // display cover
+      }
+    },
   });
 </script>
