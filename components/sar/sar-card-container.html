@@ -1,6 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../firebase-element/firebase-collection.html" rel="import">
+<link href="../polymerfire/firebase-app.html" rel="import">
+<link href="../polymerfire/firebase-query.html" rel="import">
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
 <link href="../paper-radio-button/paper-radio-button.html" rel="import">
@@ -119,9 +120,15 @@
     }
   </style>
   <template>
-    <firebase-collection
-        location="https://sexy-anime-reviews.firebaseio.com/reviews"
-        data="{{reviews}}"></firebase-collection>
+    <firebase-app app="{{firebase}}"
+                  auth-domain="sexy-anime-reviews.firebaseapp.com"
+                  database-url="https://sexy-anime-reviews.firebaseio.com"
+                  api-key="AIzaSyAocDkU-CPiuuPMv-qlBlkrz8LISeT64Iw"
+                  storage-bucket="firebase-sexy-anime-reviews.appspot.com"
+                  messaging-sender-id="927545895739"></firebase-app>
+    <firebase-query
+        path="/reviews"
+        data="{{reviews}}"></firebase-query>
     <paper-scroll-header-panel id="paper-scroll-header-panel" noReveal no-reveal>
       <div class="paper-header">
         <div id="header">Spoiler Free Anime Reviews</div>

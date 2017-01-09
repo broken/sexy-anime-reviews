@@ -12,9 +12,9 @@ Few things I wanted to play with:
 
 
 My notes so I don't forget...
-Can push to appengine via git or script
- git push appengine
- appcfg.py update .
-not sure what happened with upgrade of tools, but now have to use
- ../google-cloud-sdk/.install/.backup/bin/appcfg.py update .
- 
+can push to appengine via script:
+  ../google-cloud-sdk/platform/google_appengine/appcfg.py --noauth_local_webserver update .
+Used to be able to push with git, but no longer tracking bower_components directory.
+  git push appengine
+If creds expire:
+  gcloud auth login
