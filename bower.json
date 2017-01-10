@@ -21,6 +21,7 @@
     "neon-elements": "PolymerElements/neon-elements#~1.0.0",
     "paper-select": "~0.2.6",
     "polymerfire": "^0.10.3",
-    "file-input": "rnicholus/file-input#^2.0.0"
+    "file-input": "rnicholus/file-input#^2.0.0",
+    "app-elements": "PolymerElements/app-elements#^0.10.1"
   }
 }

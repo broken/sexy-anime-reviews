@@ -23,7 +23,8 @@ def components(filepath):
   return static_file(filepath, root='bower_components')
 
 @bottle.route('/add')
-def add():
+@bottle.route('/edit/<name>')
+def add(name=''):
   return static_file('add.html', root='views')
 
 

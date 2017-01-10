@@ -9,6 +9,10 @@ handlers:
   script: main.bottle
   login: admin
   secure: always
+- url: /edit/*
+  script: main.bottle
+  login: admin
+  secure: always
 - url: .*
   script: main.bottle
   secure: always

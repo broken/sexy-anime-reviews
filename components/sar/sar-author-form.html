@@ -1,5 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link rel="import" href="../app-route/app-location.html">
+<link rel="import" href="../app-route/app-route.html">
 <link rel="import" href="../polymerfire/firebase-app.html">
 <link rel="import" href="../polymerfire/firebase-auth.html">
 <link rel="import" href="../polymerfire/firebase-database-script.html">
@@ -56,6 +58,11 @@
     }
   </style>
   <template>
+    <app-location route="{{route}}"></app-location>
+    <app-route
+        route="{{route}}"
+        pattern="/edit/:name"
+        data="{{routeData}}"></app-route>
     <firebase-app app="{{firebase}}"
                   auth-domain="sexy-anime-reviews.firebaseapp.com"
                   database-url="https://sexy-anime-reviews.firebaseio.com"
@@ -95,7 +102,6 @@
       title: String,
       rating: String,
       cover: Object,
-      ratingNum: Number,
       genres: Array,
       viewMethod: String,
       review: String,
@@ -104,6 +110,23 @@
         observer: '_reviewsChanged'
       },
       tags: Array
+    },
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        if (!!this.routeData.name) {
+          let ref = this.firebase.database().ref('reviews').child(this.routeData.name);
+          ref.on('value', function(snapshot) {
+            let val = snapshot.val();
+            this.title = val.title;
+            this.rating = val.rating;
+            this.viewMethod = val.viewMethod;
+            this.review = val.review;
+            // todo genres
+            // todo cover
+          }.bind(this));
+        }
+      }.bind(this));
     },
     _saveReview: function(authInfo) {
       let token = authInfo.credential.accessToken;
