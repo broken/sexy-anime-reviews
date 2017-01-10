@@ -96,7 +96,7 @@
       <div class="article row">
         <div class="title">[[review.title]]</div>
         <template is="dom-if" if="[[isAdmin]]">
-          <div id="edit" class="meta">[ edit ]</div>
+          <div id="edit" class="meta"><a href="[[_createEditUrl(review)]]">[ edit ]</a></div>
         </template>
       </div>
       <div class="article row">
@@ -225,6 +225,9 @@
     _getGenreArray: function(review) {
       var genres = review.genres || {};
       return Object.keys(genres);
-    }
+    },
+    _createEditUrl: function(review) {
+      return '/edit/' + review.title;
+    },
   });
 </script>
