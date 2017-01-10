@@ -12,7 +12,7 @@ bottle = Bottle()
 @bottle.route('/')
 @bottle.route('/a/<name>')
 def main(name=''):
-  return template('views/main.html', is_admin=users.is_current_user_admin())
+  return template('views/main.html', is_admin=('true' if users.is_current_user_admin() else 'false'))
 
 @bottle.route('/components/sar/<filepath:path>')
 def sar(filepath):
