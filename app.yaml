@@ -11,4 +11,4 @@ handlers:
   secure: always
 - url: .*
   script: main.bottle
-  secure: optional
+  secure: always

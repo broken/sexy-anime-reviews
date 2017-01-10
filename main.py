@@ -1,5 +1,7 @@
 from bottle import Bottle
+from bottle import mako_template as template
 from bottle import static_file
+from google.appengine.api import users
 
 bottle = Bottle()
 
@@ -10,7 +12,7 @@ bottle = Bottle()
 @bottle.route('/')
 @bottle.route('/a/<name>')
 def main(name=''):
-  return static_file('main.html', root='views')
+  return template('views/main.html', is_admin=users.is_current_user_admin())
 
 @bottle.route('/components/sar/<filepath:path>')
 def sar(filepath):
@@ -23,7 +25,7 @@ def components(filepath):
 @bottle.route('/add')
 def add():
   return static_file('add.html', root='views')
-  
+
 
 # Define an handler for 404 errors.
 @bottle.error(404)

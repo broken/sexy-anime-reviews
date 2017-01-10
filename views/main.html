@@ -33,7 +33,7 @@
     <template is="dom-bind">
       <neon-animated-pages selected="0" id="pages">
         <sar-card-container on-card-selected="_onCardSelected" id="cards"></sar-card-container>
-        <sar-review on-exit-click="_onExitClick" id="review"></sar-review>
+        <sar-review on-exit-click="_onExitClick" id="review" is-admin="${is_admin}"></sar-review>
       </neon-animated-pages>
     </template>
     <script>
