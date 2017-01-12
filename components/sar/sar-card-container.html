@@ -4,6 +4,9 @@
 <link href="../polymerfire/firebase-query.html" rel="import">
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../neon-animation/neon-shared-element-animatable-behavior.html" rel="import">
+<link href="../paper-dropdown-menu/paper-dropdown-menu.html" rel="import">
+<link href="../paper-item/paper-item.html" rel="import">
+<link href="../paper-menu/paper-menu.html" rel="import">
 <link href="../paper-radio-button/paper-radio-button.html" rel="import">
 <link href="../paper-radio-group/paper-radio-group.html" rel="import">
 <link href="../paper-scroll-header-panel/paper-scroll-header-panel.html" rel="import">
@@ -118,6 +121,22 @@
         line-height: inherit;
       };
     }
+    #genreSearch {
+      margin-top: -37px;
+      --paper-input-container-input: {
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+        color: inherit;
+      };
+      --paper-input-container-label: {
+        font-family: inherit;
+        font-size: inherit;
+        font-weight: inherit;
+        line-height: inherit;
+      };
+    }
   </style>
   <template>
     <firebase-app app="{{firebase}}"
@@ -168,6 +187,14 @@
           </div>
           <div class="spacer"></div>
           <paper-input id="titleSearch" label="Search by title" value="{{searchString}}"></paper-input>
+          <div class="spacer"></div>
+          <paper-dropdown-menu id="genreSearch" label="Search by genre">
+            <paper-menu attr-for-selected="value" selected="{{searchGenre}}" class="dropdown-content">
+              <template is="dom-repeat" items="[[genresAndCounts]]">
+                <paper-item value="[[item.genre]]">[[_computeGenreAndCountString(item)]]</paper-item>
+              </template>
+            </paper-menu>
+          </paper-dropdown-menu>
         </div>
         <div class="cards">
           <template is="dom-repeat" items="[[reviews]]" sort="[[sortFunction]]" filter="[[filterFunction]]" on-dom-change="_domChanged">
@@ -204,9 +231,13 @@
       'immediate-value-change': '_immediateMinRatingChanged'
     },
     properties: {
-      reviews: Array,
       sortFunction: Function,
       filterFunction: Function,
+      genresAndCounts: Object,
+      reviews: {
+        type: Array,
+        observer: '_reviewsChanged'
+      },
       orderBy: {
         type: String,
         value: 'title',
@@ -223,6 +254,10 @@
         observer: '_updateFilterFunction'
       },
       searchString: {
+        type: String,
+        observer: '_updateFilterFunction'
+      },
+      searchGenre: {
         type: String,
         observer: '_updateFilterFunction'
       },
@@ -295,6 +330,14 @@
         }
       }
     },
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        this.firebase.database().ref('reviews').on('value', function(snapshot) {
+          this.reviews = snapshot.val();
+        }.bind(this));
+      }.bind(this));
+    },
     _domChanged: function() {
       if (window.location.pathname.length > 3) {
         this.async(this.selectCard);
@@ -331,6 +374,23 @@
       return node.getBoundingClientRect().bottom > 0 &&
           node.getBoundingClientRect().top < window.document.documentElement.clientHeight;
     },
+    _reviewsChanged: function(newValue, oldValue) {
+      let tags = {};
+      for (let key in this.reviews) {
+        let genres = this.reviews[key].genres;
+        for (let genre in genres) {
+          tags[genre] = tags[genre] ? tags[genre] + 1 : 1;
+        }
+      }
+      let genresAndCounts = [];
+      for (let key in tags) {
+        let info = { genre: key, count: tags[key] };
+        genresAndCounts.push(info);
+      }
+      genresAndCounts.sort();
+      genresAndCounts.unshift({genre: '', count: genresAndCounts.length});
+      this.genresAndCounts = genresAndCounts;
+    },
     _orderByChanged: function(newOrderBy) {
       this.sortFunction = this._sortFunctions[newOrderBy];
     },
@@ -346,7 +406,8 @@
       var showDub = this.showDub, showSub = this.showSub;
       var minRating = this.minRating;
       var searchString = this.searchString;
-      if (showDub === undefined || showSub === undefined || minRating === undefined || searchString === undefined) {
+      var searchGenre = this.searchGenre;
+      if (showDub === undefined || showSub === undefined || minRating === undefined || searchString === undefined || searchGenre === undefined) {
         return;
       }
       this.filterFunction = function(x) {
@@ -354,7 +415,8 @@
             (!showDub && x.viewMethod === 'dub') ||
             (!showSub && x.viewMethod === 'sub') ||
             (minRating > RATING_VALUES[x.rating]) ||
-            (!!searchString && x.title.toLowerCase().indexOf(searchString.toLowerCase()) < 0);
+            (!!searchString && x.title.toLowerCase().indexOf(searchString.toLowerCase()) < 0) ||
+            (!!searchGenre && !genreMatch(searchGenre, x));
         return !filtered;
       };
     },
@@ -377,5 +439,19 @@
         this.async(function() { card.$.cover.click() }, 300);
       }
     },
+    _computeGenreAndCountString: function(item) {
+      if (!item.genre) return '';
+      return item.genre + ' (' + item.count + ')';
+    },
   });
+
+
+  var genreMatch = function(searchGenre, review) {
+    if (!review.genres) return false;
+    let genres = Object.keys(review.genres);
+    for (let i = 0; i < genres.length; ++i) {
+      if (genres[i] == searchGenre) return true;
+    }
+    return false;
+  };
 </script>
