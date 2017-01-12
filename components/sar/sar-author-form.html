@@ -101,7 +101,8 @@
     properties: {
       title: String,
       rating: String,
-      cover: Object,
+      cover: String,
+      coverImg: Object,
       genres: Array,
       viewMethod: String,
       review: String,
@@ -122,11 +123,32 @@
             this.rating = val.rating;
             this.viewMethod = val.viewMethod;
             this.review = val.review;
-            // todo genres
-            // todo cover
+            this.genres = Object.values(val.genres);
+            this.cover = val.cover;
           }.bind(this));
         }
       }.bind(this));
+    },
+    _saveReviewInDb: function(review) {
+      this.firebase.database().ref('reviews').child(this.title).set(review)
+          .then(function() {
+            console.log('Synchronization succeeded');
+            this.$.toast.text = 'Review saved successfully.';
+            this.$.toast.show();
+          }.bind(this))
+          .catch(function(error) {
+            console.warn('Synchronization failed');
+            this.$.toast.text = 'Failed to save review.';
+            this.$.toast.show();
+            console.error(error);
+          }.bind(this));
+      this.title = '';
+      this.rating = 0;
+      this.cover = '';
+      this.coverImg = null;
+      this.genres = [];
+      this.viewMethod = '';
+      this.review = '';
     },
     _saveReview: function(authInfo) {
       let token = authInfo.credential.accessToken;
@@ -141,38 +163,28 @@
         'review': this.review
       };
       // upload cover image first
-      let uploadTask = this.firebase.storage().ref('covers').child(key).put(this.cover);
-      uploadTask.on('state_changed',
-        function progress(snapshot) {
-          var percentage = snapshot.bytesTransferred / snapshot.totalBytes * 100;
-          console.info(percentage + '%');
-          // TODO uploader.value = percentage;
-        },
-        function error(err) {
-          console.warn('Unable to upload cover image file.');
-          console.error(err);
-        },
-        function complete() {
-          console.info('Cover image upload completed.');
-          review.cover = uploadTask.snapshot.downloadURL;
-          this.firebase.database().ref('reviews').child(this.title).set(review)
-              .then(function() {
-                console.log('Synchronization succeeded');
-                this.$.toast.text = 'Review saved successfully.';
-                this.$.toast.show();
-              }.bind(this))
-              .catch(function(error) {
-                console.warn('Synchronization failed');
-                this.$.toast.text = 'Failed to save review.';
-                this.$.toast.show();
-                console.error(error);
-              }.bind(this));
-          this.title = '';
-          this.genres = [];
-          this.review = '';
-          this.cover = null;
-        }.bind(this)
-      );
+      if (!!this.coverImg) {
+        let uploadTask = this.firebase.storage().ref('covers').child(key).put(this.coverImg);
+        uploadTask.on('state_changed',
+          function progress(snapshot) {
+            var percentage = snapshot.bytesTransferred / snapshot.totalBytes * 100;
+            console.info(percentage + '%');
+            // TODO uploader.value = percentage;
+          },
+          function error(err) {
+            console.warn('Unable to upload cover image file.');
+            console.error(err);
+          },
+          function complete() {
+            console.info('Cover image upload completed.');
+            review.cover = uploadTask.snapshot.downloadURL;
+            this._saveReviewInDb(review).bind(this);
+          }.bind(this)
+        );
+      } else {
+        review.cover = this.cover;
+        this._saveReviewInDb(review).bind(this);
+      }
     },
     _onClick: function(event) {
       this.$.auth.signInWithPopup('google').then(this._saveReview.bind(this)).catch(function(err) {
@@ -209,7 +221,7 @@
       var valid = e.detail.valid,
           invalid = e.detail.invalid;
       if (valid.length) {
-        this.cover = valid[0];
+        this.coverImg = valid[0];
         // display cover
       }
     },
