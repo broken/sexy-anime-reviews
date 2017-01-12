@@ -23,6 +23,7 @@
 <link href="../paper-toast/paper-toast.html" rel="import">
 
 <link href="../sar/sar-rating-slider.html" rel="import">
+<link href="../sar/util.html" rel="import">
 
 
 <dom-module id="sar-author-form">
@@ -135,6 +136,7 @@
             console.log('Synchronization succeeded');
             this.$.toast.text = 'Review saved successfully.';
             this.$.toast.show();
+            window.location.href = "/a/" + cleanTitle(review.title);
           }.bind(this))
           .catch(function(error) {
             console.warn('Synchronization failed');
