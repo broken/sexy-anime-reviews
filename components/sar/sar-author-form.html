@@ -116,6 +116,9 @@
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
+        this.firebase.database().ref('reviews').on('value', function(snapshot) {
+          this.reviews = snapshot.val();
+        }.bind(this));
         if (!!this.routeData.name) {
           let ref = this.firebase.database().ref('reviews').child(this.routeData.name);
           ref.on('value', function(snapshot) {
