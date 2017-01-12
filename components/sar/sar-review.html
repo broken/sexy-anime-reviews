@@ -93,7 +93,7 @@
       <div id="header">Spoiler Free Anime Reviews</div>
     </div>
     <div class="content">
-      <div class="article row">
+      <div class="article row" id="titlebar">
         <div class="title">[[review.title]]</div>
         <template is="dom-if" if="[[isAdmin]]">
           <div id="edit" class="meta"><a href="[[_createEditUrl(review)]]">[ edit ]</a></div>
@@ -208,7 +208,7 @@
     },
     _onClick: function(event) {
       // we keep this computation on click just in case they resize the window
-      var rect = this.$.title.getBoundingClientRect();
+      var rect = this.$.titlebar.getBoundingClientRect();
       this.animationConfig['entry'][1].transformFrom = 'translateX(-' + rect.right + 'px)';
       this.animationConfig['exit'][1].transformTo = 'translateX(-' + rect.right + 'px)';
       this.fire('exit-click');
