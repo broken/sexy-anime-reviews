@@ -334,7 +334,7 @@
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
         this.firebase.database().ref('reviews').on('value', function(snapshot) {
-          this.reviews = snapshot.val();
+          this.reviews = Object.values(snapshot.val());
         }.bind(this));
       }.bind(this));
     },
@@ -410,7 +410,7 @@
       var minRating = this.minRating;
       var searchString = this.searchString;
       var searchGenre = this.searchGenre;
-      if (showDub === undefined || showSub === undefined || minRating === undefined || searchString === undefined || searchGenre === undefined) {
+      if (showDub === undefined || showSub === undefined || minRating === undefined || searchString === undefined) {
         return;
       }
       this.filterFunction = function(x) {
