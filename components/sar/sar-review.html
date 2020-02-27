@@ -10,6 +10,8 @@
 <link href="../paper-material/paper-material.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 
+<link href="../sar/util.html" rel="import">
+
 
 <dom-module id="sar-review">
   <style is="custom-style">
@@ -227,7 +229,7 @@
       return Object.keys(genres);
     },
     _createEditUrl: function(review) {
-      return '/edit/' + review.title;
+      return '/edit/' + dbTitle(review.title);
     },
   });
 </script>

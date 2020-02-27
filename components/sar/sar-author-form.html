@@ -1,12 +1,12 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link rel="import" href="../app-route/app-location.html">
-<link rel="import" href="../app-route/app-route.html">
-<link rel="import" href="../polymerfire/firebase-app.html">
-<link rel="import" href="../polymerfire/firebase-auth.html">
-<link rel="import" href="../polymerfire/firebase-database-script.html">
-<link rel="import" href="../polymerfire/firebase-storage-script.html">
-<link rel="import" href="../file-input/file-input.html">
+<link href="../app-route/app-location.html" rel="import">
+<link href="../app-route/app-route.html" rel="import">
+<link href="../polymerfire/firebase-app.html" rel="import">
+<link href="../polymerfire/firebase-auth.html" rel="import">
+<link href="../polymerfire/firebase-database-script.html" rel="import">
+<link href="../polymerfire/firebase-storage-script.html" rel="import">
+<link href="../file-input/file-input.html" rel="import">
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-icon/iron-icon.html" rel="import">
 <link href="../iron-icons/av-icons.html" rel="import">
@@ -134,7 +134,7 @@
       }.bind(this));
     },
     _saveReviewInDb: function(review) {
-      this.firebase.database().ref('reviews').child(this.title).set(review)
+      this.firebase.database().ref('reviews').child(dbTitle(this.title)).set(review)
           .then(function() {
             console.log('Synchronization succeeded');
             this.$.toast.text = 'Review saved successfully.';
