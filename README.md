@@ -11,10 +11,7 @@ Few things I wanted to play with:
 * bonus: Google authentication in GAE & Firebase
 
 
-My notes so I don't forget...
-can push to appengine via script:
-  ../google-cloud-sdk/platform/google_appengine/appcfg.py --noauth_local_webserver update .
-Used to be able to push with git, but no longer tracking bower_components directory.
-  git push appengine
-If creds expire:
-  gcloud auth login
+## 2020 Update
+Wow; the last time I deployed this was Jan 2017. I've been able to update reviews and serve them flawlessly since. (I am only dusting it off now to fix a minor bug when the title includes a slash.) A lot has changed though. Amazon bought Cloud9, Google bought Firebase, and Web Components / Polymer are quite different now. My AWS account was suspended for some reason, and who knows if this project exists in AWS Cloud9 anymore, but it's great to see the Google / Firebase transition was smooth. Also, Google Cloud's App Engine looks nicer (I would hope after all these years), with automatic versioning and canarying. Plus, deployment was simpler (`gcloud app deploy`). I'm still happy with the performance and design, so I don't plan on updating this off of Polymer 1.0, but I will probably update to Py3 in the next few days.
+
+Here's hoping another many years pass without any need to look at this code. :D
