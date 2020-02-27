@@ -159,7 +159,7 @@
       let token = authInfo.credential.accessToken;
       let user = authInfo.user;
       if (!this.title) return;
-      let key = this.title;
+      let key = dbTitle(this.title);
       let review = {
         'title': this.title,
         'rating': this.rating,
