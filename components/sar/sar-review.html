@@ -61,6 +61,9 @@
     #view_method {
       height: 16px;
     }
+    #show_type {
+      height: 16px;
+    }
     .paper-header {
       padding: 0 6%;
       white-space: nowrap;
@@ -103,6 +106,7 @@
       </div>
       <div class="article row">
         <iron-icon id="view_method" icon="[[_viewMethodIcon(review)]]"></iron-icon>
+        <!-- <iron-icon id="show_type" icon="[[_showTypeIcon(review)]]"></iron-icon> -->
         <div class="meta">[[review.rating]]</div>
         <template is="dom-repeat" items="[[_getGenreArray(review)]]">
           <div class="meta">[[item]]</div>
@@ -220,6 +224,15 @@
         return 'av:mic';
       } else if (review.viewMethod === 'sub') {
         return 'av:subtitles';
+      } else {
+        return 'av:not-interested';
+      }
+    },
+    _showTypeIcon: function(review) {
+      if (review.showType === 'series') {
+        return 'hardware:tv';
+      } else if (review.showType === 'movie') {
+        return 'av:movie';
       } else {
         return 'av:not-interested';
       }

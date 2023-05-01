@@ -1,15 +1,14 @@
-runtime: python27
-threadsafe: yes
+runtime: python37
 
 handlers:
 - url: /add
-  script: main.bottle
+  script: auto
   login: admin
   secure: always
 - url: /edit/*
-  script: main.bottle
+  script: auto
   login: admin
   secure: always
 - url: .*
-  script: main.bottle
+  script: auto
   secure: always

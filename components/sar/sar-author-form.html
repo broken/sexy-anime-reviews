@@ -85,6 +85,10 @@
         <paper-radio-button name="dub">Dub</paper-radio-button>
         <paper-radio-button name="sub">Sub</paper-radio-button>
       </paper-radio-group>
+      <paper-radio-group class="horizontal" selected="{{showType}}">
+        <paper-radio-button name="movie">Movie</paper-radio-button>
+        <paper-radio-button name="series" selected>Show</paper-radio-button>
+      </paper-radio-group>
       <sar-rating-slider rating="{{rating}}"></sar-rating-slider>
       <paper-textarea label="Review" value="{{review}}"></paper-textarea>
       <br>
@@ -106,6 +110,7 @@
       coverImg: Object,
       genres: Array,
       viewMethod: String,
+      showType: String,
       review: String,
       reviews: {
         type: Object,
@@ -126,6 +131,7 @@
             this.title = val.title;
             this.rating = val.rating;
             this.viewMethod = val.viewMethod;
+            this.showType = val.showType;
             this.review = val.review;
             this.genres = Object.values(val.genres);
             this.cover = val.cover;
@@ -153,6 +159,7 @@
       this.coverImg = null;
       this.genres = [];
       this.viewMethod = '';
+      this.showType = '';
       this.review = '';
     },
     _saveReview: function(authInfo) {
@@ -165,6 +172,7 @@
         'rating': this.rating,
         'genres': this.genres.reduce(function(obj, val) { obj[val] = val; return obj; }, {}),
         'viewMethod': this.viewMethod,
+        'showType': this.showType,
         'review': this.review
       };
       // upload cover image first
