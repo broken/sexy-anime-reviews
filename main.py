@@ -27,6 +27,10 @@ def components(filepath):
 def add(name=''):
   return static_file('add.html', root='views')
 
+@app.route('/pub/<filepath:path>')
+def pub(filepath):
+  return static_file(filepath, root='pub')
+
 
 # Define an handler for 404 errors.
 @app.error(404)
