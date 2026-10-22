@@ -57,6 +57,109 @@
     paper-button {
       background: var(--accent-color);
     }
+    paper-radio-button {
+      padding: 12px;
+    }
+    .autofill-box {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 6px;
+      padding: 16px 20px;
+      margin-top: 10px;
+      margin-bottom: 24px;
+    }
+    .autofill-title {
+      font-size: 13px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #aaa;
+      margin-bottom: 6px;
+    }
+    .autofill-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+    }
+    .autofill-input {
+      flex: 1;
+    }
+    .results-list {
+      margin-top: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 260px;
+      overflow-y: auto;
+    }
+    .result-card {
+      display: flex;
+      align-items: center;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.15s ease-in-out;
+    }
+    .result-card:hover {
+      background: rgba(255, 255, 255, 0.12);
+    }
+    .result-thumb {
+      width: 44px;
+      height: 62px;
+      object-fit: cover;
+      border-radius: 3px;
+      margin-right: 14px;
+      background: #222;
+      flex-shrink: 0;
+    }
+    .result-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .result-name {
+      font-weight: 600;
+      color: #fff;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .result-meta {
+      font-size: 12px;
+      color: #999;
+      margin-top: 3px;
+    }
+    .cover-section {
+      margin: 16px 0;
+      padding: 12px 16px;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .cover-preview-img {
+      width: 80px;
+      height: 114px;
+      object-fit: cover;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .cover-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .cover-status {
+      font-size: 12px;
+      color: #8bc34a;
+      font-weight: 500;
+    }
   </style>
   <template>
     <app-location route="{{route}}"></app-location>
@@ -76,10 +179,51 @@
     </div>
     <br>
     <paper-material id="card" elevation="2">
+      <!-- Auto-Fill Section -->
+      <div class="autofill-box">
+        <div class="autofill-title">Auto-Fill Anime Info & Vertical Banner</div>
+        <div class="autofill-row">
+          <paper-input class="autofill-input" label="Search title or paste Crunchyroll URL" value="{{searchQuery}}" on-keydown="_onSearchKeydown"></paper-input>
+          <paper-button raised on-click="_searchAnime" disabled="{{isSearching}}">
+            <span>{{_computeSearchButtonText(isSearching)}}</span>
+          </paper-button>
+        </div>
+
+        <template is="dom-if" if="{{_hasSearchResults(searchResults)}}">
+          <div class="results-list">
+            <template is="dom-repeat" items="{{searchResults}}">
+              <div class="result-card" on-click="_selectSearchResult">
+                <img class="result-thumb" src$="{{item.coverUrl}}">
+                <div class="result-info">
+                  <div class="result-name">{{item.title}}</div>
+                  <div class="result-meta">{{item.romajiTitle}} &bull; {{item.format}} &bull; {{_joinGenres(item.genres)}}</div>
+                </div>
+                <paper-button raised>Select</paper-button>
+              </div>
+            </template>
+          </div>
+        </template>
+      </div>
+
       <paper-input label="Title" value="{{title}}"></paper-input>
-      <paper-button raised on-click="_uploadCover">
-        <file-input accept="image/*" invalidText="Invalid Image" on-change="_uploadCover">Upload Cover Image</file-input>
-      </paper-button>
+
+      <!-- Cover Image & Preview Section -->
+      <div class="cover-section">
+        <template is="dom-if" if="{{previewCover}}">
+          <img class="cover-preview-img" src$="{{previewCover}}" alt="Cover preview">
+        </template>
+        <div class="cover-actions">
+          <template is="dom-if" if="{{previewCover}}">
+            <div class="cover-status">&#x2714; Vertical banner loaded</div>
+          </template>
+          <paper-button raised on-click="_triggerCoverUpload">
+            <file-input accept="image/*" invalidText="Invalid Image" on-change="_uploadCover">
+              <span>{{_computeUploadButtonText(previewCover)}}</span>
+            </file-input>
+          </paper-button>
+        </div>
+      </div>
+
       <paper-select label="Genres" bind-value="{{genres}}" on-input-changed="_genreInputChanged" multiple nonmatching unique></paper-select>
       <paper-radio-group class="horizontal" selected="{{viewMethod}}">
         <paper-radio-button name="dub">Dub</paper-radio-button>
@@ -108,6 +252,22 @@
       rating: String,
       cover: String,
       coverImg: Object,
+      previewCover: {
+        type: String,
+        value: ''
+      },
+      searchQuery: {
+        type: String,
+        value: ''
+      },
+      isSearching: {
+        type: Boolean,
+        value: false
+      },
+      searchResults: {
+        type: Array,
+        value: function() { return []; }
+      },
       genres: Array,
       viewMethod: String,
       showType: String,
@@ -135,9 +295,117 @@
             this.review = val.review;
             this.genres = Object.values(val.genres);
             this.cover = val.cover;
+            this.previewCover = val.cover;
           }.bind(this));
         }
       }.bind(this));
+    },
+    _computeSearchButtonText: function(isSearching) {
+      return isSearching ? 'Fetching...' : 'Fetch Info';
+    },
+    _computeUploadButtonText: function(previewCover) {
+      return previewCover ? 'Change Cover Image' : 'Upload Cover Image';
+    },
+    _hasSearchResults: function(results) {
+      return results && results.length > 0;
+    },
+    _joinGenres: function(genres) {
+      return (genres || []).join(', ');
+    },
+    _onSearchKeydown: function(e) {
+      if (e.keyCode === 13) {
+        e.preventDefault();
+        this._searchAnime();
+      }
+    },
+    _searchAnime: function() {
+      var query = (this.searchQuery || '').trim();
+      if (!query) {
+        this.$.toast.text = 'Please enter an anime title or Crunchyroll URL.';
+        this.$.toast.show();
+        return;
+      }
+      this.isSearching = true;
+      this.searchResults = [];
+      var url = '/api/anime/search?q=' + encodeURIComponent(query);
+      fetch(url)
+        .then(function(res) { return res.json(); })
+        .then(function(data) {
+          this.isSearching = false;
+          if (data.results && data.results.length > 0) {
+            if (data.results.length === 1) {
+              this._applyAnimeResult(data.results[0]);
+            } else {
+              this.searchResults = data.results;
+            }
+          } else {
+            this.$.toast.text = 'No anime found. Try another search term.';
+            this.$.toast.show();
+          }
+        }.bind(this))
+        .catch(function(err) {
+          this.isSearching = false;
+          console.error(err);
+          this.$.toast.text = 'Failed to fetch anime info.';
+          this.$.toast.show();
+        }.bind(this));
+    },
+    _selectSearchResult: function(e) {
+      this._applyAnimeResult(e.model.item);
+    },
+    _applyAnimeResult: function(item) {
+      this.title = item.title || item.romajiTitle || '';
+      if (item.showType) {
+        this.showType = item.showType;
+      }
+      if (item.viewMethod) {
+        this.viewMethod = item.viewMethod;
+      }
+      if (item.genres && item.genres.length) {
+        this.genres = item.genres;
+        // Merge into tags for paper-select
+        if (this.tags) {
+          var currentTags = this.tags.slice();
+          item.genres.forEach(function(g) {
+            if (currentTags.indexOf(g) === -1) {
+              currentTags.push(g);
+            }
+          });
+          this.tags = currentTags;
+        }
+      }
+      this.searchResults = [];
+
+      if (item.coverUrl) {
+        this.previewCover = item.coverUrl;
+        var proxyUrl = '/api/anime/proxy-image?url=' + encodeURIComponent(item.coverUrl);
+        fetch(proxyUrl)
+          .then(function(res) {
+            if (!res.ok) throw new Error('Image fetch failed');
+            return res.blob();
+          })
+          .then(function(blob) {
+            var ext = blob.type.indexOf('png') !== -1 ? 'png' : 'jpg';
+            var safeTitle = cleanTitle(item.title || 'cover');
+            var filename = safeTitle + '.' + ext;
+            var file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
+            this.coverImg = file;
+            this.previewCover = window.URL.createObjectURL(blob);
+          }.bind(this))
+          .catch(function(err) {
+            console.warn('Could not load blob directly, fallback to cover URL:', err);
+            this.cover = item.coverUrl;
+          }.bind(this));
+      }
+
+      this.$.toast.text = 'Loaded info for ' + (item.title || item.romajiTitle);
+      this.$.toast.show();
+    },
+    _triggerCoverUpload: function() {
+      var fileInput = this.$$('file-input input[type="file"]');
+      if (fileInput) {
+        fileInput.click();
+      }
     },
     _saveReviewInDb: function(review) {
       this.firebase.database().ref('reviews').child(dbTitle(this.title)).set(review)
@@ -157,10 +425,13 @@
       this.rating = 0;
       this.cover = '';
       this.coverImg = null;
+      this.previewCover = '';
       this.genres = [];
       this.viewMethod = '';
       this.showType = '';
       this.review = '';
+      this.searchQuery = '';
+      this.searchResults = [];
     },
     _saveReview: function(authInfo) {
       let token = authInfo.credential.accessToken;
@@ -233,9 +504,9 @@
     _uploadCover: function(e) {
       var valid = e.detail.valid,
           invalid = e.detail.invalid;
-      if (valid.length) {
+      if (valid && valid.length) {
         this.coverImg = valid[0];
-        // display cover
+        this.previewCover = window.URL.createObjectURL(valid[0]);
       }
     },
   });

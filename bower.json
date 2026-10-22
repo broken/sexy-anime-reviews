@@ -23,5 +23,8 @@
     "polymerfire": "^0.10.3",
     "file-input": "rnicholus/file-input#^2.0.0",
     "app-elements": "PolymerElements/app-elements#^0.10.1"
+  },
+  "resolutions": {
+    "app-storage": "^0.10.0"
   }
 }
