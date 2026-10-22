@@ -3,6 +3,6 @@
 # Run 'pip install -r requirements.txt -t lib/' to install these dependencies
 # in this project's lib/ directory.  The `lib` directory is added to `sys.path`
 # by `appengine_config.py`.
-bottle==0.12.8
-mako==1.0.6
-appengine-python-standard>=1.0.0
+bottle>=0.13.4
+mako>=1.4.1
+appengine-python-standard>=3.0.0
