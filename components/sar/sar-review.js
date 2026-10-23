@@ -25,18 +25,19 @@ export class SarReview extends LitElement {
       border-radius: 50%;
       width: 44px;
       height: 44px;
-    }
-    #close paper-material {
-      border-radius: inherit;
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
+      cursor: pointer;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
+      transition: background-color 0.2s;
+    }
+    #close:hover {
+      background-color: rgba(0, 0, 0, 0.08);
+    }
+    #close svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
     }
     img {
       border: 0;
@@ -47,6 +48,18 @@ export class SarReview extends LitElement {
       height: 420px;
       box-sizing: border-box;
       margin: 0 0 16px 20px;
+      cursor: pointer;
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+      transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #cover:hover {
+      box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+    #cover img {
+      display: block;
+      border-radius: 2px;
     }
     .title {
       font-size: 28px;
@@ -74,6 +87,13 @@ export class SarReview extends LitElement {
     }
     #view_method {
       height: 16px;
+      width: 16px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--secondary-text-color, #727272);
+      vertical-align: middle;
+      fill: currentColor;
     }
     #show_type {
       height: 16px;
@@ -301,26 +321,25 @@ export class SarReview extends LitElement {
     this.fire('exit-click');
   }
 
-  _viewMethodIcon(review) {
-    if (!review) return 'av:not-interested';
-    if (review.viewMethod === 'dub') {
-      return 'av:mic';
-    } else if (review.viewMethod === 'sub') {
-      return 'av:subtitles';
-    } else {
-      return 'av:not-interested';
+  _renderViewMethodIcon(review) {
+    if (review?.viewMethod === 'dub') {
+      return html`
+        <svg id="view_method" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" title="Dub">
+          <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+        </svg>
+      `;
+    } else if (review?.viewMethod === 'sub') {
+      return html`
+        <svg id="view_method" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" title="Sub">
+          <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h4v2H4v-2zm10 6H4v-2h10v2zm6 0h-4v-2h4v2zm0-4H10v-2h10v2z"/>
+        </svg>
+      `;
     }
-  }
-
-  _showTypeIcon(review) {
-    if (!review) return 'av:not-interested';
-    if (review.showType === 'series') {
-      return 'hardware:tv';
-    } else if (review.showType === 'movie') {
-      return 'av:movie';
-    } else {
-      return 'av:not-interested';
-    }
+    return html`
+      <svg id="view_method" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9z"/>
+      </svg>
+    `;
   }
 
   _getGenreArray(review) {
@@ -350,11 +369,10 @@ export class SarReview extends LitElement {
         @keys-pressed="${this._onClick}"
       ></iron-a11y-keys>
       <div class="paper-header">
-        <div id="close" @click="${this._onClick}">
-          <paper-ripple center></paper-ripple>
-          <paper-material elevation="0">
-            <iron-icon icon="arrow-back"></iron-icon>
-          </paper-material>
+        <div id="close" @click="${this._onClick}" title="Back">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+          </svg>
         </div>
         <div id="header">Spoiler Free Anime Reviews</div>
       </div>
@@ -366,15 +384,14 @@ export class SarReview extends LitElement {
             : ''}
         </div>
         <div class="article row">
-          <iron-icon id="view_method" icon="${this._viewMethodIcon(review)}"></iron-icon>
-          <!-- <iron-icon id="show_type" icon="${this._showTypeIcon(review)}"></iron-icon> -->
+          ${this._renderViewMethodIcon(review)}
           <div class="meta">${review?.rating ?? ''}</div>
           ${genres.map(item => html`<div class="meta">${item}</div>`)}
         </div>
         <section>
-          <paper-material id="cover" .elevation="${this.elevation}" elevation="${this.elevation}" animated>
+          <div id="cover">
             <img src="${this._computeCover(review)}" @click="${this._onClick}">
-          </paper-material>
+          </div>
           <br>
           <div class="article pre">${review?.review ?? ''}</div>
         </section>

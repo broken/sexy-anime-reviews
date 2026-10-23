@@ -25,10 +25,20 @@ export class SarCard extends LitElement {
       height: 320px;
       box-sizing: border-box;
       display: inline-block;
+      cursor: pointer;
+      background: #fff;
+      border-radius: 2px;
+      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+      transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    #cover:hover {
+      box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
     }
     #cover img {
       border: 0;
       height: 320px;
+      display: block;
+      border-radius: 2px;
     }
   `;
 
@@ -71,15 +81,12 @@ export class SarCard extends LitElement {
 
   render() {
     return html`
-      <paper-material
+      <div
         id="cover"
-        .elevation="${this.elevation}"
-        elevation="${this.elevation}"
-        animated
         @click="${this._onClick}"
       >
         <img src="${this._computeCover(this.review)}">
-      </paper-material>
+      </div>
       <div id="title">${this.review?.title ?? ''}</div>
     `;
   }
