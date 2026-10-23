@@ -1,0 +1,28 @@
+{
+  "name": "sexy-anime-reviews",
+  "version": "1.0.0",
+  "description": "Simple app to display my anime reviews. Site: http://animereviews.link",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/broken/sexy-anime-reviews.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/broken/sexy-anime-reviews/issues"
+  },
+  "homepage": "https://github.com/broken/sexy-anime-reviews#readme",
+  "dependencies": {
+    "firebase": "^13.1.0",
+    "lit": "^3.3.3"
+  },
+  "devDependencies": {
+    "vite": "^8.3.5"
+  }
+}
