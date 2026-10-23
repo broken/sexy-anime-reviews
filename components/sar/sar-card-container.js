@@ -210,21 +210,39 @@ export class SarCardContainer extends LitElement {
         line-height: inherit;
       };
     }
-    #genreSearch {
-      margin-top: -37px;
-      --paper-input-container-input: {
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-        color: inherit;
-      };
-      --paper-input-container-label: {
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-      };
+    .dropdown-container {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      margin-top: -8px;
+    }
+    .genre-select {
+      font-family: inherit;
+      font-size: 13px;
+      color: inherit;
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--divider-color, #B6B6B6);
+      border-radius: 0;
+      padding: 4px 24px 4px 0;
+      min-width: 150px;
+      cursor: pointer;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><polygon points="0,0 10,0 5,6" fill="%23727272"/></svg>');
+      background-repeat: no-repeat;
+      background-position: right 6px center;
+      transition: border-color 0.2s;
+    }
+    .genre-select:focus {
+      border-bottom: 2px solid var(--default-primary-color, #9C27B0);
+      margin-bottom: -1px;
+    }
+    .genre-select option {
+      color: var(--primary-text-color, #212121);
+      background: #ffffff;
     }
   `;
 
@@ -724,28 +742,25 @@ export class SarCardContainer extends LitElement {
               }}"
             ></paper-input>
             <div class="spacer"></div>
-            <paper-dropdown-menu id="genreSearch" label="Search by genre">
-              <paper-menu
-                attr-for-selected="value"
-                .selected="${this.searchGenre}"
-                selected="${this.searchGenre}"
-                class="dropdown-content"
-                @selected-changed="${(e) => {
-                  this.searchGenre = e.detail.value ?? e.target.selected ?? '';
-                }}"
-                @iron-select="${(e) => {
-                  if (e.target.selected !== undefined) this.searchGenre = e.target.selected;
+            <div class="dropdown-container">
+              <select
+                id="genreSearch"
+                class="genre-select"
+                aria-label="Search by genre"
+                .value="${this.searchGenre}"
+                @change="${(e) => {
+                  this.searchGenre = e.target.value;
                 }}"
               >
                 ${this.genresAndCounts.map(
                   (item) => html`
-                    <paper-item value="${item.genre}">
-                      ${this._computeGenreAndCountString(item)}
-                    </paper-item>
+                    <option value="${item.genre}" ?selected="${this.searchGenre === item.genre}">
+                      ${item.genre ? this._computeGenreAndCountString(item) : 'Search by genre'}
+                    </option>
                   `
                 )}
-              </paper-menu>
-            </paper-dropdown-menu>
+              </select>
+            </div>
           </div>
           <div class="cards">
             ${this.filteredReviews.map(
