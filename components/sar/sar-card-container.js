@@ -120,18 +120,61 @@ export class SarCardContainer extends LitElement {
       accent-color: var(--default-primary-color, #9C27B0);
       cursor: pointer;
     }
-    paper-toggle-button {
-      padding: 0 2px 9px 10px;
-      transform: scale(0.72);
-      --paper-toggle-button-checked-bar-color: var(--default-primary-color);
-      --paper-toggle-button-checked-button-color: var(--default-primary-color);
-      --paper-toggle-button-checked-ink-color: var(--default-primary-color);
+    .toggle-row {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+      margin-bottom: 5px;
     }
-    paper-toggle-button::shadow #ink {
-      top: -2px;
-      left: -2px;
-      height: 24px;
-      width: 24px;
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 28px;
+      height: 16px;
+      margin: 0 6px 0 10px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+      position: absolute;
+      margin: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #b0bec5;
+      transition: background-color 0.2s, opacity 0.2s;
+      border-radius: 16px;
+      opacity: 0.7;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 12px;
+      width: 12px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: transform 0.2s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+    }
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: var(--default-primary-color, #9C27B0);
+      opacity: 1;
+    }
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(12px);
+    }
+    .toggle-text {
+      font-size: 13px;
     }
     paper-slider {
       --paper-slider-active-color: var(--default-primary-color);
@@ -588,60 +631,60 @@ export class SarCardContainer extends LitElement {
             <div class="horizontal">
               <div>Show</div>
               <div class="vertical">
-                <div class="horizontal">
-                  <paper-toggle-button
-                    ?checked="${this.showDub}"
-                    .checked="${this.showDub}"
-                    @change="${(e) => {
-                      this.showDub = e.target.checked;
-                    }}"
-                    @checked-changed="${(e) => {
-                      this.showDub = e.target.checked;
-                    }}"
-                  ></paper-toggle-button>
-                  <div>Dubs</div>
-                </div>
-                <div class="horizontal">
-                  <paper-toggle-button
-                    ?checked="${this.showSub}"
-                    .checked="${this.showSub}"
-                    @change="${(e) => {
-                      this.showSub = e.target.checked;
-                    }}"
-                    @checked-changed="${(e) => {
-                      this.showSub = e.target.checked;
-                    }}"
-                  ></paper-toggle-button>
-                  <div>Subs</div>
-                </div>
+                <label class="toggle-row">
+                  <span class="toggle-switch">
+                    <input
+                      type="checkbox"
+                      .checked="${this.showDub}"
+                      @change="${(e) => {
+                        this.showDub = e.target.checked;
+                      }}"
+                    />
+                    <span class="toggle-slider"></span>
+                  </span>
+                  <span class="toggle-text">Dubs</span>
+                </label>
+                <label class="toggle-row">
+                  <span class="toggle-switch">
+                    <input
+                      type="checkbox"
+                      .checked="${this.showSub}"
+                      @change="${(e) => {
+                        this.showSub = e.target.checked;
+                      }}"
+                    />
+                    <span class="toggle-slider"></span>
+                  </span>
+                  <span class="toggle-text">Subs</span>
+                </label>
               </div>
               <div class="vertical">
-                <div class="horizontal">
-                  <paper-toggle-button
-                    ?checked="${this.showMovie}"
-                    .checked="${this.showMovie}"
-                    @change="${(e) => {
-                      this.showMovie = e.target.checked;
-                    }}"
-                    @checked-changed="${(e) => {
-                      this.showMovie = e.target.checked;
-                    }}"
-                  ></paper-toggle-button>
-                  <div>Movies</div>
-                </div>
-                <div class="horizontal">
-                  <paper-toggle-button
-                    ?checked="${this.showSeries}"
-                    .checked="${this.showSeries}"
-                    @change="${(e) => {
-                      this.showSeries = e.target.checked;
-                    }}"
-                    @checked-changed="${(e) => {
-                      this.showSeries = e.target.checked;
-                    }}"
-                  ></paper-toggle-button>
-                  <div>Series</div>
-                </div>
+                <label class="toggle-row">
+                  <span class="toggle-switch">
+                    <input
+                      type="checkbox"
+                      .checked="${this.showMovie}"
+                      @change="${(e) => {
+                        this.showMovie = e.target.checked;
+                      }}"
+                    />
+                    <span class="toggle-slider"></span>
+                  </span>
+                  <span class="toggle-text">Movies</span>
+                </label>
+                <label class="toggle-row">
+                  <span class="toggle-switch">
+                    <input
+                      type="checkbox"
+                      .checked="${this.showSeries}"
+                      @change="${(e) => {
+                        this.showSeries = e.target.checked;
+                      }}"
+                    />
+                    <span class="toggle-slider"></span>
+                  </span>
+                  <span class="toggle-text">Series</span>
+                </label>
               </div>
             </div>
             <div class="spacer"></div>
