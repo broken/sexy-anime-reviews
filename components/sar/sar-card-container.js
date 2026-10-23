@@ -549,7 +549,11 @@ export class SarCardContainer extends LitElement {
       this.animationConfig.exit[2].node = event.detail.title;
     }
 
-    this.fire('card-selected', { review: event.detail.review });
+    this.fire('card-selected', {
+      review: event.detail.review,
+      cover: event.detail.cover,
+      card: target,
+    });
   }
 
   _immediateMinRatingChanged(e) {

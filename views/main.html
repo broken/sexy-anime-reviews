@@ -45,8 +45,29 @@
       background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+");
     }
 
-    neon-animated-pages {
+    #pages {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
       height: 100%;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    #pages > * {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    #pages > [hidden] {
+      display: none !important;
     }
   </style>
 </head>
@@ -55,19 +76,76 @@
   <script type="module" src="/pub/dist/main.bundle.js"></script>
   <script src="/components/webcomponentsjs/webcomponents-lite.min.js"></script>
   <link href="/components/polymer/polymer.html" rel="import">
-  <link href="/components/neon-animation/neon-animated-pages.html" rel="import">
-  <link href="/components/neon-animation/neon-animations.html" rel="import">
   <link href="/components/sar/theme-carbon-fiber.html" rel="import">
   <link href="/components/sar/util.html" rel="import">
-  <neon-animated-pages selected="0" id="pages">
+  <div id="pages">
     <sar-card-container id="cards"></sar-card-container>
-    <sar-review id="review"></sar-review>
-  </neon-animated-pages>
+    <sar-review id="review" hidden></sar-review>
+  </div>
   <script>
     var pages = document.querySelector('#pages');
     var cards = document.querySelector('#cards');
     var review = document.querySelector('#review');
     var isAdmin = ${ is_admin };
+    var activeCardCover = null;
+    var activeCardElement = null;
+    var activeCardTitle = null;
+    var isTransitioning = false;
+    var exitedCards = [];
+    var exitedDistance = 0;
+
+    var clearAnimations = function (el) {
+      if (!el || !el.getAnimations) return;
+      el.getAnimations().forEach(function (anim) {
+        anim.cancel();
+      });
+    };
+
+    var isNodeInViewport = function (node) {
+      if (!node) return false;
+      var rect = node.getBoundingClientRect();
+      var vh = window.innerHeight || document.documentElement.clientHeight;
+      return rect.bottom > 0 && rect.top < vh;
+    };
+
+    var setPage = function (index) {
+      var idx = Number(index);
+      pages._selected = idx;
+      if (idx === 0) {
+        cards.removeAttribute('hidden');
+        review.setAttribute('hidden', '');
+        var allCards = cards.renderRoot ? Array.from(cards.renderRoot.querySelectorAll('sar-card')) : [];
+        allCards.forEach(function (c) {
+          clearAnimations(c);
+          c.style.transform = '';
+          var t = c.$ ? c.$.title : c.renderRoot?.querySelector('#title');
+          if (t) {
+            clearAnimations(t);
+            t.style.visibility = '';
+            t.style.opacity = '';
+          }
+        });
+        exitedCards = [];
+        exitedDistance = 0;
+        activeCardCover = null;
+        activeCardElement = null;
+        activeCardTitle = null;
+        isTransitioning = false;
+      } else {
+        cards.setAttribute('hidden', '');
+        review.removeAttribute('hidden');
+      }
+    };
+
+    Object.defineProperty(pages, 'selected', {
+      get: function () {
+        return pages._selected !== undefined ? pages._selected : 0;
+      },
+      set: function (val) {
+        setPage(val);
+      }
+    });
+    setPage(0);
 
     var syncAdmin = function () {
       if (review) {
@@ -79,20 +157,511 @@
       customElements.whenDefined('sar-review').then(syncAdmin);
     }
 
+    var animateToReview = function (fromCover, reviewData, fromCard) {
+      if (isTransitioning) return;
+      isTransitioning = true;
+      activeCardCover = fromCover;
+      activeCardElement = fromCard;
+      activeCardTitle = fromCard ? (fromCard.$ ? fromCard.$.title : fromCard.renderRoot?.querySelector('#title')) : null;
+
+      // Card title fades out immediately at beginning of transition to review
+      if (activeCardTitle) {
+        clearAnimations(activeCardTitle);
+        var tAnim = activeCardTitle.animate([
+          { opacity: 1 },
+          { opacity: 0 }
+        ], {
+          duration: 100,
+          easing: 'ease-out'
+        });
+        tAnim.onfinish = function () {
+          activeCardTitle.style.visibility = 'hidden';
+          activeCardTitle.style.opacity = '';
+        };
+      }
+
+      review.review = reviewData;
+      review.isAdmin = isAdmin;
+
+      if (!fromCover) {
+        setPage(1);
+        isTransitioning = false;
+        return;
+      }
+
+      var fromRect = fromCover.getBoundingClientRect();
+
+      // 1. Other cards slide down to bottom of screen
+      var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      var allCards = cards.renderRoot ? Array.from(cards.renderRoot.querySelectorAll('sar-card')) : [];
+      var otherCards = allCards.filter(function (c) {
+        return c !== fromCard && isNodeInViewport(c);
+      });
+      var farthestDistance = 0;
+      otherCards.forEach(function (c) {
+        var d = viewportHeight - c.getBoundingClientRect().top + 50;
+        if (d > farthestDistance) farthestDistance = d;
+      });
+      if (farthestDistance <= 0) farthestDistance = viewportHeight;
+
+      exitedCards = otherCards;
+      exitedDistance = farthestDistance;
+
+      otherCards.forEach(function (c, i) {
+        clearAnimations(c);
+        var cAnim = c.animate([
+          { transform: 'none' },
+          { transform: 'translateY(' + farthestDistance + 'px)' }
+        ], {
+          duration: 500,
+          delay: i * 50,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        });
+        cAnim.onfinish = function () {
+          c.style.transform = 'translateY(' + farthestDistance + 'px)';
+        };
+      });
+
+      // 3. Filters blur & fade out
+      var filters = cards.$ ? cards.$.filters : cards.renderRoot?.querySelector('#filters');
+      if (filters) {
+        clearAnimations(filters);
+        var fAnim = filters.animate([
+          { opacity: 1, filter: 'blur(0px)' },
+          { opacity: 0, filter: 'blur(8px)' }
+        ], {
+          duration: 400,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        });
+        fAnim.onfinish = function () {
+          filters.style.opacity = '0';
+          filters.style.filter = 'blur(8px)';
+        };
+      }
+
+      // 4. Main title animating from main page to review page
+      var fromHeader = cards.$ ? cards.$.header : cards.renderRoot?.querySelector('#header');
+      var fromHeaderRect = fromHeader ? fromHeader.getBoundingClientRect() : null;
+
+      var preClose = review.$ ? review.$.close : review.renderRoot?.querySelector('#close');
+      if (preClose) {
+        clearAnimations(preClose);
+        preClose.style.opacity = '0';
+      }
+
+      review.removeAttribute('hidden');
+
+      var readyPromise = review.updateComplete
+        ? review.updateComplete
+        : new Promise(function (res) { requestAnimationFrame(res); });
+
+      readyPromise.then(function () {
+        var toCover = review.$ ? review.$.cover : review.renderRoot?.querySelector('#cover');
+        var toHeader = review.$ ? review.$.header : review.renderRoot?.querySelector('#header');
+
+        if (!toCover) {
+          setPage(1);
+          isTransitioning = false;
+          return;
+        }
+
+        var toRect = toCover.getBoundingClientRect();
+        if (!toRect.width || !toRect.height) {
+          setPage(1);
+          isTransitioning = false;
+          return;
+        }
+
+        // Hero Cover Animation
+        var deltaLeft = fromRect.left - toRect.left;
+        var deltaTop = fromRect.top - toRect.top;
+        var deltaWidth = fromRect.width / toRect.width;
+        var deltaHeight = fromRect.height / toRect.height;
+
+        toCover.style.transformOrigin = '0 0';
+        toCover.style.zIndex = '1000';
+        fromCover.style.visibility = 'hidden';
+
+        clearAnimations(toCover);
+        var anim = toCover.animate([
+          {
+            transform: 'translate(' + deltaLeft + 'px, ' + deltaTop + 'px) scale(' + deltaWidth + ', ' + deltaHeight + ')'
+          },
+          {
+            transform: 'none'
+          }
+        ], {
+          duration: 500,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        });
+
+        // 4. Main title hero animation
+        if (fromHeader && toHeader && fromHeaderRect) {
+          clearAnimations(fromHeader);
+          clearAnimations(toHeader);
+
+          var toHeaderRect = toHeader.getBoundingClientRect();
+          var hDeltaLeft = fromHeaderRect.left - toHeaderRect.left;
+          var hDeltaTop = fromHeaderRect.top - toHeaderRect.top;
+          var hDeltaWidth = fromHeaderRect.width / toHeaderRect.width;
+          var hDeltaHeight = fromHeaderRect.height / toHeaderRect.height;
+
+          toHeader.style.transformOrigin = '0 0';
+          fromHeader.style.visibility = 'hidden';
+
+          var headerAnim = toHeader.animate([
+            {
+              transform: 'translate(' + hDeltaLeft + 'px, ' + hDeltaTop + 'px) scale(' + hDeltaWidth + ', ' + hDeltaHeight + ')'
+            },
+            {
+              transform: 'none'
+            }
+          ], {
+            duration: 500,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+          });
+
+          headerAnim.onfinish = function () {
+            clearAnimations(toHeader);
+            toHeader.style.transformOrigin = '';
+            toHeader.style.transform = '';
+            fromHeader.style.visibility = '';
+          };
+        }
+
+        // 2. Review page elements (title, metadata, review) sliding in from left
+        var articleElements = review.renderRoot ? Array.from(review.renderRoot.querySelectorAll('.article')) : [];
+        var titlebar = review.$ ? review.$.titlebar : review.renderRoot?.querySelector('#titlebar');
+        var slideDist = titlebar ? titlebar.getBoundingClientRect().right : window.innerWidth;
+        if (slideDist <= 0) slideDist = window.innerWidth;
+
+        articleElements.forEach(function (el, i) {
+          clearAnimations(el);
+          el.style.transform = 'translateX(-' + slideDist + 'px)';
+          el.style.opacity = '0';
+          var aAnim = el.animate([
+            { transform: 'translateX(-' + slideDist + 'px)', opacity: 0 },
+            { transform: 'none', opacity: 1 }
+          ], {
+            duration: 500,
+            delay: 100 + i * 50,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+          });
+          aAnim.onfinish = function () {
+            clearAnimations(el);
+            el.style.transform = '';
+            el.style.opacity = '';
+          };
+        });
+
+        var closeBtn = review.$ ? review.$.close : review.renderRoot?.querySelector('#close');
+        if (closeBtn) {
+          clearAnimations(closeBtn);
+          closeBtn.style.opacity = '0';
+          var cbAnim = closeBtn.animate([
+            { opacity: 0 },
+            { opacity: 1 }
+          ], {
+            duration: 500,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+          });
+          cbAnim.onfinish = function () {
+            clearAnimations(closeBtn);
+            closeBtn.style.opacity = '';
+            closeBtn.style.transform = '';
+          };
+        }
+
+        anim.onfinish = function () {
+          clearAnimations(toCover);
+          toCover.style.transformOrigin = '';
+          toCover.style.zIndex = '';
+          toCover.style.transform = '';
+          fromCover.style.visibility = '';
+          if (activeCardTitle) {
+            clearAnimations(activeCardTitle);
+            activeCardTitle.style.visibility = 'hidden';
+          }
+          otherCards.forEach(function (c) {
+            clearAnimations(c);
+            c.style.transform = 'translateY(' + farthestDistance + 'px)';
+          });
+          cards.setAttribute('hidden', '');
+          pages._selected = 1;
+          isTransitioning = false;
+        };
+      }).catch(function () {
+        setPage(1);
+        isTransitioning = false;
+      });
+    };
+
+    var animateToCards = function () {
+      if (isTransitioning) return;
+      isTransitioning = true;
+
+      var fromCover = review.$ ? review.$.cover : review.renderRoot?.querySelector('#cover');
+      var toCover = activeCardCover;
+      var targetCard = activeCardElement;
+
+      if ((!toCover || !targetCard) && review.review && cards.renderRoot) {
+        var clean = cleanTitle(review.review.title);
+        var cardElem = cards.renderRoot.querySelector('#' + CSS.escape(clean));
+        if (cardElem) {
+          targetCard = cardElem;
+          toCover = cardElem.$ ? cardElem.$.cover : cardElem.renderRoot?.querySelector('#cover');
+        }
+      }
+
+      var targetCardTitle = activeCardTitle || (targetCard ? (targetCard.$ ? targetCard.$.title : targetCard.renderRoot?.querySelector('#title')) : null);
+      if (targetCardTitle) {
+        clearAnimations(targetCardTitle);
+        targetCardTitle.style.visibility = 'hidden';
+      }
+
+      if (!fromCover || !toCover) {
+        setPage(0);
+        isTransitioning = false;
+        return;
+      }
+
+      var fromRect = fromCover.getBoundingClientRect();
+      cards.removeAttribute('hidden');
+      var toRect = toCover.getBoundingClientRect();
+
+      var deltaLeft = toRect.left - fromRect.left;
+      var deltaTop = toRect.top - fromRect.top;
+      var deltaWidth = toRect.width / fromRect.width;
+      var deltaHeight = toRect.height / fromRect.height;
+
+      fromCover.style.transformOrigin = '0 0';
+      fromCover.style.zIndex = '1000';
+      toCover.style.visibility = 'hidden';
+
+      // 4. Main title animating from review page back to main page
+      var fromHeader = review.$ ? review.$.header : review.renderRoot?.querySelector('#header');
+      var toHeader = cards.$ ? cards.$.header : cards.renderRoot?.querySelector('#header');
+      if (fromHeader && toHeader) {
+        clearAnimations(fromHeader);
+        clearAnimations(toHeader);
+
+        var fromHeaderRect = fromHeader.getBoundingClientRect();
+        var toHeaderRect = toHeader.getBoundingClientRect();
+        var hDeltaLeft = toHeaderRect.left - fromHeaderRect.left;
+        var hDeltaTop = toHeaderRect.top - fromHeaderRect.top;
+        var hDeltaWidth = toHeaderRect.width / fromHeaderRect.width;
+        var hDeltaHeight = toHeaderRect.height / fromHeaderRect.height;
+
+        fromHeader.style.transformOrigin = '0 0';
+        toHeader.style.visibility = 'hidden';
+
+        var headerAnim = fromHeader.animate([
+          { transform: 'none' },
+          { transform: 'translate(' + hDeltaLeft + 'px, ' + hDeltaTop + 'px) scale(' + hDeltaWidth + ', ' + hDeltaHeight + ')' }
+        ], {
+          duration: 500,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        });
+
+        headerAnim.onfinish = function () {
+          clearAnimations(fromHeader);
+          fromHeader.style.transformOrigin = '';
+          fromHeader.style.transform = '';
+          toHeader.style.visibility = '';
+        };
+      }
+
+      // 2. Review page elements sliding out to left
+      var articleElements = review.renderRoot ? Array.from(review.renderRoot.querySelectorAll('.article')) : [];
+      var titlebar = review.$ ? review.$.titlebar : review.renderRoot?.querySelector('#titlebar');
+      var slideDist = titlebar ? titlebar.getBoundingClientRect().right : window.innerWidth;
+      if (slideDist <= 0) slideDist = window.innerWidth;
+
+      articleElements.forEach(function (el, i) {
+        clearAnimations(el);
+        var aAnim = el.animate([
+          { transform: 'none', opacity: 1 },
+          { transform: 'translateX(-' + slideDist + 'px)', opacity: 0 }
+        ], {
+          duration: 350,
+          delay: i * 40,
+          easing: 'ease-in'
+        });
+        aAnim.onfinish = function () {
+          clearAnimations(el);
+          el.style.transform = 'translateX(-' + slideDist + 'px)';
+          el.style.opacity = '0';
+        };
+      });
+
+      var closeBtn = review.$ ? review.$.close : review.renderRoot?.querySelector('#close');
+      if (closeBtn) {
+        clearAnimations(closeBtn);
+        closeBtn.style.opacity = '1';
+        var cbAnim = closeBtn.animate([
+          { opacity: 1 },
+          { opacity: 0 }
+        ], {
+          duration: 500,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        });
+        cbAnim.onfinish = function () {
+          clearAnimations(closeBtn);
+          closeBtn.style.opacity = '0';
+        };
+      }
+
+      // 1. Other cards slide back up from bottom of screen
+      var viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      var allCards = cards.renderRoot ? Array.from(cards.renderRoot.querySelectorAll('sar-card')) : [];
+      var cardsToAnimate = [];
+
+      if (exitedCards && exitedCards.length > 0) {
+        cardsToAnimate = exitedCards.filter(function (c) {
+          return c !== targetCard;
+        });
+      } else {
+        cardsToAnimate = allCards.filter(function (c) {
+          return c !== targetCard && isNodeInViewport(c);
+        });
+      }
+
+      var dist = Math.max(exitedDistance || 0, viewportHeight);
+      if (dist <= 0) dist = viewportHeight;
+
+      cardsToAnimate.forEach(function (c, i) {
+        clearAnimations(c);
+        c.style.transform = 'translateY(' + dist + 'px)';
+        var cAnim = c.animate([
+          { transform: 'translateY(' + dist + 'px)' },
+          { transform: 'none' }
+        ], {
+          duration: 500,
+          delay: 50 + i * 40,
+          easing: 'cubic-bezier(0, 0, 0.2, 1)'
+        });
+        cAnim.onfinish = function () {
+          clearAnimations(c);
+          c.style.transform = '';
+        };
+      });
+
+      // 3. Filters blur & fade in
+      var filters = cards.$ ? cards.$.filters : cards.renderRoot?.querySelector('#filters');
+      if (filters) {
+        clearAnimations(filters);
+        var fAnim = filters.animate([
+          { opacity: 0, filter: 'blur(8px)' },
+          { opacity: 1, filter: 'blur(0px)' }
+        ], {
+          duration: 450,
+          delay: 50,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        });
+        fAnim.onfinish = function () {
+          clearAnimations(filters);
+          filters.style.opacity = '';
+          filters.style.filter = '';
+        };
+      }
+
+      // Hero Cover Animation Back
+      clearAnimations(fromCover);
+      var anim = fromCover.animate([
+        {
+          transform: 'none'
+        },
+        {
+          transform: 'translate(' + deltaLeft + 'px, ' + deltaTop + 'px) scale(' + deltaWidth + ', ' + deltaHeight + ')'
+        }
+      ], {
+        duration: 500,
+        easing: 'cubic-bezier(0.4, 0, 0.2, 1)'
+      });
+
+      anim.onfinish = function () {
+        clearAnimations(fromCover);
+        fromCover.style.transformOrigin = '';
+        fromCover.style.zIndex = '';
+        fromCover.style.transform = '';
+        toCover.style.visibility = '';
+        review.setAttribute('hidden', '');
+
+        // Card title becomes visible at the end of the transition back to main page
+        if (targetCardTitle) {
+          clearAnimations(targetCardTitle);
+          targetCardTitle.style.visibility = '';
+          targetCardTitle.animate([
+            { opacity: 0 },
+            { opacity: 1 }
+          ], {
+            duration: 150,
+            easing: 'ease-in'
+          });
+        }
+
+        articleElements.forEach(function (el) {
+          clearAnimations(el);
+          el.style.transform = '';
+          el.style.opacity = '';
+        });
+        if (closeBtn) {
+          clearAnimations(closeBtn);
+          closeBtn.style.opacity = '';
+          closeBtn.style.transform = '';
+        }
+        if (filters) {
+          clearAnimations(filters);
+          filters.style.opacity = '';
+          filters.style.filter = '';
+        }
+        pages._selected = 0;
+        activeCardCover = null;
+        activeCardElement = null;
+
+        allCards.forEach(function (c) {
+          if (!cardsToAnimate.includes(c)) {
+            clearAnimations(c);
+            c.style.transform = '';
+          }
+        });
+      };
+
+      var maxCardTime = 500;
+      if (cardsToAnimate.length > 0) {
+        maxCardTime = Math.max(500, 50 + (cardsToAnimate.length - 1) * 40 + 500);
+      }
+
+      setTimeout(function () {
+        allCards.forEach(function (c) {
+          clearAnimations(c);
+          c.style.transform = '';
+          var t = c.$ ? c.$.title : c.renderRoot?.querySelector('#title');
+          if (t) {
+            clearAnimations(t);
+            t.style.visibility = '';
+            t.style.opacity = '';
+          }
+        });
+        exitedCards = [];
+        exitedDistance = 0;
+        activeCardTitle = null;
+        isTransitioning = false;
+      }, maxCardTime);
+    };
+
     cards.addEventListener('card-selected', function (event) {
       window.history.pushState(null, null, '/a/' + cleanTitle(event.detail.review.title));
-      review.review = event.detail.review;
-      review.isAdmin = isAdmin;
-      pages.selected = 1;
+      animateToReview(event.detail.cover, event.detail.review, event.detail.card);
     });
 
     review.addEventListener('exit-click', function (event) {
       window.history.pushState(null, null, '/');
-      pages.selected = 0;
+      animateToCards();
     });
 
     window.onpopstate = function (event) {
-      pages.selected = 0;
+      animateToCards();
       if (cards && typeof cards.selectCard === 'function') {
         cards.selectCard();
       }
