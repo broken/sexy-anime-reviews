@@ -16,5 +16,6 @@
 # Python pycache:
 __pycache__/
 .venv/
+node_modules/
 # Ignored by the build system
 /setup.cfg
