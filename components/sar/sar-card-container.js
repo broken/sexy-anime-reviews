@@ -194,28 +194,14 @@ export class SarCardContainer extends LitElement {
       font-weight: 500;
       color: var(--secondary-text-color, #727272);
     }
-    #titleSearch {
-      margin-top: -28px;
-      --paper-input-container-input: {
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-        color: inherit;
-      };
-      --paper-input-container-label: {
-        font-family: inherit;
-        font-size: inherit;
-        font-weight: inherit;
-        line-height: inherit;
-      };
-    }
+    .search-input-container,
     .dropdown-container {
       position: relative;
       display: inline-flex;
       align-items: center;
       margin-top: -8px;
     }
+    .title-search-input,
     .genre-select {
       font-family: inherit;
       font-size: 13px;
@@ -224,21 +210,29 @@ export class SarCardContainer extends LitElement {
       border: none;
       border-bottom: 1px solid var(--divider-color, #B6B6B6);
       border-radius: 0;
-      padding: 4px 24px 4px 0;
+      padding: 4px 0;
       min-width: 150px;
-      cursor: pointer;
       outline: none;
+      transition: border-color 0.2s;
+    }
+    .genre-select {
+      padding-right: 24px;
+      cursor: pointer;
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
       background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><polygon points="0,0 10,0 5,6" fill="%23727272"/></svg>');
       background-repeat: no-repeat;
       background-position: right 6px center;
-      transition: border-color 0.2s;
     }
+    .title-search-input:focus,
     .genre-select:focus {
       border-bottom: 2px solid var(--default-primary-color, #9C27B0);
       margin-bottom: -1px;
+    }
+    .title-search-input::placeholder {
+      color: var(--secondary-text-color, #727272);
+      opacity: 0.8;
     }
     .genre-select option {
       color: var(--primary-text-color, #212121);
@@ -729,18 +723,19 @@ export class SarCardContainer extends LitElement {
               </div>
             </div>
             <div class="spacer"></div>
-            <paper-input
-              id="titleSearch"
-              label="Search by title"
-              .value="${this.searchString}"
-              value="${this.searchString}"
-              @value-changed="${(e) => {
-                this.searchString = e.detail.value ?? e.target.value ?? '';
-              }}"
-              @input="${(e) => {
-                this.searchString = e.target.value ?? '';
-              }}"
-            ></paper-input>
+            <div class="search-input-container">
+              <input
+                type="text"
+                id="titleSearch"
+                class="title-search-input"
+                placeholder="Search by title"
+                aria-label="Search by title"
+                .value="${this.searchString || ''}"
+                @input="${(e) => {
+                  this.searchString = e.target.value;
+                }}"
+              />
+            </div>
             <div class="spacer"></div>
             <div class="dropdown-container">
               <select
