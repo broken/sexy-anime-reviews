@@ -133,13 +133,26 @@
     }
     .cover-section {
       margin: 16px 0;
-      padding: 12px 16px;
+      padding: 16px;
       background: rgba(0, 0, 0, 0.15);
       border-radius: 6px;
       display: flex;
       align-items: center;
       gap: 20px;
       flex-wrap: wrap;
+    }
+    .image-preview-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    .image-preview-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #aaa;
     }
     .cover-preview-img {
       height: 420px;
@@ -148,10 +161,22 @@
       flex-shrink: 0;
       border: 1px solid rgba(255, 255, 255, 0.2);
     }
+    .thumb-preview-img {
+      height: 320px;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+      flex-shrink: 0;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
     .cover-actions {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 16px;
+    }
+    .cover-action-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
     }
     .cover-status {
       font-size: 12px;
@@ -205,20 +230,41 @@
 
       <paper-input label="Title" value="{{title}}"></paper-input>
 
-      <!-- Cover Image & Preview Section -->
+      <!-- Cover & Thumbnail Image Section -->
       <div class="cover-section">
         <template is="dom-if" if="{{previewCover}}">
-          <img class="cover-preview-img" src$="{{previewCover}}" alt="Cover preview">
+          <div class="image-preview-card">
+            <div class="image-preview-label">Cover (Review)</div>
+            <img class="cover-preview-img" src$="{{previewCover}}" alt="Cover preview">
+          </div>
+        </template>
+        <template is="dom-if" if="{{previewThumbnail}}">
+          <div class="image-preview-card">
+            <div class="image-preview-label">Thumbnail (Card)</div>
+            <img class="thumb-preview-img" src$="{{previewThumbnail}}" alt="Thumbnail preview">
+          </div>
         </template>
         <div class="cover-actions">
-          <template is="dom-if" if="{{previewCover}}">
-            <div class="cover-status">&#x2714; High-res cover &amp; thumbnail ready</div>
-          </template>
-          <paper-button raised on-click="_triggerCoverUpload">
-            <file-input accept="image/*" invalidText="Invalid Image" on-change="_uploadCover">
-              <span>{{_computeUploadButtonText(previewCover)}}</span>
-            </file-input>
-          </paper-button>
+          <div class="cover-action-item">
+            <template is="dom-if" if="{{previewCover}}">
+              <div class="cover-status">&#x2714; High-res cover ready</div>
+            </template>
+            <paper-button raised on-click="_triggerCoverUpload">
+              <file-input id="coverFileInput" accept="image/*" invalidText="Invalid Image" on-change="_uploadCover">
+                <span>{{_computeUploadButtonText(previewCover)}}</span>
+              </file-input>
+            </paper-button>
+          </div>
+          <div class="cover-action-item">
+            <template is="dom-if" if="{{previewThumbnail}}">
+              <div class="cover-status">&#x2714; Thumbnail ready</div>
+            </template>
+            <paper-button raised on-click="_triggerThumbnailUpload">
+              <file-input id="thumbnailFileInput" accept="image/*" invalidText="Invalid Image" on-change="_uploadThumbnail">
+                <span>{{_computeThumbnailButtonText(previewThumbnail)}}</span>
+              </file-input>
+            </paper-button>
+          </div>
         </div>
       </div>
 
@@ -253,6 +299,10 @@
       thumbnail: String,
       thumbnailImg: Object,
       previewCover: {
+        type: String,
+        value: ''
+      },
+      previewThumbnail: {
         type: String,
         value: ''
       },
@@ -296,7 +346,8 @@
             this.genres = Object.values(val.genres);
             this.cover = val.cover;
             this.thumbnail = val.thumbnail || '';
-            this.previewCover = val.thumbnail || val.cover;
+            this.previewCover = val.cover || '';
+            this.previewThumbnail = val.thumbnail || '';
           }.bind(this));
         }
       }.bind(this));
@@ -306,6 +357,9 @@
     },
     _computeUploadButtonText: function(previewCover) {
       return previewCover ? 'Change Cover Image' : 'Upload Cover Image';
+    },
+    _computeThumbnailButtonText: function(previewThumbnail) {
+      return previewThumbnail ? 'Change Thumbnail Image' : 'Upload Thumbnail Image';
     },
     _hasSearchResults: function(results) {
       return results && results.length > 0;
@@ -377,7 +431,7 @@
       this.searchResults = [];
 
       if (item.coverUrl) {
-        this.previewCover = item.thumbnailUrl || item.coverUrl;
+        this.previewCover = item.coverUrl;
         var proxyUrl = '/api/anime/proxy-image?url=' + encodeURIComponent(item.coverUrl);
         fetch(proxyUrl)
           .then(function(res) {
@@ -391,6 +445,9 @@
             var file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
             this.coverImg = file;
             this.previewCover = window.URL.createObjectURL(blob);
+            if (!item.thumbnailUrl) {
+              this._generateClientThumbnail(file);
+            }
           }.bind(this))
           .catch(function(err) {
             console.warn('Could not load blob directly, fallback to cover URL:', err);
@@ -400,6 +457,7 @@
 
       if (item.thumbnailUrl) {
         this.thumbnail = item.thumbnailUrl;
+        this.previewThumbnail = item.thumbnailUrl;
         var proxyThumbUrl = '/api/anime/proxy-image?url=' + encodeURIComponent(item.thumbnailUrl);
         fetch(proxyThumbUrl)
           .then(function(res) {
@@ -412,6 +470,7 @@
             var filename = safeTitle + '_thumb.' + ext;
             var file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
             this.thumbnailImg = file;
+            this.previewThumbnail = window.URL.createObjectURL(blob);
           }.bind(this))
           .catch(function(err) {
             console.warn('Could not load thumbnail blob directly, fallback to thumbnail URL:', err);
@@ -422,8 +481,22 @@
       this.$.toast.text = 'Loaded info for ' + (item.title || item.romajiTitle);
       this.$.toast.show();
     },
-    _triggerCoverUpload: function() {
-      var fileInput = this.$$('file-input input[type="file"]');
+    _triggerCoverUpload: function(e) {
+      if (e && e.target && e.target.tagName === 'INPUT') {
+        return;
+      }
+      var el = this.$.coverFileInput || this.$$('#coverFileInput');
+      var fileInput = el ? el.querySelector('input[type="file"]') : null;
+      if (fileInput) {
+        fileInput.click();
+      }
+    },
+    _triggerThumbnailUpload: function(e) {
+      if (e && e.target && e.target.tagName === 'INPUT') {
+        return;
+      }
+      var el = this.$.thumbnailFileInput || this.$$('#thumbnailFileInput');
+      var fileInput = el ? el.querySelector('input[type="file"]') : null;
       if (fileInput) {
         fileInput.click();
       }
@@ -449,6 +522,7 @@
       this.thumbnail = '';
       this.thumbnailImg = null;
       this.previewCover = '';
+      this.previewThumbnail = '';
       this.genres = [];
       this.viewMethod = '';
       this.showType = '';
@@ -566,6 +640,14 @@
         this._generateClientThumbnail(valid[0]);
       }
     },
+    _uploadThumbnail: function(e) {
+      var valid = e.detail.valid,
+          invalid = e.detail.invalid;
+      if (valid && valid.length) {
+        this.thumbnailImg = valid[0];
+        this.previewThumbnail = window.URL.createObjectURL(valid[0]);
+      }
+    },
     _generateClientThumbnail: function(file) {
       var reader = new FileReader();
       reader.onload = function(e) {
@@ -581,6 +663,7 @@
           canvas.toBlob(function(blob) {
             if (blob) {
               this.thumbnailImg = new File([blob], 'thumb_' + file.name, { type: blob.type || 'image/jpeg' });
+              this.previewThumbnail = window.URL.createObjectURL(blob);
             }
           }.bind(this), 'image/jpeg', 0.85);
         }.bind(this);
