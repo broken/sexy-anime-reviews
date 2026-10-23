@@ -362,17 +362,16 @@
         this.viewMethod = item.viewMethod;
       }
       if (item.genres && item.genres.length) {
-        this.genres = item.genres;
-        // Merge into tags for paper-select
-        if (this.tags) {
-          var currentTags = this.tags.slice();
-          item.genres.forEach(function(g) {
-            if (currentTags.indexOf(g) === -1) {
-              currentTags.push(g);
-            }
-          });
-          this.tags = currentTags;
-        }
+        this.genres = item.genres.map(function(g) {
+          var tag = g.trim().toLowerCase();
+          if (tag === 'shonen') {
+            return 'shōnen';
+          }
+          if (tag === 'shojo') {
+            return 'shōjo';
+          }
+          return tag;
+        });
       }
       this.searchResults = [];
 
