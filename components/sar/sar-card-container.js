@@ -105,14 +105,20 @@ export class SarCardContainer extends LitElement {
     .spacer {
       width: 28px;
     }
-    paper-radio-group {
+    .radio-group {
       margin-top: -2px;
     }
-    paper-radio-button {
+    .radio-label {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
       padding: 0 10px 5px;
+      user-select: none;
     }
-    paper-radio-button::shadow #radioLabel {
-      margin-left: 3px;
+    .radio-label input[type="radio"] {
+      margin: 0 5px 0 0;
+      accent-color: var(--default-primary-color, #9C27B0);
+      cursor: pointer;
     }
     paper-toggle-button {
       padding: 0 2px 9px 10px;
@@ -551,20 +557,32 @@ export class SarCardContainer extends LitElement {
           <div class="horizontal" id="filters">
             <div class="horizontal">
               <div>Order by</div>
-              <paper-radio-group
-                class="vertical"
-                .selected="${this.orderBy}"
-                selected="${this.orderBy}"
-                @selected-changed="${(e) => {
-                  this.orderBy = e.detail.value ?? e.target.selected ?? 'title';
-                }}"
-                @iron-select="${(e) => {
-                  if (e.target.selected) this.orderBy = e.target.selected;
-                }}"
-              >
-                <paper-radio-button name="title">Title</paper-radio-button>
-                <paper-radio-button name="rating">Rating</paper-radio-button>
-              </paper-radio-group>
+              <div class="vertical radio-group" role="radiogroup">
+                <label class="radio-label">
+                  <input
+                    type="radio"
+                    name="orderBy"
+                    value="title"
+                    .checked="${this.orderBy === 'title'}"
+                    @change="${() => {
+                      this.orderBy = 'title';
+                    }}"
+                  />
+                  <span>Title</span>
+                </label>
+                <label class="radio-label">
+                  <input
+                    type="radio"
+                    name="orderBy"
+                    value="rating"
+                    .checked="${this.orderBy === 'rating'}"
+                    @change="${() => {
+                      this.orderBy = 'rating';
+                    }}"
+                  />
+                  <span>Rating</span>
+                </label>
+              </div>
             </div>
             <div class="spacer"></div>
             <div class="horizontal">
