@@ -134,6 +134,36 @@
       } else {
         cards.setAttribute('hidden', '');
         review.removeAttribute('hidden');
+        var resetReview = function () {
+          var closeBtn = review.$ ? review.$.close : review.renderRoot?.querySelector('#close');
+          if (closeBtn) {
+            clearAnimations(closeBtn);
+            closeBtn.style.opacity = '';
+            closeBtn.style.transform = '';
+          }
+          var revHeader = review.$ ? review.$.header : review.renderRoot?.querySelector('#header');
+          if (revHeader) {
+            clearAnimations(revHeader);
+            revHeader.style.transform = '';
+            revHeader.style.visibility = '';
+          }
+          var revCover = review.$ ? review.$.cover : review.renderRoot?.querySelector('#cover');
+          if (revCover) {
+            clearAnimations(revCover);
+            revCover.style.transform = '';
+            revCover.style.visibility = '';
+          }
+          var articleElements = review.renderRoot ? Array.from(review.renderRoot.querySelectorAll('.article')) : [];
+          articleElements.forEach(function (el) {
+            clearAnimations(el);
+            el.style.transform = '';
+            el.style.opacity = '';
+          });
+        };
+        resetReview();
+        if (review.updateComplete) {
+          review.updateComplete.then(resetReview);
+        }
       }
     };
 
@@ -378,6 +408,12 @@
           toCover.style.zIndex = '';
           toCover.style.transform = '';
           fromCover.style.visibility = '';
+          var closeBtn = review.$ ? review.$.close : review.renderRoot?.querySelector('#close');
+          if (closeBtn) {
+            clearAnimations(closeBtn);
+            closeBtn.style.opacity = '';
+            closeBtn.style.transform = '';
+          }
           if (activeCardTitle) {
             clearAnimations(activeCardTitle);
             activeCardTitle.style.visibility = 'hidden';
