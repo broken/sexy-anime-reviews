@@ -65,12 +65,16 @@ export class SarCardContainer extends LitElement {
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
       align-self: flex-end;
     }
-    #paper-scroll-header-panel {
+    .scroll-container {
       position: absolute;
       top: 0;
       right: 0;
       bottom: 0;
       left: 0;
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      box-sizing: border-box;
     }
     .paper-header {
       padding: 0 6%;
@@ -284,7 +288,8 @@ export class SarCardContainer extends LitElement {
       minRatingSlider: this.renderRoot?.querySelector('#minRatingSlider'),
       titleSearch: this.renderRoot?.querySelector('#titleSearch'),
       genreSearch: this.renderRoot?.querySelector('#genreSearch'),
-      scrollHeaderPanel: this.renderRoot?.querySelector('#paper-scroll-header-panel'),
+      scrollContainer: this.renderRoot?.querySelector('#scrollContainer') || this.renderRoot?.querySelector('.scroll-container'),
+      scrollHeaderPanel: this.renderRoot?.querySelector('#scrollContainer') || this.renderRoot?.querySelector('.scroll-container'),
     };
   }
 
@@ -607,7 +612,7 @@ export class SarCardContainer extends LitElement {
 
   render() {
     return html`
-      <paper-scroll-header-panel id="paper-scroll-header-panel" noReveal no-reveal>
+      <div id="scrollContainer" class="scroll-container">
         <div class="paper-header">
           <div id="header">Spoiler Free Anime Reviews</div>
         </div>
@@ -769,7 +774,7 @@ export class SarCardContainer extends LitElement {
             )}
           </div>
         </div>
-      </paper-scroll-header-panel>
+      </div>
     `;
   }
 }
