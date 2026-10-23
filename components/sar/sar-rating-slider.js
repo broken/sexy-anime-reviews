@@ -1,7 +1,5 @@
 import { LitElement, html, css } from 'lit';
-import { property, customElement } from 'lit/decorators.js';
 
-@customElement('sar-rating-slider')
 export class SarRatingSlider extends LitElement {
   static styles = css`
     :host {
@@ -29,10 +27,13 @@ export class SarRatingSlider extends LitElement {
     }
   `;
 
-  @property({ type: String }) label = 'Rating';
-  @property({ type: String }) rating = 'abysmal';
-  @property({ type: Number }) ratingNum = 1;
-  @property({ type: String }) ratingText = 'abysmal';
+  static properties = {
+    label: { type: String },
+    rating: { type: String },
+    ratingNum: { type: Number },
+    ratingText: { type: String },
+  };
+
 
   static get ratingValues() {
     return {
@@ -82,6 +83,10 @@ export class SarRatingSlider extends LitElement {
 
   constructor() {
     super();
+    this.label = 'Rating';
+    this.rating = 'abysmal';
+    this.ratingNum = 1;
+    this.ratingText = 'abysmal';
     this._ratingChanged();
   }
 
@@ -155,3 +160,5 @@ export class SarRatingSlider extends LitElement {
     `;
   }
 }
+
+customElements.define('sar-rating-slider', SarRatingSlider);

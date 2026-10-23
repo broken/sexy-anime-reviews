@@ -3,12 +3,27 @@
 
 <head>
   <title>Spoiler Free Anime Reviews</title>
-  <link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow|Open+Sans' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=PT+Sans+Narrow|Open+Sans' rel='stylesheet' type='text/css'>
   <link rel="apple-touch-icon" sizes="180x180" href="/pub/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/pub/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/pub/favicon-16x16.png">
   <link rel="manifest" href="/pub/site.webmanifest">
   <style type="text/css">
+    :root {
+      /* theme-carbon-fiber styles */
+      --dark-primary-color: #7B1FA2;
+      --default-primary-color: #9C27B0;
+      --light-primary-color: #E1BEE7;
+      --text-primary-color: #FFFFFF;
+      --accent-color: #03A9F4;
+      --primary-background-color: #ffffff;
+      --primary-text-color: #212121;
+      --secondary-text-color: #727272;
+      --disabled-text-color: #bdbdbd;
+      --divider-color: #B6B6B6;
+      --sar-card-text-color: var(--primary-text-color);
+    }
+
     html,
     body {
       height: 100%;
@@ -21,7 +36,12 @@
       font-size: 13px;
       color: #333;
       -webkit-user-select: none;
-      @apply(--layout-fit);
+      user-select: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
       background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+");
     }
 
@@ -37,8 +57,20 @@
   <link href="/components/polymer/polymer.html" rel="import">
   <link href="/components/neon-animation/neon-animated-pages.html" rel="import">
   <link href="/components/neon-animation/neon-animations.html" rel="import">
-  <link href="/components/sar/sar-card-container.html" rel="import">
-  <link href="/components/sar/sar-review.html" rel="import">
+  <link href="/components/iron-flex-layout/iron-flex-layout.html" rel="import">
+  <link href="/components/paper-dropdown-menu/paper-dropdown-menu.html" rel="import">
+  <link href="/components/paper-input/paper-input.html" rel="import">
+  <link href="/components/paper-item/paper-item.html" rel="import">
+  <link href="/components/paper-menu/paper-menu.html" rel="import">
+  <link href="/components/paper-radio-button/paper-radio-button.html" rel="import">
+  <link href="/components/paper-radio-group/paper-radio-group.html" rel="import">
+  <link href="/components/paper-scroll-header-panel/paper-scroll-header-panel.html" rel="import">
+  <link href="/components/paper-slider/paper-slider.html" rel="import">
+  <link href="/components/paper-toggle-button/paper-toggle-button.html" rel="import">
+  <link href="/components/paper-material/paper-material.html" rel="import">
+  <link href="/components/iron-icon/iron-icon.html" rel="import">
+  <link href="/components/iron-icons/iron-icons.html" rel="import">
+  <link href="/components/iron-icons/av-icons.html" rel="import">
   <link href="/components/sar/theme-carbon-fiber.html" rel="import">
   <link href="/components/sar/util.html" rel="import">
   <neon-animated-pages selected="0" id="pages">

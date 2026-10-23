@@ -1,5 +1,4 @@
 import { LitElement, html, css } from 'lit';
-import { property, customElement } from 'lit/decorators.js';
 import { subscribeToReviews, cleanTitle as fbCleanTitle, app } from '../../src/services/firebase.js';
 
 const RATING_VALUES = {
@@ -45,7 +44,6 @@ function cleanTitle(title) {
   return fbCleanTitle(title);
 }
 
-@customElement('sar-card-container')
 export class SarCardContainer extends LitElement {
   static styles = css`
     :host {
@@ -179,17 +177,34 @@ export class SarCardContainer extends LitElement {
     }
   `;
 
-  @property({ type: Array }) reviews = [];
-  @property({ type: String }) orderBy = 'title';
-  @property({ type: Boolean }) showDub = true;
-  @property({ type: Boolean }) showSub = true;
-  @property({ type: Boolean }) showMovie = true;
-  @property({ type: Boolean }) showSeries = true;
-  @property({ type: String }) searchString = '';
-  @property({ type: String }) searchGenre = '';
-  @property({ type: Number }) minRating = 0;
-  @property({ type: String }) minRatingText = 'abysmal';
-  @property({ type: Array }) genresAndCounts = [];
+  static properties = {
+    reviews: { type: Array },
+    orderBy: { type: String },
+    showDub: { type: Boolean },
+    showSub: { type: Boolean },
+    showMovie: { type: Boolean },
+    showSeries: { type: Boolean },
+    searchString: { type: String },
+    searchGenre: { type: String },
+    minRating: { type: Number },
+    minRatingText: { type: String },
+    genresAndCounts: { type: Array },
+  };
+
+  constructor() {
+    super();
+    this.reviews = [];
+    this.orderBy = 'title';
+    this.showDub = true;
+    this.showSub = true;
+    this.showMovie = true;
+    this.showSeries = true;
+    this.searchString = '';
+    this.searchGenre = '';
+    this.minRating = 0;
+    this.minRatingText = 'abysmal';
+    this.genresAndCounts = [];
+  }
 
   get ratingValuesInverted() {
     return RATING_VALUES_INVERTED;
@@ -685,3 +700,5 @@ export class SarCardContainer extends LitElement {
     `;
   }
 }
+
+customElements.define('sar-card-container', SarCardContainer);

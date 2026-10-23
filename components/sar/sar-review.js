@@ -1,5 +1,4 @@
 import { LitElement, html, css } from 'lit';
-import { property, customElement } from 'lit/decorators.js';
 
 function dbTitle(title) {
   if (typeof window !== 'undefined' && typeof window.dbTitle === 'function') {
@@ -8,7 +7,6 @@ function dbTitle(title) {
   return (title || '').replace(/\//g, '');
 }
 
-@customElement('sar-review')
 export class SarReview extends LitElement {
   static styles = css`
     :host {
@@ -104,16 +102,19 @@ export class SarReview extends LitElement {
     }
   `;
 
-  @property({ type: Object }) review = null;
-  @property({ type: Boolean, attribute: 'is-admin' }) isAdmin = false;
-  @property({ type: Number }) elevation = 4;
-  @property({ type: Object }) keyEventTarget = null;
+  static properties = {
+    review: { type: Object },
+    isAdmin: { type: Boolean, attribute: 'is-admin' },
+    elevation: { type: Number },
+    keyEventTarget: { type: Object },
+  };
 
   constructor() {
     super();
-    if (typeof document !== 'undefined') {
-      this.keyEventTarget = document.body;
-    }
+    this.review = null;
+    this.isAdmin = false;
+    this.elevation = 4;
+    this.keyEventTarget = typeof document !== 'undefined' ? document.body : null;
   }
 
   get $() {
@@ -381,3 +382,5 @@ export class SarReview extends LitElement {
     `;
   }
 }
+
+customElements.define('sar-review', SarReview);

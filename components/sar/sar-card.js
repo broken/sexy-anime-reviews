@@ -1,8 +1,17 @@
 import { LitElement, html, css } from 'lit';
-import { property, customElement } from 'lit/decorators.js';
 
-@customElement('sar-card')
 export class SarCard extends LitElement {
+  static properties = {
+    review: { type: Object },
+    elevation: { type: Number },
+  };
+
+  constructor() {
+    super();
+    this.review = null;
+    this.elevation = 4;
+  }
+
   static styles = css`
     :host {
       display: block;
@@ -22,9 +31,6 @@ export class SarCard extends LitElement {
       height: 320px;
     }
   `;
-
-  @property({ type: Object }) review = null;
-  @property({ type: Number }) elevation = 4;
 
   get $() {
     return {
@@ -78,3 +84,5 @@ export class SarCard extends LitElement {
     `;
   }
 }
+
+customElements.define('sar-card', SarCard);
