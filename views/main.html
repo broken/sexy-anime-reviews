@@ -1,79 +1,85 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Spoiler Free Anime Reviews</title>
-    <link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow|Open+Sans' rel='stylesheet' type='text/css'>
-    <link rel="apple-touch-icon" sizes="180x180" href="/pub/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/pub/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/pub/favicon-16x16.png">
-    <link rel="manifest" href="/pub/site.webmanifest">
-    <style type="text/css">
-      html, body {
-        height: 100%;
-        margin: 0;
-        padding: 0;
-      }
-      body {
-        font-family: 'Open Sans', Helvetica, Arial, sans-serif;
-        font-size: 13px;
-        color: #333;
-        -webkit-user-select: none;
-        @apply(--layout-fit);
-        background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+");
-      }
-      neon-animated-pages {
-        height: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <script type="module" src="/pub/dist/main.bundle.js"></script>
-    <script src="/components/webcomponentsjs/webcomponents-lite.min.js"></script>
-    <link href="/components/polymer/polymer.html" rel="import">
-    <link href="/components/neon-animation/neon-animated-pages.html" rel="import">
-    <link href="/components/neon-animation/neon-animations.html" rel="import">
-    <link href="/components/sar/sar-card-container.html" rel="import">
-    <link href="/components/sar/sar-review.html" rel="import">
-    <link href="/components/sar/theme-carbon-fiber.html" rel="import">
-    <link href="/components/sar/util.html" rel="import">
-    <neon-animated-pages selected="0" id="pages">
-      <sar-card-container id="cards"></sar-card-container>
-      <sar-review id="review"></sar-review>
-    </neon-animated-pages>
-    <script>
-      var pages = document.querySelector('#pages');
-      var cards = document.querySelector('#cards');
-      var review = document.querySelector('#review');
-      var isAdmin = ${is_admin};
 
-      var syncAdmin = function() {
-        if (review) {
-          review.isAdmin = isAdmin;
-        }
-      };
-      syncAdmin();
-      if (window.customElements) {
-        customElements.whenDefined('sar-review').then(syncAdmin);
-      }
+<head>
+  <title>Spoiler Free Anime Reviews</title>
+  <link href='http://fonts.googleapis.com/css?family=PT+Sans+Narrow|Open+Sans' rel='stylesheet' type='text/css'>
+  <link rel="apple-touch-icon" sizes="180x180" href="/pub/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/pub/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/pub/favicon-16x16.png">
+  <link rel="manifest" href="/pub/site.webmanifest">
+  <style type="text/css">
+    html,
+    body {
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
 
-      cards.addEventListener('card-selected', function(event) {
-        window.history.pushState(null, null, '/a/' + cleanTitle(event.detail.review.title));
-        review.review = event.detail.review;
+    body {
+      font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+      font-size: 13px;
+      color: #333;
+      -webkit-user-select: none;
+      @apply(--layout-fit);
+      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+");
+    }
+
+    neon-animated-pages {
+      height: 100%;
+    }
+  </style>
+</head>
+
+<body>
+  <script type="module" src="/pub/dist/main.bundle.js"></script>
+  <script src="/components/webcomponentsjs/webcomponents-lite.min.js"></script>
+  <link href="/components/polymer/polymer.html" rel="import">
+  <link href="/components/neon-animation/neon-animated-pages.html" rel="import">
+  <link href="/components/neon-animation/neon-animations.html" rel="import">
+  <link href="/components/sar/sar-card-container.html" rel="import">
+  <link href="/components/sar/sar-review.html" rel="import">
+  <link href="/components/sar/theme-carbon-fiber.html" rel="import">
+  <link href="/components/sar/util.html" rel="import">
+  <neon-animated-pages selected="0" id="pages">
+    <sar-card-container id="cards"></sar-card-container>
+    <sar-review id="review"></sar-review>
+  </neon-animated-pages>
+  <script>
+    var pages = document.querySelector('#pages');
+    var cards = document.querySelector('#cards');
+    var review = document.querySelector('#review');
+    var isAdmin = ${ is_admin };
+
+    var syncAdmin = function () {
+      if (review) {
         review.isAdmin = isAdmin;
-        pages.selected = 1;
-      });
+      }
+    };
+    syncAdmin();
+    if (window.customElements) {
+      customElements.whenDefined('sar-review').then(syncAdmin);
+    }
 
-      review.addEventListener('exit-click', function(event) {
-        window.history.pushState(null, null, '/');
-        pages.selected = 0;
-      });
+    cards.addEventListener('card-selected', function (event) {
+      window.history.pushState(null, null, '/a/' + cleanTitle(event.detail.review.title));
+      review.review = event.detail.review;
+      review.isAdmin = isAdmin;
+      pages.selected = 1;
+    });
 
-      window.onpopstate = function(event) {
-        pages.selected = 0;
-        if (cards && typeof cards.selectCard === 'function') {
-          cards.selectCard();
-        }
-      };
-    </script>
-  </body>
+    review.addEventListener('exit-click', function (event) {
+      window.history.pushState(null, null, '/');
+      pages.selected = 0;
+    });
+
+    window.onpopstate = function (event) {
+      pages.selected = 0;
+      if (cards && typeof cards.selectCard === 'function') {
+        cards.selectCard();
+      }
+    };
+  </script>
+</body>
+
 </html>
