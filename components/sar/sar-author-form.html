@@ -328,29 +328,74 @@
       },
       tags: Array
     },
+    observers: [
+      '_loadReviewFromRoute(routeData.name, reviews)'
+    ],
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
         this.firebase.database().ref('reviews').on('value', function(snapshot) {
           this.reviews = snapshot.val();
         }.bind(this));
-        if (!!this.routeData.name) {
-          let ref = this.firebase.database().ref('reviews').child(this.routeData.name);
-          ref.on('value', function(snapshot) {
-            let val = snapshot.val();
-            this.title = val.title;
-            this.rating = val.rating;
-            this.viewMethod = val.viewMethod;
-            this.showType = val.showType;
-            this.review = val.review;
-            this.genres = Object.values(val.genres);
-            this.cover = val.cover;
-            this.thumbnail = val.thumbnail || '';
-            this.previewCover = val.cover || '';
-            this.previewThumbnail = val.thumbnail || '';
-          }.bind(this));
-        }
       }.bind(this));
+    },
+    _populateFromReview: function(val) {
+      if (!val) return;
+      this.title = val.title || '';
+      this.rating = val.rating || 0;
+      this.viewMethod = val.viewMethod || '';
+      this.showType = val.showType || '';
+      this.review = val.review || '';
+      if (val.genres) {
+        this.genres = Array.isArray(val.genres) ? val.genres : Object.values(val.genres);
+      } else {
+        this.genres = [];
+      }
+      this.cover = val.cover || '';
+      this.thumbnail = val.thumbnail || '';
+      this.previewCover = val.cover || '';
+      this.previewThumbnail = val.thumbnail || '';
+    },
+    _findReview: function(name) {
+      if (!name || !this.reviews) return null;
+      var raw = name;
+      var decoded = name;
+      try {
+        decoded = decodeURIComponent(name);
+      } catch (e) {}
+
+      // 1. Direct match on key
+      if (this.reviews[decoded]) return this.reviews[decoded];
+      if (this.reviews[raw]) return this.reviews[raw];
+
+      // 2. Direct match on dbTitle
+      var targetDb = dbTitle(decoded);
+      if (this.reviews[targetDb]) return this.reviews[targetDb];
+
+      // 3. Match by cleanTitle
+      var targetClean = cleanTitle(decoded).toLowerCase();
+      for (var key in this.reviews) {
+        var item = this.reviews[key];
+        if (!item) continue;
+        if (cleanTitle(key).toLowerCase() === targetClean) {
+          return item;
+        }
+        if (item.title && cleanTitle(item.title).toLowerCase() === targetClean) {
+          return item;
+        }
+      }
+      return null;
+    },
+    _loadReviewFromRoute: function() {
+      if (!this.routeData || !this.routeData.name) return;
+      var name = this.routeData.name;
+      if (this._loadedRouteName === name && this.title) return;
+
+      var match = this._findReview(name);
+      if (match) {
+        this._loadedRouteName = name;
+        this._populateFromReview(match);
+      }
     },
     _computeSearchButtonText: function(isSearching) {
       return isSearching ? 'Fetching...' : 'Fetch Info';

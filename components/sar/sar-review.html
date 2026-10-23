@@ -54,6 +54,15 @@
     }
     #edit {
       padding: 4px;
+      font-size: 14px;
+    }
+    #edit a {
+      color: var(--secondary-text-color, #727272);
+      text-decoration: none;
+    }
+    #edit a:hover {
+      color: var(--default-primary-color, #9C27B0);
+      text-decoration: underline;
     }
     .meta {
       margin: 0 5px;
@@ -101,7 +110,7 @@
       <div class="article row" id="titlebar">
         <div class="title">[[review.title]]</div>
         <template is="dom-if" if="[[isAdmin]]">
-          <div id="edit" class="meta"><a href="[[_createEditUrl(review)]]">[ edit ]</a></div>
+          <div id="edit" class="meta"><a href$="[[_createEditUrl(review)]]">[ edit ]</a></div>
         </template>
       </div>
       <div class="article row">
@@ -246,7 +255,7 @@
       return review.cover || review.thumbnail || '';
     },
     _createEditUrl: function(review) {
-      return '/edit/' + dbTitle(review.title);
+      return '/edit/' + encodeURIComponent(dbTitle(review.title));
     },
   });
 </script>

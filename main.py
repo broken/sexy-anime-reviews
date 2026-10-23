@@ -5,10 +5,15 @@ import urllib.request
 from bottle import Bottle
 from bottle import HTTPResponse
 from bottle import mako_template as template
+from bottle import redirect
 from bottle import request
 from bottle import response
 from bottle import static_file
 from google.appengine.api import users
+try:
+  from google.appengine.api import wrap_wsgi_app
+except ImportError:
+  wrap_wsgi_app = None
 
 from crunchyroll import search_crunchyroll
 
@@ -18,10 +23,31 @@ app = Bottle()
 # the App Engine WSGI application server.
 
 
+def is_admin_user():
+  if request.headers.get('X-Appengine-User-Is-Admin') == '1':
+    return True
+  if request.environ.get('USER_IS_ADMIN') == '1':
+    return True
+  if request.environ.get('HTTP_X_APPENGINE_USER_IS_ADMIN') == '1':
+    return True
+  try:
+    return users.is_current_user_admin()
+  except Exception:
+    return False
+
+
+@app.route('/login')
+def login():
+  next_url = request.query.get('next', '/')
+  if not next_url.startswith('/'):
+    next_url = '/'
+  redirect(next_url)
+
+
 @app.route('/')
 @app.route('/a/<name>')
 def main(name=''):
-  return template('views/main.html', is_admin=('true' if users.is_current_user_admin() else 'false'))
+  return template('views/main.html', is_admin=('true' if is_admin_user() else 'false'))
 
 @app.route('/components/sar/<filepath:path>')
 def sar(filepath):
@@ -152,6 +178,10 @@ def error_404(error):
   """Return a custom 404 error."""
   return 'Sorry, nothing at this URL.'
 
+if wrap_wsgi_app:
+  app = wrap_wsgi_app(app)
+
 if __name__ == '__main__':
-  app.run(host='localhost', port=8080, debug=True)
+  import bottle
+  bottle.run(app=app, host='localhost', port=8080, debug=True)
 
