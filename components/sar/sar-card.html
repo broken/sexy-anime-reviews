@@ -24,7 +24,7 @@
   </style>
   <template>
     <paper-material id="cover" elevation="[[elevation]]" animated on-click="_onClick">
-      <img src="[[review.cover]]">
+      <img src="[[_computeCover(review)]]">
     </paper-material>
     <div id="title">[[review.title]]</div>
   </template>
@@ -39,6 +39,10 @@
         type: Number,
         value: 4
       }
+    },
+    _computeCover: function(review) {
+      if (!review) return '';
+      return review.thumbnail || review.cover || '';
     },
     _onClick: function(event) {
       this.fire('card-click', { review: this.review,

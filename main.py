@@ -108,6 +108,7 @@ def api_anime_search():
         show_type = 'movie' if fmt == 'MOVIE' else 'series'
         cover_img = item.get('coverImage', {})
         cover_url = cover_img.get('extraLarge') or cover_img.get('large') or cover_img.get('medium') or ''
+        thumbnail_url = cover_img.get('medium') or cover_img.get('large') or cover_url
         genres = item.get('genres') or []
         results.append({
             'id': item.get('id'),
@@ -116,6 +117,7 @@ def api_anime_search():
             'showType': show_type,
             'genres': genres,
             'coverUrl': cover_url,
+            'thumbnailUrl': thumbnail_url,
             'format': fmt,
             'viewMethod': 'sub'
         })

@@ -114,7 +114,7 @@
       </div>
       <section>
         <paper-material id="cover" elevation="[[elevation]]" animated="">
-          <img src="[[review.cover]]" on-click="_onClick">
+          <img src="[[_computeCover(review)]]" on-click="_onClick">
         </paper-material>
         <br>
         <div class="article pre">[[review.review]]</div>
@@ -240,6 +240,10 @@
     _getGenreArray: function(review) {
       var genres = review.genres || {};
       return Object.keys(genres);
+    },
+    _computeCover: function(review) {
+      if (!review) return '';
+      return review.cover || review.thumbnail || '';
     },
     _createEditUrl: function(review) {
       return '/edit/' + dbTitle(review.title);

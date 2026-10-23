@@ -33,15 +33,18 @@ def fetch_anime(query, download_cover=True, output_dir="."):
     genres = match.get('genres', [])
     view_method = match.get('viewMethod', 'sub').upper()
     cover_url = match.get('coverUrl', '')
+    thumbnail_url = match.get('thumbnailUrl', '')
 
     print("\n" + "=" * 52)
     print("  CRUNCHYROLL ANIME DETAILS")
     print("=" * 52)
-    print(f"  Title:      {title}")
-    print(f"  Show Type:  {show_type}")
-    print(f"  Audio:      {view_method}")
-    print(f"  Genres:     {', '.join(genres) if genres else 'N/A'}")
-    print(f"  Cover URL:  {cover_url}")
+    print(f"  Title:          {title}")
+    print(f"  Show Type:      {show_type}")
+    print(f"  Audio:          {view_method}")
+    print(f"  Genres:         {', '.join(genres) if genres else 'N/A'}")
+    print(f"  Cover URL:      {cover_url}")
+    if thumbnail_url:
+        print(f"  Thumbnail URL:  {thumbnail_url}")
     print("=" * 52)
 
     if download_cover and cover_url:
@@ -53,7 +56,19 @@ def fetch_anime(query, download_cover=True, output_dir="."):
         with urllib.request.urlopen(img_req, timeout=15) as img_resp:
             with open(filename, 'wb') as f:
                 f.write(img_resp.read())
-        print(f"✓ Official cover saved: {filename}\n")
+        print(f"✓ Official cover saved: {filename}")
+
+        if thumbnail_url:
+            thumb_ext = 'png' if '.png' in thumbnail_url else 'jpg'
+            thumb_filename = os.path.join(output_dir, f"{clean_title}_thumb.{thumb_ext}")
+            print(f"Downloading thumbnail to: {thumb_filename} ...")
+            thumb_req = urllib.request.Request(thumbnail_url, headers={'User-Agent': 'Mozilla/5.0'})
+            with urllib.request.urlopen(thumb_req, timeout=15) as thumb_resp:
+                with open(thumb_filename, 'wb') as f:
+                    f.write(thumb_resp.read())
+            print(f"✓ Thumbnail saved: {thumb_filename}\n")
+        else:
+            print()
 
     return match
 

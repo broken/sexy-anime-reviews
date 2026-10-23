@@ -61,6 +61,25 @@ def pick_best_poster(images_dict):
   return flat[0].get('source')
 
 
+def pick_thumbnail_poster(images_dict, target_width=480):
+  """Finds a thumbnail vertical poster suitable for card previews."""
+  posters = images_dict.get('poster_tall', [])
+  if not posters:
+    return ''
+
+  flat = []
+  for item in posters:
+    if isinstance(item, list):
+      flat.extend(item)
+    elif isinstance(item, dict):
+      flat.append(item)
+
+  if not flat:
+    return ''
+
+  return min(flat, key=lambda x: abs(x.get('width', 0) - target_width)).get('source', '')
+
+
 def get_series_by_id(series_id, token):
   """Retrieves detailed series information including categories and Dub/Sub availability."""
   url = f'https://beta-api.crunchyroll.com/content/v2/cms/objects/{series_id}'
@@ -80,6 +99,7 @@ def get_series_by_id(series_id, token):
         meta = item.get('series_metadata') or {}
         genres = meta.get('tenant_categories') or item.get('keywords') or []
         cover = pick_best_poster(item.get('images', {}))
+        thumbnail = pick_thumbnail_poster(item.get('images', {}))
         show_type = 'movie' if item.get('type') == 'movie_listing' else 'series'
         is_dubbed = meta.get('is_dubbed', False)
         view_method = 'dub' if is_dubbed else 'sub'
@@ -89,6 +109,7 @@ def get_series_by_id(series_id, token):
             'showType': show_type,
             'genres': genres,
             'coverUrl': cover,
+            'thumbnailUrl': thumbnail,
             'format': item.get('type'),
             'viewMethod': view_method
         }
@@ -136,12 +157,14 @@ def search_crunchyroll(query):
           series_id = item.get('id')
           title = item.get('title')
           cover = pick_best_poster(item.get('images', {}))
+          thumbnail = pick_thumbnail_poster(item.get('images', {}))
           show_type = 'movie' if item.get('type') == 'movie_listing' else 'series'
           results.append({
               'id': series_id,
               'title': title,
               'showType': show_type,
               'coverUrl': cover,
+              'thumbnailUrl': thumbnail,
               'format': item.get('type'),
           })
 
@@ -151,6 +174,10 @@ def search_crunchyroll(query):
         if details:
           r['genres'] = details.get('genres', [])
           r['viewMethod'] = details.get('viewMethod', 'sub')
+          if details.get('coverUrl'):
+            r['coverUrl'] = details['coverUrl']
+          if details.get('thumbnailUrl'):
+            r['thumbnailUrl'] = details['thumbnailUrl']
         else:
           r['genres'] = []
           r['viewMethod'] = 'sub'
