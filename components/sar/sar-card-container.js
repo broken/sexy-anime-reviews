@@ -176,21 +176,23 @@ export class SarCardContainer extends LitElement {
     .toggle-text {
       font-size: 13px;
     }
-    paper-slider {
-      --paper-slider-active-color: var(--default-primary-color);
-      --paper-slider-knob-color: var(--default-primary-color);
+    .sliderContainer {
+      width: 170px;
     }
-    .sliderContainer,
-    .sliderContainer paper-slider {
-      width: 200px;
-    }
-    #minRatingSlider {
-      margin-top: -7px;
+    .rating-range-slider {
+      width: 100%;
+      height: 6px;
+      margin: 6px 0 2px 10px;
+      accent-color: var(--default-primary-color, #9C27B0);
+      cursor: pointer;
     }
     #minRatingText {
       text-align: right;
-      margin-right: 12px;
-      margin-top: -5px;
+      margin-right: 4px;
+      margin-top: 2px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--secondary-text-color, #727272);
     }
     #titleSearch {
       margin-top: -28px;
@@ -535,9 +537,10 @@ export class SarCardContainer extends LitElement {
 
   _immediateMinRatingChanged(e) {
     const slider = e?.target || this.$.minRatingSlider;
-    const immediateVal = slider ? (slider.immediateValue ?? slider.value) : undefined;
-    if (immediateVal !== undefined && this.ratingValuesInverted?.[immediateVal]) {
-      this.minRatingText = this.ratingValuesInverted[immediateVal];
+    const val = slider ? Number(slider.value) : this.minRating;
+    this.minRating = val;
+    if (this.ratingValuesInverted?.[val]) {
+      this.minRatingText = this.ratingValuesInverted[val];
     }
   }
 
@@ -692,18 +695,17 @@ export class SarCardContainer extends LitElement {
               <div class="horizontal">
                 <div>Min rating</div>
                 <div class="vertical sliderContainer">
-                  <paper-slider
+                  <input
+                    type="range"
                     id="minRatingSlider"
-                    .value="${this.minRating}"
-                    value="${this.minRating}"
+                    class="rating-range-slider"
+                    .value="${this.minRating || 1}"
                     min="1"
                     max="10"
-                    snaps
-                    @value-change="${this._minRatingChanged}"
-                    @change="${this._minRatingChanged}"
-                    @immediate-value-change="${this._immediateMinRatingChanged}"
+                    step="1"
                     @input="${this._immediateMinRatingChanged}"
-                  ></paper-slider>
+                    @change="${this._minRatingChanged}"
+                  />
                   <div id="minRatingText">${this.minRatingText}</div>
                 </div>
               </div>

@@ -13,9 +13,11 @@ export class SarRatingSlider extends LitElement {
       margin-right: 12px;
       margin-top: -5px;
     }
-    paper-slider {
-      --paper-slider-active-color: var(--default-primary-color);
-      --paper-slider-knob-color: var(--default-primary-color);
+    .rating-range-slider {
+      width: 200px;
+      height: 6px;
+      accent-color: var(--default-primary-color, #9C27B0);
+      cursor: pointer;
     }
     .horizontal {
       display: flex;
@@ -143,17 +145,17 @@ export class SarRatingSlider extends LitElement {
       <div class="horizontal">
         <div>${this.label}</div>
         <div class="vertical">
-          <paper-slider
+          <input
+            type="range"
             id="slider"
+            class="rating-range-slider"
             min="1"
             max="10"
+            step="1"
             .value="${this.ratingNum}"
-            snaps
-            @value-change="${this._ratingNumChanged}"
-            @immediate-value-change="${this._immediateRatingChanged}"
-            @change="${this._ratingNumChanged}"
             @input="${this._immediateRatingChanged}"
-          ></paper-slider>
+            @change="${this._ratingNumChanged}"
+          />
           <div id="ratingText">${this.ratingText}</div>
         </div>
       </div>
