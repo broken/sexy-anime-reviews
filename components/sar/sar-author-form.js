@@ -582,28 +582,20 @@ export class SarAuthorForm extends LitElement {
     }
   }
 
-  _triggerCoverUpload(e) {
-    if (e && e.target && e.target.tagName === 'INPUT') {
-      return;
-    }
-    const el = this.$.coverFileInput || this.$$?.('#coverFileInput');
-    const fileInput = el
-      ? el.shadowRoot?.querySelector('input[type="file"]') || el.querySelector('input[type="file"]')
-      : null;
+  _triggerCoverUpload() {
+    const el = this.$.coverFileInput || this.renderRoot?.querySelector('#coverFileInput');
+    const fileInput = el?.tagName === 'INPUT' ? el : el?.querySelector?.('input[type="file"]');
     if (fileInput) {
+      fileInput.value = '';
       fileInput.click();
     }
   }
 
-  _triggerThumbnailUpload(e) {
-    if (e && e.target && e.target.tagName === 'INPUT') {
-      return;
-    }
-    const el = this.$.thumbnailFileInput || this.$$?.('#thumbnailFileInput');
-    const fileInput = el
-      ? el.shadowRoot?.querySelector('input[type="file"]') || el.querySelector('input[type="file"]')
-      : null;
+  _triggerThumbnailUpload() {
+    const el = this.$.thumbnailFileInput || this.renderRoot?.querySelector('#thumbnailFileInput');
+    const fileInput = el?.tagName === 'INPUT' ? el : el?.querySelector?.('input[type="file"]');
     if (fileInput) {
+      fileInput.value = '';
       fileInput.click();
     }
   }
@@ -914,30 +906,30 @@ export class SarAuthorForm extends LitElement {
               ${this.previewCover
                 ? html`<div class="cover-status">&#x2714; High-res cover ready</div>`
                 : ''}
+              <input
+                type="file"
+                id="coverFileInput"
+                accept="image/*"
+                style="display: none;"
+                @change="${this._uploadCover}"
+              />
               <button type="button" @click="${this._triggerCoverUpload}">
-                <file-input
-                  id="coverFileInput"
-                  accept="image/*"
-                  invalidText="Invalid Image"
-                  @change="${this._uploadCover}"
-                >
-                  <span>${this._computeUploadButtonText(this.previewCover)}</span>
-                </file-input>
+                <span>${this._computeUploadButtonText(this.previewCover)}</span>
               </button>
             </div>
             <div class="cover-action-item">
               ${this.previewThumbnail
                 ? html`<div class="cover-status">&#x2714; Thumbnail ready</div>`
                 : ''}
+              <input
+                type="file"
+                id="thumbnailFileInput"
+                accept="image/*"
+                style="display: none;"
+                @change="${this._uploadThumbnail}"
+              />
               <button type="button" @click="${this._triggerThumbnailUpload}">
-                <file-input
-                  id="thumbnailFileInput"
-                  accept="image/*"
-                  invalidText="Invalid Image"
-                  @change="${this._uploadThumbnail}"
-                >
-                  <span>${this._computeThumbnailButtonText(this.previewThumbnail)}</span>
-                </file-input>
+                <span>${this._computeThumbnailButtonText(this.previewThumbnail)}</span>
               </button>
             </div>
           </div>
