@@ -64,12 +64,14 @@
     }
 
     .theme-switch-wrapper {
-      position: fixed;
+      position: absolute;
       top: calc(20px + env(safe-area-inset-top, 0px));
       right: calc(6% + env(safe-area-inset-right, 0px));
       z-index: 1200;
       display: flex;
       align-items: center;
+      will-change: transform;
+      pointer-events: auto;
     }
 
     @media (max-width: 600px) {
@@ -202,6 +204,9 @@
           review.updateComplete.then(resetReview);
         }
       }
+      if (typeof syncThemeSwitchScroll === 'function') {
+        syncThemeSwitchScroll();
+      }
     };
 
     Object.defineProperty(pages, 'selected', {
@@ -222,6 +227,43 @@
     syncAdmin();
     if (window.customElements) {
       customElements.whenDefined('sar-review').then(syncAdmin);
+    }
+
+    var themeSwitchWrapper = document.querySelector('.theme-switch-wrapper');
+    var syncThemeSwitchScroll = function () {
+      if (!themeSwitchWrapper) return;
+      var scrollY = 0;
+      if (pages.selected === 1) {
+        scrollY = review ? (review.scrollTop || 0) : 0;
+      } else {
+        var scrollContainer = cards.renderRoot ? cards.renderRoot.querySelector('#scrollContainer') : null;
+        scrollY = scrollContainer ? (scrollContainer.scrollTop || 0) : 0;
+      }
+      themeSwitchWrapper.style.transform = 'translateY(' + (-scrollY) + 'px)';
+    };
+
+    var bindThemeSwitchScroll = function () {
+      var scrollContainer = cards.renderRoot ? cards.renderRoot.querySelector('#scrollContainer') : null;
+      if (scrollContainer) {
+        scrollContainer.removeEventListener('scroll', syncThemeSwitchScroll);
+        scrollContainer.addEventListener('scroll', syncThemeSwitchScroll, { passive: true });
+      }
+      if (review) {
+        review.removeEventListener('scroll', syncThemeSwitchScroll);
+        review.addEventListener('scroll', syncThemeSwitchScroll, { passive: true });
+      }
+      syncThemeSwitchScroll();
+    };
+
+    if (window.customElements) {
+      customElements.whenDefined('sar-card-container').then(function () {
+        if (cards.updateComplete) {
+          cards.updateComplete.then(bindThemeSwitchScroll);
+        } else {
+          setTimeout(bindThemeSwitchScroll, 50);
+        }
+      });
+      customElements.whenDefined('sar-review').then(bindThemeSwitchScroll);
     }
 
     var animateToReview = function (fromCover, reviewData, fromCard) {

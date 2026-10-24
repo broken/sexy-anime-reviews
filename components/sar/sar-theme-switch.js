@@ -78,7 +78,7 @@ export class SarThemeSwitch extends HTMLElement {
         console.warn('Could not save theme preference:', err);
       }
     }
-    this._updateUI();
+    // Dispatch a single composed event for any external consumers/listeners
     this.dispatchEvent(
       new CustomEvent('theme-change', {
         detail: { theme: newTheme },

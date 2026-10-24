@@ -44,6 +44,7 @@
     }
 
     body {
+      position: relative;
       padding: 0 6%;
       padding-top: env(safe-area-inset-top, 0px);
       padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
@@ -59,7 +60,7 @@
     }
 
     .theme-switch-wrapper {
-      position: fixed;
+      position: absolute;
       top: calc(20px + env(safe-area-inset-top, 0px));
       right: calc(6% + env(safe-area-inset-right, 0px));
       z-index: 1200;
