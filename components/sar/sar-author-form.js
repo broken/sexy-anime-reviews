@@ -1,29 +1,14 @@
 import { LitElement, html, css } from 'lit';
 import './sar-rating-slider.js';
+import { cleanTitle, dbTitle } from './util.js';
 import {
   subscribeToReviews,
   saveReview,
   uploadCover,
   uploadThumbnail,
   signInWithGoogle,
-  cleanTitle as fbCleanTitle,
-  dbTitle as fbDbTitle,
   app,
 } from '../../src/services/firebase.js';
-
-function cleanTitle(title) {
-  if (typeof window !== 'undefined' && typeof window.cleanTitle === 'function') {
-    return window.cleanTitle(title);
-  }
-  return fbCleanTitle(title);
-}
-
-function dbTitle(title) {
-  if (typeof window !== 'undefined' && typeof window.dbTitle === 'function') {
-    return window.dbTitle(title);
-  }
-  return fbDbTitle(title);
-}
 
 export class SarAuthorForm extends LitElement {
   static styles = css`
