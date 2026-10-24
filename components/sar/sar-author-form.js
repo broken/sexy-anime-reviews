@@ -291,6 +291,108 @@ export class SarAuthorForm extends LitElement {
       transform: translateY(0);
       pointer-events: auto;
     }
+    .genres-container {
+      position: relative;
+      margin: 16px 0;
+    }
+    .genres-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--secondary-text-color, #727272);
+      margin-bottom: 6px;
+    }
+    .genres-wrapper {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      min-height: 36px;
+      border-bottom: 1px solid var(--divider-color, #B6B6B6);
+      padding: 4px 0 6px 0;
+      transition: border-color 0.2s;
+    }
+    .genres-wrapper:focus-within {
+      border-bottom: 2px solid var(--default-primary-color, #9C27B0);
+      margin-bottom: -1px;
+    }
+    .genre-chip {
+      display: inline-flex;
+      align-items: center;
+      background: rgba(156, 39, 176, 0.15);
+      border: 1px solid rgba(156, 39, 176, 0.35);
+      color: var(--default-primary-color, #9C27B0);
+      padding: 2px 8px 2px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 500;
+      gap: 4px;
+      user-select: none;
+    }
+    button.genre-chip-remove {
+      background: transparent;
+      color: inherit;
+      box-shadow: none;
+      padding: 0 2px;
+      font-size: 14px;
+      font-weight: bold;
+      border-radius: 50%;
+      width: 16px;
+      height: 16px;
+      min-width: unset;
+      letter-spacing: normal;
+      text-transform: none;
+      opacity: 0.7;
+      cursor: pointer;
+    }
+    button.genre-chip-remove:hover {
+      background: rgba(156, 39, 176, 0.2);
+      box-shadow: none;
+      opacity: 1;
+      filter: none;
+    }
+    .genre-input {
+      flex: 1;
+      min-width: 140px;
+      border: none;
+      background: transparent;
+      outline: none;
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--primary-text-color, #212121);
+      padding: 4px 0;
+    }
+    .genre-input::placeholder {
+      color: var(--secondary-text-color, #727272);
+      opacity: 0.8;
+    }
+    .genre-suggestions {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: #ffffff;
+      border: 1px solid var(--divider-color, #B6B6B6);
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+      max-height: 160px;
+      overflow-y: auto;
+      z-index: 100;
+      margin-top: 4px;
+      padding: 4px 0;
+    }
+    .genre-suggestion-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--primary-text-color, #212121);
+      transition: background 0.15s;
+    }
+    .genre-suggestion-item:hover {
+      background: rgba(156, 39, 176, 0.08);
+      color: var(--default-primary-color, #9C27B0);
+    }
   `;
 
   static properties = {
@@ -315,6 +417,8 @@ export class SarAuthorForm extends LitElement {
     routeData: { type: Object },
     toastText: { type: String },
     toastOpened: { type: Boolean },
+    genreInputValue: { type: String },
+    genreSuggestions: { type: Array },
   };
 
   constructor() {
@@ -342,6 +446,8 @@ export class SarAuthorForm extends LitElement {
     this.toastText = '';
     this.toastOpened = false;
     this._toastTimer = null;
+    this.genreInputValue = '';
+    this.genreSuggestions = [];
   }
 
   showToast(text, duration = 3000) {
@@ -351,6 +457,62 @@ export class SarAuthorForm extends LitElement {
     this._toastTimer = setTimeout(() => {
       this.toastOpened = false;
     }, duration);
+  }
+
+  _addGenre(genre) {
+    const val = (genre || '').trim().toLowerCase();
+    if (!val) return;
+    const current = this.genres || [];
+    if (!current.includes(val)) {
+      this.genres = [...current, val];
+    }
+    this.genreInputValue = '';
+    this.genreSuggestions = [];
+    const inputEl = this.renderRoot?.querySelector('.genre-input');
+    if (inputEl) inputEl.value = '';
+  }
+
+  _removeGenre(genre) {
+    this.genres = (this.genres || []).filter((g) => g !== genre);
+  }
+
+  _onGenreKeydown(e) {
+    if (e.key === 'Enter' || e.key === ',') {
+      e.preventDefault();
+      this._addGenre(e.target.value);
+    } else if (e.key === 'Backspace' && !e.target.value && this.genres?.length) {
+      this._removeGenre(this.genres[this.genres.length - 1]);
+    }
+  }
+
+  _onGenreInput(e) {
+    const val = e.target.value;
+    if (val.includes(',')) {
+      const parts = val.split(',');
+      parts.forEach((p) => {
+        if (p.trim()) this._addGenre(p);
+      });
+      e.target.value = '';
+      this.genreInputValue = '';
+      this.genreSuggestions = [];
+      return;
+    }
+    this.genreInputValue = val;
+    const input = val.trim().toLowerCase();
+    if (input) {
+      const current = this.genres || [];
+      this.genreSuggestions = (this.tags || []).filter((tag) => {
+        return tag.toLowerCase().indexOf(input) === 0 && !current.includes(tag.toLowerCase());
+      });
+    } else {
+      this.genreSuggestions = [];
+    }
+  }
+
+  _onGenreBlur() {
+    setTimeout(() => {
+      this.genreSuggestions = [];
+    }, 200);
   }
 
   get firebase() {
@@ -372,13 +534,23 @@ export class SarAuthorForm extends LitElement {
         this.toastOpened = false;
       };
     }
+    const genresSelectEl = this.renderRoot?.querySelector('#genresSelect');
+    if (genresSelectEl && !genresSelectEl._enhanced) {
+      genresSelectEl._enhanced = true;
+      Object.defineProperty(genresSelectEl, 'bindValue', {
+        get: () => this.genres,
+        set: (val) => {
+          this.genres = Array.isArray(val) ? val : [];
+        },
+      });
+    }
     return {
       card: this.renderRoot?.querySelector('#card'),
       toast: toastEl,
       auth: this.renderRoot?.querySelector('#auth'),
       coverFileInput: this.renderRoot?.querySelector('#coverFileInput'),
       thumbnailFileInput: this.renderRoot?.querySelector('#thumbnailFileInput'),
-      genresSelect: this.renderRoot?.querySelector('#genresSelect'),
+      genresSelect: genresSelectEl,
     };
   }
 
@@ -417,9 +589,6 @@ export class SarAuthorForm extends LitElement {
     }
     if (changedProperties.has('reviews')) {
       this._reviewsChanged();
-    }
-    if (changedProperties.has('genres') && this.$.genresSelect) {
-      this.$.genresSelect.bindValue = this.genres;
     }
   }
 
@@ -668,6 +837,8 @@ export class SarAuthorForm extends LitElement {
     this.previewCover = '';
     this.previewThumbnail = '';
     this.genres = [];
+    this.genreInputValue = '';
+    this.genreSuggestions = [];
     this.viewMethod = '';
     this.showType = '';
     this.review = '';
@@ -799,14 +970,7 @@ export class SarAuthorForm extends LitElement {
   }
 
   _genreInputChanged(event) {
-    const input = (event.detail?.value || event.target?.input || '').trim().toLowerCase();
-    if (input) {
-      event.target.options = (this.tags || []).filter((tag) => {
-        return tag.toLowerCase().indexOf(input) === 0;
-      });
-    } else {
-      event.target.options = [];
-    }
+    this._onGenreInput(event);
   }
 
   _uploadCover(e) {
@@ -966,19 +1130,54 @@ export class SarAuthorForm extends LitElement {
           </div>
         </div>
 
-        <paper-select
-          id="genresSelect"
-          label="Genres"
-          .bindValue="${this.genres}"
-          bind-value="${(this.genres || []).join(',')}"
-          @input-changed="${this._genreInputChanged}"
-          @bind-value-changed="${(e) => {
-        this.genres = e.detail.value;
-      }}"
-          multiple
-          nonmatching
-          unique
-        ></paper-select>
+        <div id="genresSelect" class="genres-container">
+          <div class="genres-label">Genres</div>
+          <div class="genres-wrapper">
+            ${(this.genres || []).map(
+              (genre) => html`
+                <span class="genre-chip">
+                  <span>${genre}</span>
+                  <button
+                    type="button"
+                    class="genre-chip-remove"
+                    aria-label="Remove ${genre}"
+                    @click="${() => this._removeGenre(genre)}"
+                  >
+                    &times;
+                  </button>
+                </span>
+              `
+            )}
+            <input
+              type="text"
+              class="genre-input"
+              placeholder="${this.genres && this.genres.length ? 'Add genre...' : 'Genres (type and press Enter or comma)'}"
+              .value="${this.genreInputValue || ''}"
+              @input="${this._onGenreInput}"
+              @keydown="${this._onGenreKeydown}"
+              @blur="${this._onGenreBlur}"
+            />
+          </div>
+          ${this.genreSuggestions && this.genreSuggestions.length > 0
+            ? html`
+                <div class="genre-suggestions">
+                  ${this.genreSuggestions.map(
+                    (tag) => html`
+                      <div
+                        class="genre-suggestion-item"
+                        @mousedown="${(e) => {
+                          e.preventDefault();
+                          this._addGenre(tag);
+                        }}"
+                      >
+                        ${tag}
+                      </div>
+                    `
+                  )}
+                </div>
+              `
+            : ''}
+        </div>
 
         <div class="horizontal radio-group" role="radiogroup">
           <label class="radio-label">
