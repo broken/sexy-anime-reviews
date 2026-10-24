@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import './sar-rating-slider.js';
 import {
   subscribeToReviews,
   saveReview,
