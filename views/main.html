@@ -2,6 +2,13 @@
 <html>
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Anime Reviews">
+  <meta name="theme-color" content="#121216" id="themeColorMeta">
   <title>Spoiler Free Anime Reviews</title>
   <link href='https://fonts.googleapis.com/css?family=PT+Sans+Narrow|Open+Sans' rel='stylesheet' type='text/css'>
   <link rel="apple-touch-icon" sizes="180x180" href="/pub/apple-touch-icon.png">
@@ -16,12 +23,21 @@
         var storedTheme = localStorage.getItem('sar-theme');
         var theme = storedTheme === 'light' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', theme);
+        var meta = document.getElementById('themeColorMeta');
+        if (meta) {
+          meta.setAttribute('content', theme === 'light' ? '#ffffff' : '#121216');
+        }
       } catch (e) {
         document.documentElement.setAttribute('data-theme', 'dark');
       }
     })();
   </script>
   <style type="text/css">
+    html {
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+    }
+
     html,
     body {
       height: 100%;
@@ -37,6 +53,8 @@
       background-image: var(--body-bg-image);
       -webkit-user-select: none;
       user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
       position: absolute;
       top: 0;
       right: 0;
@@ -47,8 +65,8 @@
 
     .theme-switch-wrapper {
       position: fixed;
-      top: 24px;
-      right: 6%;
+      top: calc(20px + env(safe-area-inset-top, 0px));
+      right: calc(6% + env(safe-area-inset-right, 0px));
       z-index: 1200;
       display: flex;
       align-items: center;
@@ -56,8 +74,8 @@
 
     @media (max-width: 600px) {
       .theme-switch-wrapper {
-        top: 16px;
-        right: 16px;
+        top: calc(12px + env(safe-area-inset-top, 0px));
+        right: calc(12px + env(safe-area-inset-right, 0px));
       }
     }
 
@@ -150,6 +168,9 @@
       } else {
         cards.setAttribute('hidden', '');
         review.removeAttribute('hidden');
+        if (review.scrollTop !== undefined) {
+          review.scrollTop = 0;
+        }
         var resetReview = function () {
           var closeBtn = review.$ ? review.$.close : review.renderRoot?.querySelector('#close');
           if (closeBtn) {
@@ -296,6 +317,9 @@
       }
 
       review.removeAttribute('hidden');
+      if (review.scrollTop !== undefined) {
+        review.scrollTop = 0;
+      }
 
       var readyPromise = review.updateComplete
         ? review.updateComplete

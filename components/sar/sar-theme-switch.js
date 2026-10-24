@@ -67,6 +67,10 @@ export class SarThemeSwitch extends HTMLElement {
     if (document.body) {
       document.body.setAttribute('data-theme', newTheme);
     }
+    const metaThemeColor = document.getElementById('themeColorMeta') || document.querySelector('meta[name="theme-color"]');
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', newTheme === 'light' ? '#ffffff' : '#121216');
+    }
     if (saveToStorage) {
       try {
         localStorage.setItem('sar-theme', newTheme);
@@ -121,6 +125,15 @@ export class SarThemeSwitch extends HTMLElement {
           box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.35);
           transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.2s ease;
           -webkit-tap-highlight-color: transparent;
+          touch-action: manipulation;
+        }
+        .switch-btn::after {
+          content: '';
+          position: absolute;
+          top: -8px;
+          bottom: -8px;
+          left: -8px;
+          right: -8px;
         }
         .switch-btn:hover {
           transform: scale(1.05);

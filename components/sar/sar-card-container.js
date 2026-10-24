@@ -59,12 +59,15 @@ export class SarCardContainer extends LitElement {
       bottom: 0;
       left: 0;
       color: var(--primary-text-color);
+      touch-action: manipulation;
     }
     #header {
       color: var(--header-title-color, silver);
       font-size: 54px;
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
       align-self: flex-end;
+      line-height: 1.1;
+      padding-bottom: 8px;
     }
     .scroll-container {
       position: absolute;
@@ -76,32 +79,41 @@ export class SarCardContainer extends LitElement {
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       box-sizing: border-box;
+      overscroll-behavior-y: contain;
     }
     .paper-header {
       padding: 0 6%;
-      white-space: nowrap;
+      padding-top: env(safe-area-inset-top, 0px);
+      white-space: normal;
       height: 168px;
       display: flex;
+      box-sizing: border-box;
+      align-items: flex-end;
     }
     .content {
       padding: 0 6%;
+      padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
       display: flex;
       flex-direction: column;
+      box-sizing: border-box;
     }
     #filters {
       margin: 30px 0;
       display: flex;
       flex-wrap: wrap;
+      align-items: center;
     }
     .cards {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
+      gap: 16px;
     }
     .horizontal {
       display: flex;
       flex-direction: row;
+      align-items: center;
     }
     .vertical {
       display: flex;
@@ -117,13 +129,19 @@ export class SarCardContainer extends LitElement {
       display: inline-flex;
       align-items: center;
       cursor: pointer;
-      padding: 0 10px 5px;
+      padding: 3px 10px;
       user-select: none;
+      touch-action: manipulation;
     }
     .radio-label input[type="radio"] {
       margin: 0 5px 0 0;
       accent-color: var(--default-primary-color, #9C27B0);
       cursor: pointer;
+      width: 16px;
+      height: 16px;
+    }
+    .filter-label {
+      user-select: none;
     }
     .toggle-row {
       display: flex;
@@ -132,6 +150,7 @@ export class SarCardContainer extends LitElement {
       cursor: pointer;
       user-select: none;
       margin-bottom: 5px;
+      touch-action: manipulation;
     }
     .toggle-switch {
       position: relative;
@@ -139,6 +158,7 @@ export class SarCardContainer extends LitElement {
       width: 28px;
       height: 16px;
       margin: 0 6px 0 10px;
+      touch-action: manipulation;
     }
     .toggle-switch input {
       opacity: 0;
@@ -185,10 +205,11 @@ export class SarCardContainer extends LitElement {
       width: 170px;
     }
     .rating-range-slider {
-      height: 2px;
+      height: 4px;
       margin: 6px 0 2px 10px;
       accent-color: var(--default-primary-color, #9C27B0);
       cursor: pointer;
+      touch-action: manipulation;
     }
     #minRatingText {
       text-align: right;
@@ -218,6 +239,7 @@ export class SarCardContainer extends LitElement {
       min-width: 150px;
       outline: none;
       transition: border-color 0.2s;
+      touch-action: manipulation;
     }
     .genre-select {
       padding-right: 24px;
@@ -250,6 +272,76 @@ export class SarCardContainer extends LitElement {
     .genre-select option[value=""],
     .genre-select option:not([value]) {
       color: var(--secondary-text-color, #727272);
+    }
+    @media (max-width: 768px) {
+      .paper-header {
+        padding: 0 16px;
+        padding-top: calc(16px + env(safe-area-inset-top, 0px));
+        height: auto;
+        min-height: 80px;
+        align-items: flex-start;
+      }
+      #header {
+        font-size: clamp(28px, 7.5vw, 42px);
+        padding-right: 68px; /* Leave space for floating theme switch */
+        padding-bottom: 4px;
+        align-self: flex-start;
+        word-break: break-word;
+      }
+      .content {
+        padding: 0 12px;
+        padding-bottom: calc(32px + env(safe-area-inset-bottom, 0px));
+      }
+      #filters {
+        margin: 16px 0 24px 0;
+        gap: 12px 10px;
+        align-items: flex-start;
+      }
+      .spacer {
+        display: none;
+      }
+      .search-input-container,
+      .dropdown-container {
+        order: 1;
+        flex: 1 1 calc(50% - 6px);
+        min-width: 135px;
+        margin-top: 0;
+      }
+      .title-search-input,
+      .genre-select {
+        width: 100%;
+        min-width: 0;
+        font-size: 16px; /* Prevents auto-zoom on iOS */
+        padding: 6px 0;
+      }
+      .filter-order {
+        order: 2;
+        flex: 1 1 auto;
+      }
+      .filter-show {
+        order: 3;
+        flex: 1 1 auto;
+      }
+      .filter-rating {
+        order: 4;
+        flex: 1 1 100%;
+      }
+      .rating-row {
+        width: 100%;
+        display: flex;
+        align-items: center;
+      }
+      .sliderContainer {
+        flex: 1;
+        width: auto;
+      }
+      .rating-range-slider {
+        width: 100%;
+      }
+      .cards {
+        gap: 12px;
+        justify-content: space-between;
+      }
     }
   `;
 
@@ -631,8 +723,8 @@ export class SarCardContainer extends LitElement {
         </div>
         <div class="content">
           <div class="horizontal" id="filters">
-            <div class="horizontal">
-              <div>Order by</div>
+            <div class="horizontal filter-order">
+              <div class="filter-label">Order by</div>
               <div class="vertical radio-group" role="radiogroup">
                 <label class="radio-label">
                   <input
@@ -661,8 +753,8 @@ export class SarCardContainer extends LitElement {
               </div>
             </div>
             <div class="spacer"></div>
-            <div class="horizontal">
-              <div>Show</div>
+            <div class="horizontal filter-show">
+              <div class="filter-label">Show</div>
               <div class="vertical">
                 <label class="toggle-row">
                   <span class="toggle-switch">
@@ -721,9 +813,9 @@ export class SarCardContainer extends LitElement {
               </div>
             </div>
             <div class="spacer"></div>
-            <div class="vertical">
-              <div class="horizontal">
-                <div>Min rating</div>
+            <div class="vertical filter-rating">
+              <div class="horizontal rating-row">
+                <div class="filter-label">Min rating</div>
                 <div class="vertical sliderContainer">
                   <input
                     type="range"

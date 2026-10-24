@@ -10,7 +10,7 @@ function dbTitle(title) {
 export class SarReview extends LitElement {
   static styles = css`
     :host {
-      box-sizing: content-box;
+      box-sizing: border-box;
       display: flex;
       position: absolute;
       top: 0;
@@ -19,6 +19,11 @@ export class SarReview extends LitElement {
       left: 0;
       flex-direction: column;
       color: var(--primary-text-color);
+      overflow-x: hidden;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      touch-action: manipulation;
     }
     #close {
       position: relative;
@@ -26,14 +31,22 @@ export class SarReview extends LitElement {
       border-radius: 50%;
       width: 44px;
       height: 44px;
+      min-width: 44px;
+      min-height: 44px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: background-color 0.2s;
+      transition: background-color 0.2s, transform 0.15s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      margin-right: 8px;
     }
     #close:hover {
       background-color: var(--hover-overlay, rgba(0, 0, 0, 0.08));
+    }
+    #close:active {
+      transform: scale(0.92);
     }
     #close svg {
       width: 24px;
@@ -64,12 +77,16 @@ export class SarReview extends LitElement {
     .title {
       font-size: 28px;
       color: var(--primary-text-color);
+      font-weight: 600;
+      line-height: 1.25;
+      word-break: break-word;
     }
     .row {
       display: flex;
       flex-direction: row;
       flex-wrap: wrap;
-      align-items: flex-end;
+      align-items: center;
+      gap: 4px;
     }
     #edit {
       padding: 4px;
@@ -102,25 +119,81 @@ export class SarReview extends LitElement {
     }
     .paper-header {
       padding: 0 6%;
-      white-space: nowrap;
+      padding-top: env(safe-area-inset-top, 0px);
+      white-space: normal;
       display: flex;
       flex-direction: row;
+      align-items: center;
+      min-height: 64px;
+      box-sizing: border-box;
     }
     #header {
       color: var(--header-title-color, silver);
       font-size: 32px;
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
+      line-height: 1.1;
+      word-break: break-word;
     }
     .content {
       padding: 0 6%;
+      padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
       margin-top: 48px;
       margin-right: auto;
       margin-left: auto;
       max-width: 720px;
       min-width: 40px;
+      box-sizing: border-box;
+      width: 100%;
     }
     .pre {
       white-space: pre-wrap;
+      font-size: 14px;
+      line-height: 1.6;
+      user-select: text;
+      -webkit-user-select: text;
+      word-break: break-word;
+    }
+    @media (max-width: 680px) {
+      .paper-header {
+        padding: 8px 16px;
+        padding-top: calc(8px + env(safe-area-inset-top, 0px));
+        min-height: 56px;
+      }
+      #header {
+        font-size: clamp(20px, 5.5vw, 26px);
+        padding-right: 64px; /* Space for theme switcher */
+      }
+      .content {
+        padding: 0 16px;
+        padding-bottom: calc(48px + env(safe-area-inset-bottom, 0px));
+        margin-top: 16px;
+      }
+      .title {
+        font-size: clamp(22px, 6vw, 28px);
+      }
+      #cover {
+        float: none;
+        display: block;
+        margin: 16px auto 20px auto;
+        max-width: 260px;
+        text-align: center;
+      }
+      #cover img {
+        width: 100%;
+        max-width: 260px;
+        height: auto;
+        max-height: 380px;
+        object-fit: contain;
+        display: block;
+        margin: 0 auto;
+      }
+      .pre {
+        font-size: 15px;
+        line-height: 1.65;
+      }
+      .row {
+        gap: 6px;
+      }
     }
   `;
 
@@ -371,7 +444,7 @@ export class SarReview extends LitElement {
         @keys-pressed="${this._onClick}"
       ></iron-a11y-keys>
       <div class="paper-header">
-        <div id="close" @click="${this._onClick}" title="Back">
+        <div id="close" role="button" tabindex="0" aria-label="Back to reviews" @click="${this._onClick}" title="Back">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor">
             <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
           </svg>
@@ -392,7 +465,7 @@ export class SarReview extends LitElement {
         </div>
         <section>
           <div id="cover">
-            <img src="${this._computeCover(review)}" @click="${this._onClick}">
+            <img src="${this._computeCover(review)}" alt="${review?.title ?? ''}" @click="${this._onClick}">
           </div>
           <br>
           <div class="article pre">${review?.review ?? ''}</div>

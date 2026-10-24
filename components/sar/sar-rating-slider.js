@@ -4,28 +4,42 @@ export class SarRatingSlider extends LitElement {
   static styles = css`
     :host {
       display: flex;
+      touch-action: manipulation;
     }
     #slider {
-      margin: 7px;
+      margin: 7px 0;
     }
     #ratingText {
       text-align: right;
       margin-right: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--secondary-text-color, #727272);
     }
     .rating-range-slider {
       width: 162px;
-      height: 2px;
+      height: 4px;
       accent-color: var(--default-primary-color, #9C27B0);
       cursor: pointer;
+      touch-action: manipulation;
     }
     .horizontal {
       display: flex;
       flex-direction: row;
+      align-items: center;
+      width: 100%;
     }
     .vertical {
       display: flex;
       flex-direction: column;
       margin: 0 16px;
+      flex: 1;
+      max-width: 220px;
+    }
+    @media (max-width: 600px) {
+      .rating-range-slider {
+        width: 100%;
+      }
     }
   `;
 

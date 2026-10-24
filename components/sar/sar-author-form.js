@@ -15,15 +15,21 @@ export class SarAuthorForm extends LitElement {
     :host {
       justify-content: center;
       color: var(--primary-text-color);
+      touch-action: manipulation;
     }
     .paper-header {
-      white-space: nowrap;
+      white-space: normal;
       display: flex;
+      padding-top: env(safe-area-inset-top, 0px);
+      align-items: center;
+      min-height: 60px;
     }
     #header {
       color: var(--header-title-color, silver);
       font-size: 32px;
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
+      line-height: 1.1;
+      word-break: break-word;
     }
     #card {
       background: var(--card-cover-bg, #fff);
@@ -53,6 +59,7 @@ export class SarAuthorForm extends LitElement {
       text-transform: uppercase;
       letter-spacing: 0.5px;
       padding: 8px 16px;
+      min-height: 40px;
       border: none;
       border-radius: 3px;
       cursor: pointer;
@@ -63,6 +70,8 @@ export class SarAuthorForm extends LitElement {
       justify-content: center;
       box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
       transition: background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     button:hover:not(:disabled) {
       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
@@ -380,6 +389,75 @@ export class SarAuthorForm extends LitElement {
     .genre-suggestion-item:hover {
       background: rgba(156, 39, 176, 0.08);
       color: var(--default-primary-color, #9C27B0);
+    }
+    @media (max-width: 600px) {
+      .paper-header {
+        min-height: 52px;
+        margin-bottom: 8px;
+      }
+      #header {
+        font-size: clamp(22px, 6.5vw, 28px);
+        padding-right: 64px;
+      }
+      #card {
+        padding: 20px 16px 32px;
+        margin-bottom: 32px;
+      }
+      .autofill-box {
+        padding: 12px 14px;
+      }
+      .autofill-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+      }
+      .autofill-row button {
+        width: 100%;
+        min-height: 44px;
+      }
+      .autofill-input,
+      .title-input,
+      .review-textarea,
+      .genre-input {
+        font-size: 16px; /* Prevents auto-zoom on iOS */
+      }
+      .cover-section {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 14px;
+        gap: 16px;
+      }
+      .cover-preview-img,
+      .thumb-preview-img {
+        max-width: 100%;
+        height: auto;
+        max-height: 260px;
+        object-fit: contain;
+      }
+      .cover-actions {
+        width: 100%;
+      }
+      .cover-actions button {
+        width: 100%;
+        min-height: 44px;
+      }
+      .radio-group {
+        flex-wrap: wrap;
+      }
+      .radio-label {
+        padding: 10px 12px;
+        min-height: 44px;
+      }
+      .reverse button {
+        width: 100%;
+        min-height: 48px;
+      }
+      .toast {
+        left: 12px;
+        right: 12px;
+        min-width: auto;
+        bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+      }
     }
   `;
 
