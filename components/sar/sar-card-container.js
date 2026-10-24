@@ -184,8 +184,7 @@ export class SarCardContainer extends LitElement {
       width: 170px;
     }
     .rating-range-slider {
-      width: 100%;
-      height: 6px;
+      height: 2px;
       margin: 6px 0 2px 10px;
       accent-color: var(--default-primary-color, #9C27B0);
       cursor: pointer;
@@ -632,8 +631,8 @@ export class SarCardContainer extends LitElement {
                     value="title"
                     .checked="${this.orderBy === 'title'}"
                     @change="${() => {
-                      this.orderBy = 'title';
-                    }}"
+        this.orderBy = 'title';
+      }}"
                   />
                   <span>Title</span>
                 </label>
@@ -644,8 +643,8 @@ export class SarCardContainer extends LitElement {
                     value="rating"
                     .checked="${this.orderBy === 'rating'}"
                     @change="${() => {
-                      this.orderBy = 'rating';
-                    }}"
+        this.orderBy = 'rating';
+      }}"
                   />
                   <span>Rating</span>
                 </label>
@@ -661,8 +660,8 @@ export class SarCardContainer extends LitElement {
                       type="checkbox"
                       .checked="${this.showDub}"
                       @change="${(e) => {
-                        this.showDub = e.target.checked;
-                      }}"
+        this.showDub = e.target.checked;
+      }}"
                     />
                     <span class="toggle-slider"></span>
                   </span>
@@ -674,8 +673,8 @@ export class SarCardContainer extends LitElement {
                       type="checkbox"
                       .checked="${this.showSub}"
                       @change="${(e) => {
-                        this.showSub = e.target.checked;
-                      }}"
+        this.showSub = e.target.checked;
+      }}"
                     />
                     <span class="toggle-slider"></span>
                   </span>
@@ -689,8 +688,8 @@ export class SarCardContainer extends LitElement {
                       type="checkbox"
                       .checked="${this.showMovie}"
                       @change="${(e) => {
-                        this.showMovie = e.target.checked;
-                      }}"
+        this.showMovie = e.target.checked;
+      }}"
                     />
                     <span class="toggle-slider"></span>
                   </span>
@@ -702,8 +701,8 @@ export class SarCardContainer extends LitElement {
                       type="checkbox"
                       .checked="${this.showSeries}"
                       @change="${(e) => {
-                        this.showSeries = e.target.checked;
-                      }}"
+        this.showSeries = e.target.checked;
+      }}"
                     />
                     <span class="toggle-slider"></span>
                   </span>
@@ -741,8 +740,8 @@ export class SarCardContainer extends LitElement {
                 aria-label="Search by title"
                 .value="${this.searchString || ''}"
                 @input="${(e) => {
-                  this.searchString = e.target.value;
-                }}"
+        this.searchString = e.target.value;
+      }}"
               />
             </div>
             <div class="spacer"></div>
@@ -753,29 +752,29 @@ export class SarCardContainer extends LitElement {
                 aria-label="Search by genre"
                 .value="${this.searchGenre}"
                 @change="${(e) => {
-                  this.searchGenre = e.target.value;
-                }}"
+        this.searchGenre = e.target.value;
+      }}"
               >
                 ${this.genresAndCounts.map(
-                  (item) => html`
+        (item) => html`
                     <option value="${item.genre}" ?selected="${this.searchGenre === item.genre}">
                       ${item.genre ? this._computeGenreAndCountString(item) : 'Search by genre'}
                     </option>
                   `
-                )}
+      )}
               </select>
             </div>
           </div>
           <div class="cards">
             ${this.filteredReviews.map(
-              (item) => html`
+        (item) => html`
                 <sar-card
                   .review="${item}"
                   @card-click="${this._onCardClick}"
                   id="${this._cleanTitle(item.title)}"
                 ></sar-card>
               `
-            )}
+      )}
           </div>
         </div>
       </div>
