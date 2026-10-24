@@ -265,6 +265,32 @@ export class SarAuthorForm extends LitElement {
       color: #8bc34a;
       font-weight: 500;
     }
+    .toast {
+      position: fixed;
+      bottom: 16px;
+      left: 16px;
+      background-color: #323232;
+      color: #f1f1f1;
+      min-height: 48px;
+      min-width: 288px;
+      padding: 16px 24px;
+      box-sizing: border-box;
+      box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+      border-radius: 2px;
+      font-size: 14px;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(100px);
+      transition: transform 0.3s cubic-bezier(0, 0, 0.2, 1), opacity 0.3s, visibility 0.3s;
+      pointer-events: none;
+    }
+    .toast.opened {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
   `;
 
   static properties = {
@@ -287,6 +313,8 @@ export class SarAuthorForm extends LitElement {
     tags: { type: Array },
     route: { type: Object },
     routeData: { type: Object },
+    toastText: { type: String },
+    toastOpened: { type: Boolean },
   };
 
   constructor() {
@@ -311,6 +339,18 @@ export class SarAuthorForm extends LitElement {
     this.route = {};
     this.routeData = {};
     this._loadedRouteName = null;
+    this.toastText = '';
+    this.toastOpened = false;
+    this._toastTimer = null;
+  }
+
+  showToast(text, duration = 3000) {
+    if (text) this.toastText = text;
+    this.toastOpened = true;
+    if (this._toastTimer) clearTimeout(this._toastTimer);
+    this._toastTimer = setTimeout(() => {
+      this.toastOpened = false;
+    }, duration);
   }
 
   get firebase() {
@@ -318,9 +358,23 @@ export class SarAuthorForm extends LitElement {
   }
 
   get $() {
+    const toastEl = this.renderRoot?.querySelector('#toast');
+    if (toastEl && !toastEl._enhanced) {
+      toastEl._enhanced = true;
+      Object.defineProperty(toastEl, 'text', {
+        get: () => this.toastText,
+        set: (val) => {
+          this.toastText = val;
+        },
+      });
+      toastEl.show = (msg) => this.showToast(msg || this.toastText);
+      toastEl.hide = () => {
+        this.toastOpened = false;
+      };
+    }
     return {
       card: this.renderRoot?.querySelector('#card'),
-      toast: this.renderRoot?.querySelector('#toast'),
+      toast: toastEl,
       auth: this.renderRoot?.querySelector('#auth'),
       coverFileInput: this.renderRoot?.querySelector('#coverFileInput'),
       thumbnailFileInput: this.renderRoot?.querySelector('#thumbnailFileInput'),
@@ -464,10 +518,7 @@ export class SarAuthorForm extends LitElement {
   _searchAnime() {
     const query = (this.searchQuery || '').trim();
     if (!query) {
-      if (this.$.toast) {
-        this.$.toast.text = 'Please enter an anime title or Crunchyroll URL.';
-        this.$.toast.show();
-      }
+      this.showToast('Please enter an anime title or Crunchyroll URL.');
       return;
     }
     this.isSearching = true;
@@ -484,19 +535,13 @@ export class SarAuthorForm extends LitElement {
             this.searchResults = data.results;
           }
         } else {
-          if (this.$.toast) {
-            this.$.toast.text = 'No anime found. Try another search term.';
-            this.$.toast.show();
-          }
+          this.showToast('No anime found. Try another search term.');
         }
       })
       .catch((err) => {
         this.isSearching = false;
         console.error(err);
-        if (this.$.toast) {
-          this.$.toast.text = 'Failed to fetch anime info.';
-          this.$.toast.show();
-        }
+        this.showToast('Failed to fetch anime info.');
       });
   }
 
@@ -577,10 +622,7 @@ export class SarAuthorForm extends LitElement {
         });
     }
 
-    if (this.$.toast) {
-      this.$.toast.text = 'Loaded info for ' + (item.title || item.romajiTitle);
-      this.$.toast.show();
-    }
+    this.showToast('Loaded info for ' + (item.title || item.romajiTitle));
   }
 
   _triggerCoverUpload() {
@@ -610,17 +652,11 @@ export class SarAuthorForm extends LitElement {
         await this.firebase.database().ref('reviews').child(dbTitle(targetTitle)).set(review);
       }
       console.log('Synchronization succeeded');
-      if (this.$.toast) {
-        this.$.toast.text = 'Review saved successfully.';
-        this.$.toast.show();
-      }
+      this.showToast('Review saved successfully.');
       window.location.href = '/a/' + cleanTitle(review.title);
     } catch (error) {
       console.warn('Synchronization failed');
-      if (this.$.toast) {
-        this.$.toast.text = 'Failed to save review.';
-        this.$.toast.show();
-      }
+      this.showToast('Failed to save review.');
       console.error(error);
     }
     this.title = '';
@@ -732,10 +768,7 @@ export class SarAuthorForm extends LitElement {
       await this._saveReviewInDb(review);
     } catch (err) {
       console.error('Upload failed:', err);
-      if (this.$.toast) {
-        this.$.toast.text = 'Failed to upload cover image.';
-        this.$.toast.show();
-      }
+      this.showToast('Failed to upload cover image.');
     }
   }
 
@@ -750,10 +783,7 @@ export class SarAuthorForm extends LitElement {
       await this._saveReview(authInfo);
     } catch (err) {
       console.warn('Authentication failed.', err);
-      if (this.$.toast) {
-        this.$.toast.text = 'Review could not be saved.';
-        this.$.toast.show();
-      }
+      this.showToast('Review could not be saved.');
     }
   }
 
@@ -1030,7 +1060,9 @@ export class SarAuthorForm extends LitElement {
           <button type="button" @click="${this._onClick}">Submit</button>
         </div>
       </div>
-      <paper-toast id="toast"></paper-toast>
+      <div id="toast" class="toast ${this.toastOpened ? 'opened' : ''}">
+        ${this.toastText}
+      </div>
     `;
   }
 }
