@@ -58,8 +58,17 @@ export class SarAuthorForm extends LitElement {
     paper-button {
       background: var(--accent-color);
     }
-    paper-radio-button {
+    .radio-label {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
       padding: 12px;
+      user-select: none;
+    }
+    .radio-label input[type="radio"] {
+      margin: 0 5px 0 0;
+      accent-color: var(--default-primary-color, #9C27B0);
+      cursor: pointer;
     }
     .autofill-box {
       background: rgba(255, 255, 255, 0.05);
@@ -876,35 +885,59 @@ export class SarAuthorForm extends LitElement {
           unique
         ></paper-select>
 
-        <paper-radio-group
-          class="horizontal"
-          .selected="${this.viewMethod}"
-          selected="${this.viewMethod}"
-          @selected-changed="${(e) => {
-            this.viewMethod = e.detail.value ?? e.target.selected ?? '';
-          }}"
-          @iron-select="${(e) => {
-            if (e.target.selected !== undefined) this.viewMethod = e.target.selected;
-          }}"
-        >
-          <paper-radio-button name="dub">Dub</paper-radio-button>
-          <paper-radio-button name="sub">Sub</paper-radio-button>
-        </paper-radio-group>
+        <div class="horizontal radio-group" role="radiogroup">
+          <label class="radio-label">
+            <input
+              type="radio"
+              name="viewMethod"
+              value="dub"
+              .checked="${this.viewMethod === 'dub'}"
+              @change="${() => {
+                this.viewMethod = 'dub';
+              }}"
+            />
+            <span>Dub</span>
+          </label>
+          <label class="radio-label">
+            <input
+              type="radio"
+              name="viewMethod"
+              value="sub"
+              .checked="${this.viewMethod === 'sub'}"
+              @change="${() => {
+                this.viewMethod = 'sub';
+              }}"
+            />
+            <span>Sub</span>
+          </label>
+        </div>
 
-        <paper-radio-group
-          class="horizontal"
-          .selected="${this.showType}"
-          selected="${this.showType}"
-          @selected-changed="${(e) => {
-            this.showType = e.detail.value ?? e.target.selected ?? '';
-          }}"
-          @iron-select="${(e) => {
-            if (e.target.selected !== undefined) this.showType = e.target.selected;
-          }}"
-        >
-          <paper-radio-button name="movie">Movie</paper-radio-button>
-          <paper-radio-button name="series">Series</paper-radio-button>
-        </paper-radio-group>
+        <div class="horizontal radio-group" role="radiogroup">
+          <label class="radio-label">
+            <input
+              type="radio"
+              name="showType"
+              value="movie"
+              .checked="${this.showType === 'movie'}"
+              @change="${() => {
+                this.showType = 'movie';
+              }}"
+            />
+            <span>Movie</span>
+          </label>
+          <label class="radio-label">
+            <input
+              type="radio"
+              name="showType"
+              value="series"
+              .checked="${this.showType === 'series'}"
+              @change="${() => {
+                this.showType = 'series';
+              }}"
+            />
+            <span>Series</span>
+          </label>
+        </div>
 
         <sar-rating-slider
           .rating="${this.rating}"
