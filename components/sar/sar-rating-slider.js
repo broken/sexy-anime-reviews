@@ -6,16 +6,15 @@ export class SarRatingSlider extends LitElement {
       display: flex;
     }
     #slider {
-      margin-top: -7px;
+      margin: 7px;
     }
     #ratingText {
       text-align: right;
-      margin-right: 12px;
-      margin-top: -5px;
+      margin-right: 10px;
     }
     .rating-range-slider {
-      width: 200px;
-      height: 6px;
+      width: 162px;
+      height: 2px;
       accent-color: var(--default-primary-color, #9C27B0);
       cursor: pointer;
     }
@@ -26,6 +25,7 @@ export class SarRatingSlider extends LitElement {
     .vertical {
       display: flex;
       flex-direction: column;
+      margin: 0 16px;
     }
   `;
 
