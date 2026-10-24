@@ -237,9 +237,18 @@ export class SarCardContainer extends LitElement {
       color: var(--secondary-text-color, #727272);
       opacity: 0.8;
     }
+    .genre-select:has(option[value=""]:checked),
+    .genre-select:has(option:not([value]):checked) {
+      color: var(--secondary-text-color, #727272);
+      opacity: 0.8;
+    }
     .genre-select option {
       color: var(--primary-text-color, #212121);
       background: #ffffff;
+    }
+    .genre-select option[value=""],
+    .genre-select option:not([value]) {
+      color: var(--secondary-text-color, #727272);
     }
   `;
 
