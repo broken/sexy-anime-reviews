@@ -53,10 +53,6 @@ def main(name=''):
 def sar(filepath):
   return static_file(filepath, root='components/sar')
 
-@app.route('/components/<filepath:path>')
-def components(filepath):
-  return static_file(filepath, root='bower_components')
-
 @app.route('/add')
 @app.route('/edit/<name>')
 def add(name=''):
