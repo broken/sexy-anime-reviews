@@ -55,8 +55,37 @@ export class SarAuthorForm extends LitElement {
       display: flex;
       flex-direction: row-reverse;
     }
-    paper-button {
-      background: var(--accent-color);
+    button {
+      background: var(--accent-color, #03A9F4);
+      color: var(--text-primary-color, #FFFFFF);
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      user-select: none;
+      outline: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+      transition: background-color 0.2s, box-shadow 0.2s, opacity 0.2s;
+    }
+    button:hover:not(:disabled) {
+      box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.4);
+      filter: brightness(1.05);
+    }
+    button:active:not(:disabled) {
+      box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    }
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
     }
     .radio-label {
       display: inline-flex;
@@ -821,9 +850,9 @@ export class SarAuthorForm extends LitElement {
               }}"
               @keydown="${this._onSearchKeydown}"
             />
-            <paper-button raised @click="${this._searchAnime}" ?disabled="${this.isSearching}">
+            <button type="button" @click="${this._searchAnime}" ?disabled="${this.isSearching}">
               <span>${this._computeSearchButtonText(this.isSearching)}</span>
-            </paper-button>
+            </button>
           </div>
 
           ${this._hasSearchResults(this.searchResults)
@@ -839,7 +868,7 @@ export class SarAuthorForm extends LitElement {
                             ${item.romajiTitle} &bull; ${item.format} &bull; ${this._joinGenres(item.genres)}
                           </div>
                         </div>
-                        <paper-button raised>Select</paper-button>
+                        <button type="button">Select</button>
                       </div>
                     `
                   )}
@@ -885,7 +914,7 @@ export class SarAuthorForm extends LitElement {
               ${this.previewCover
                 ? html`<div class="cover-status">&#x2714; High-res cover ready</div>`
                 : ''}
-              <paper-button raised @click="${this._triggerCoverUpload}">
+              <button type="button" @click="${this._triggerCoverUpload}">
                 <file-input
                   id="coverFileInput"
                   accept="image/*"
@@ -894,13 +923,13 @@ export class SarAuthorForm extends LitElement {
                 >
                   <span>${this._computeUploadButtonText(this.previewCover)}</span>
                 </file-input>
-              </paper-button>
+              </button>
             </div>
             <div class="cover-action-item">
               ${this.previewThumbnail
                 ? html`<div class="cover-status">&#x2714; Thumbnail ready</div>`
                 : ''}
-              <paper-button raised @click="${this._triggerThumbnailUpload}">
+              <button type="button" @click="${this._triggerThumbnailUpload}">
                 <file-input
                   id="thumbnailFileInput"
                   accept="image/*"
@@ -909,7 +938,7 @@ export class SarAuthorForm extends LitElement {
                 >
                   <span>${this._computeThumbnailButtonText(this.previewThumbnail)}</span>
                 </file-input>
-              </paper-button>
+              </button>
             </div>
           </div>
         </div>
@@ -1005,7 +1034,7 @@ export class SarAuthorForm extends LitElement {
         </div>
         <br />
         <div class="reverse">
-          <paper-button raised @click="${this._onClick}">Submit</paper-button>
+          <button type="button" @click="${this._onClick}">Submit</button>
         </div>
       </paper-material>
       <paper-toast id="toast"></paper-toast>
