@@ -41,11 +41,10 @@ export class SarReview extends LitElement {
     }
     img {
       border: 0;
-      height: 420px;
+      height: 512px;
     }
     #cover {
       float: right;
-      height: 420px;
       box-sizing: border-box;
       margin: 0 0 16px 20px;
       cursor: pointer;
@@ -380,8 +379,8 @@ export class SarReview extends LitElement {
         <div class="article row" id="titlebar">
           <div class="title">${review?.title ?? ''}</div>
           ${this.isAdmin
-            ? html`<div id="edit" class="meta"><a href="${this._createEditUrl(review)}">[ edit ]</a></div>`
-            : ''}
+        ? html`<div id="edit" class="meta"><a href="${this._createEditUrl(review)}">[ edit ]</a></div>`
+        : ''}
         </div>
         <div class="article row">
           ${this._renderViewMethodIcon(review)}
