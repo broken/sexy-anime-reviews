@@ -91,8 +91,50 @@ export class SarAuthorForm extends LitElement {
       align-items: flex-end;
       gap: 16px;
     }
+    .autofill-input,
+    .title-input,
+    .review-textarea {
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--primary-text-color, #212121);
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid var(--divider-color, #B6B6B6);
+      border-radius: 0;
+      padding: 8px 0;
+      outline: none;
+      transition: border-color 0.2s;
+    }
     .autofill-input {
       flex: 1;
+    }
+    .input-container {
+      position: relative;
+      display: flex;
+      margin: 16px 0;
+    }
+    .title-input {
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .review-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      resize: vertical;
+      min-height: 100px;
+      line-height: 1.5;
+    }
+    .autofill-input:focus,
+    .title-input:focus,
+    .review-textarea:focus {
+      border-bottom: 2px solid var(--default-primary-color, #9C27B0);
+      margin-bottom: -1px;
+    }
+    .autofill-input::placeholder,
+    .title-input::placeholder,
+    .review-textarea::placeholder {
+      color: var(--secondary-text-color, #727272);
+      opacity: 0.8;
     }
     .results-list {
       margin-top: 12px;
@@ -767,19 +809,18 @@ export class SarAuthorForm extends LitElement {
         <div class="autofill-box">
           <div class="autofill-title">Auto-Fill Anime Info & Vertical Banner</div>
           <div class="autofill-row">
-            <paper-input
+            <input
+              type="text"
+              id="searchQuery"
               class="autofill-input"
-              label="Search title or paste Crunchyroll URL"
-              .value="${this.searchQuery}"
-              value="${this.searchQuery}"
-              @value-changed="${(e) => {
-                this.searchQuery = e.detail.value ?? e.target.value ?? '';
-              }}"
+              placeholder="Search title or paste Crunchyroll URL"
+              aria-label="Search title or paste Crunchyroll URL"
+              .value="${this.searchQuery || ''}"
               @input="${(e) => {
-                this.searchQuery = e.target.value ?? '';
+                this.searchQuery = e.target.value;
               }}"
               @keydown="${this._onSearchKeydown}"
-            ></paper-input>
+            />
             <paper-button raised @click="${this._searchAnime}" ?disabled="${this.isSearching}">
               <span>${this._computeSearchButtonText(this.isSearching)}</span>
             </paper-button>
@@ -807,17 +848,19 @@ export class SarAuthorForm extends LitElement {
             : ''}
         </div>
 
-        <paper-input
-          label="Title"
-          .value="${this.title}"
-          value="${this.title}"
-          @value-changed="${(e) => {
-            this.title = e.detail.value ?? e.target.value ?? '';
-          }}"
-          @input="${(e) => {
-            this.title = e.target.value ?? '';
-          }}"
-        ></paper-input>
+        <div class="input-container">
+          <input
+            type="text"
+            id="title"
+            class="title-input"
+            placeholder="Title"
+            aria-label="Title"
+            .value="${this.title || ''}"
+            @input="${(e) => {
+              this.title = e.target.value;
+            }}"
+          />
+        </div>
 
         <!-- Cover & Thumbnail Image Section -->
         <div class="cover-section">
@@ -947,17 +990,19 @@ export class SarAuthorForm extends LitElement {
           }}"
         ></sar-rating-slider>
 
-        <paper-textarea
-          label="Review"
-          .value="${this.review}"
-          value="${this.review}"
-          @value-changed="${(e) => {
-            this.review = e.detail.value ?? e.target.value ?? '';
-          }}"
-          @input="${(e) => {
-            this.review = e.target.value ?? '';
-          }}"
-        ></paper-textarea>
+        <div class="input-container">
+          <textarea
+            id="review"
+            class="review-textarea"
+            placeholder="Review"
+            aria-label="Review"
+            rows="5"
+            .value="${this.review || ''}"
+            @input="${(e) => {
+              this.review = e.target.value;
+            }}"
+          ></textarea>
+        </div>
         <br />
         <div class="reverse">
           <paper-button raised @click="${this._onClick}">Submit</paper-button>
