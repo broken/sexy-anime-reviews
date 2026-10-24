@@ -18,6 +18,7 @@ export class SarReview extends LitElement {
       bottom: 0;
       left: 0;
       flex-direction: column;
+      color: var(--primary-text-color);
     }
     #close {
       position: relative;
@@ -32,7 +33,7 @@ export class SarReview extends LitElement {
       transition: background-color 0.2s;
     }
     #close:hover {
-      background-color: rgba(0, 0, 0, 0.08);
+      background-color: var(--hover-overlay, rgba(0, 0, 0, 0.08));
     }
     #close svg {
       width: 24px;
@@ -48,13 +49,13 @@ export class SarReview extends LitElement {
       box-sizing: border-box;
       margin: 0 0 16px 20px;
       cursor: pointer;
-      background: #fff;
+      background: var(--card-cover-bg, #fff);
       border-radius: 2px;
-      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+      box-shadow: var(--card-shadow, 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4));
       transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     }
     #cover:hover {
-      box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      box-shadow: var(--card-shadow-hover, 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19));
     }
     #cover img {
       display: block;
@@ -62,6 +63,7 @@ export class SarReview extends LitElement {
     }
     .title {
       font-size: 28px;
+      color: var(--primary-text-color);
     }
     .row {
       display: flex;
@@ -83,6 +85,7 @@ export class SarReview extends LitElement {
     }
     .meta {
       margin: 0 5px;
+      color: var(--secondary-text-color, #727272);
     }
     #view_method {
       height: 16px;
@@ -104,7 +107,7 @@ export class SarReview extends LitElement {
       flex-direction: row;
     }
     #header {
-      color: silver;
+      color: var(--header-title-color, silver);
       font-size: 32px;
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
     }

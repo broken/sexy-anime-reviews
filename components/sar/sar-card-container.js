@@ -58,9 +58,10 @@ export class SarCardContainer extends LitElement {
       right: 0;
       bottom: 0;
       left: 0;
+      color: var(--primary-text-color);
     }
     #header {
-      color: silver;
+      color: var(--header-title-color, silver);
       font-size: 54px;
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
       align-self: flex-end;
@@ -153,7 +154,7 @@ export class SarCardContainer extends LitElement {
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #b0bec5;
+      background-color: var(--toggle-track-off, #b0bec5);
       transition: background-color 0.2s, opacity 0.2s;
       border-radius: 16px;
       opacity: 0.7;
@@ -165,7 +166,7 @@ export class SarCardContainer extends LitElement {
       width: 12px;
       left: 2px;
       bottom: 2px;
-      background-color: white;
+      background-color: var(--toggle-thumb-bg, white);
       transition: transform 0.2s;
       border-radius: 50%;
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -224,7 +225,7 @@ export class SarCardContainer extends LitElement {
       appearance: none;
       -webkit-appearance: none;
       -moz-appearance: none;
-      background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><polygon points="0,0 10,0 5,6" fill="%23727272"/></svg>');
+      background-image: var(--dropdown-arrow, url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><polygon points="0,0 10,0 5,6" fill="%23727272"/></svg>'));
       background-repeat: no-repeat;
       background-position: right 6px center;
     }
@@ -244,7 +245,7 @@ export class SarCardContainer extends LitElement {
     }
     .genre-select option {
       color: var(--primary-text-color, #212121);
-      background: #ffffff;
+      background: var(--dropdown-bg, #ffffff);
     }
     .genre-select option[value=""],
     .genre-select option:not([value]) {

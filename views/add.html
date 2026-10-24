@@ -7,24 +7,20 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/pub/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/pub/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/pub/favicon-16x16.png">
+  <link rel="stylesheet" href="/pub/themes/theme-dark.css">
+  <link rel="stylesheet" href="/pub/themes/theme-light.css">
+  <script>
+    (function () {
+      try {
+        var storedTheme = localStorage.getItem('sar-theme');
+        var theme = storedTheme === 'light' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+      } catch (e) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    })();
+  </script>
   <style type="text/css">
-    :root {
-      /* basic paper styles */
-      --dark-primary-color: #7B1FA2;
-      --default-primary-color: #9C27B0;
-      --light-primary-color: #E1BEE7;
-      --text-primary-color: #FFFFFF;
-      --accent-color: #03A9F4;
-      --primary-background-color: #ffffff;
-      --primary-text-color: #212121;
-      --secondary-text-color: #727272;
-      --disabled-text-color: #bdbdbd;
-      --divider-color: #B6B6B6;
-
-      /* sexy anime review styles */
-      --sar-card-text-color: var(--primary-text-color);
-    }
-
     html,
     body {
       height: 100%;
@@ -35,15 +31,37 @@
       padding: 0 6%;
       font-family: 'Open Sans', Helvetica, Arial, sans-serif;
       font-size: 13px;
-      color: #333;
+      color: var(--primary-text-color);
+      background-color: var(--primary-background-color);
+      background-image: var(--body-bg-image);
       -webkit-user-select: none;
       user-select: none;
-      background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI1IiBoZWlnaHQ9IjUiPgo8cmVjdCB3aWR0aD0iNSIgaGVpZ2h0PSI1IiBmaWxsPSIjZmZmIj48L3JlY3Q+CjxyZWN0IHdpZHRoPSIxIiBoZWlnaHQ9IjEiIGZpbGw9IiNjY2MiPjwvcmVjdD4KPC9zdmc+");
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .theme-switch-wrapper {
+      position: fixed;
+      top: 24px;
+      right: 6%;
+      z-index: 1200;
+      display: flex;
+      align-items: center;
+    }
+
+    @media (max-width: 600px) {
+      .theme-switch-wrapper {
+        top: 16px;
+        right: 16px;
+      }
     }
   </style>
 </head>
 
 <body>
+  <div class="theme-switch-wrapper">
+    <sar-theme-switch id="themeSwitch"></sar-theme-switch>
+  </div>
+  <script type="module" src="/components/sar/sar-theme-switch.js"></script>
   <script type="module" src="/pub/dist/add.bundle.js"></script>
   <sar-author-form></sar-author-form>
 </body>

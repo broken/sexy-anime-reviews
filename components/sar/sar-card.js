@@ -26,13 +26,13 @@ export class SarCard extends LitElement {
       box-sizing: border-box;
       display: inline-block;
       cursor: pointer;
-      background: #fff;
+      background: var(--card-cover-bg, #fff);
       border-radius: 2px;
-      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+      box-shadow: var(--card-shadow, 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4));
       transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
     }
     #cover:hover {
-      box-shadow: 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+      box-shadow: var(--card-shadow-hover, 0 8px 17px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19));
     }
     #cover img {
       border: 0;

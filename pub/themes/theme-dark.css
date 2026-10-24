@@ -1,0 +1,31 @@
+/* Dark Theme (Default) */
+:root,
+:root[data-theme="dark"] {
+  --dark-primary-color: #9C27B0;
+  --default-primary-color: #BA68C8;
+  --light-primary-color: #CE93D8;
+  --text-primary-color: #FFFFFF;
+  --accent-color: #38BDF8;
+  --primary-background-color: #121216;
+  --body-bg-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='5' height='5'%3E%3Crect width='5' height='5' fill='%23121216'/%3E%3Crect width='1' height='1' fill='%23252533'/%3E%3C/svg%3E");
+  --primary-text-color: #F1F1F5;
+  --secondary-text-color: #9E9EB4;
+  --disabled-text-color: #555566;
+  --divider-color: #333344;
+  --sar-card-text-color: #E2E2EC;
+  --header-title-color: #D1D5DB;
+  --card-cover-bg: #1B1B22;
+  --card-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.6), 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  --card-shadow-hover: 0 10px 25px 0 rgba(0, 0, 0, 0.7), 0 0 15px 0 rgba(186, 104, 200, 0.35), 0 0 0 1px rgba(186, 104, 200, 0.5);
+  --dropdown-bg: #1E1E26;
+  --dropdown-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpolygon points='0,0 10,0 5,6' fill='%239E9EB4'/%3E%3C/svg%3E");
+  --toggle-track-off: #3A3A48;
+  --toggle-thumb-bg: #E0E0EA;
+  --hover-overlay: rgba(255, 255, 255, 0.1);
+  --switch-track-bg: #1E1E26;
+  --switch-track-border: #3A3A4C;
+  --switch-thumb-bg: #BA68C8;
+  --switch-thumb-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+  --switch-glow: rgba(186, 104, 200, 0.35);
+  color-scheme: dark;
+}

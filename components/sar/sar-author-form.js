@@ -14,19 +14,21 @@ export class SarAuthorForm extends LitElement {
   static styles = css`
     :host {
       justify-content: center;
+      color: var(--primary-text-color);
     }
     .paper-header {
       white-space: nowrap;
       display: flex;
     }
     #header {
-      color: silver;
+      color: var(--header-title-color, silver);
       font-size: 32px;
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
     }
     #card {
+      background: var(--card-cover-bg, #fff);
       border-radius: 2px;
-      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+      box-shadow: var(--card-shadow, 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4));
       padding: 20px 48px 40px;
       margin-bottom: 48px;
     }
@@ -358,7 +360,7 @@ export class SarAuthorForm extends LitElement {
       top: 100%;
       left: 0;
       right: 0;
-      background: #ffffff;
+      background: var(--dropdown-bg, #ffffff);
       border: 1px solid var(--divider-color, #B6B6B6);
       border-radius: 4px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
