@@ -27,7 +27,6 @@ function dbTitle(title) {
 export class SarAuthorForm extends LitElement {
   static styles = css`
     :host {
-      display: flex;
       justify-content: center;
     }
     .paper-header {
@@ -40,6 +39,8 @@ export class SarAuthorForm extends LitElement {
       font-family: 'PT Sans Narrow', 'Open Sans', Helvetica, Arial, sans-serif;
     }
     #card {
+      border-radius: 2px;
+      box-shadow: 0 4px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 10px 0 rgba(0, 0, 0, 0.12), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
       padding: 20px 48px 40px;
       margin-bottom: 48px;
     }
@@ -392,7 +393,7 @@ export class SarAuthorForm extends LitElement {
     let decoded = name;
     try {
       decoded = decodeURIComponent(name);
-    } catch (e) {}
+    } catch (e) { }
 
     // 1. Direct match on key
     if (this.reviews[decoded]) return this.reviews[decoded];
@@ -825,7 +826,7 @@ export class SarAuthorForm extends LitElement {
         <div id="header">Sexy Anime Reviews</div>
       </div>
       <br />
-      <paper-material id="card" elevation="2">
+      <div id="card">
         <!-- Auto-Fill Section -->
         <div class="autofill-box">
           <div class="autofill-title">Auto-Fill Anime Info & Vertical Banner</div>
@@ -838,8 +839,8 @@ export class SarAuthorForm extends LitElement {
               aria-label="Search title or paste Crunchyroll URL"
               .value="${this.searchQuery || ''}"
               @input="${(e) => {
-                this.searchQuery = e.target.value;
-              }}"
+        this.searchQuery = e.target.value;
+      }}"
               @keydown="${this._onSearchKeydown}"
             />
             <button type="button" @click="${this._searchAnime}" ?disabled="${this.isSearching}">
@@ -848,10 +849,10 @@ export class SarAuthorForm extends LitElement {
           </div>
 
           ${this._hasSearchResults(this.searchResults)
-            ? html`
+        ? html`
                 <div class="results-list">
                   ${this.searchResults.map(
-                    (item) => html`
+          (item) => html`
                       <div class="result-card" @click="${(e) => this._selectSearchResult(e, item)}">
                         <img class="result-thumb" src="${item.coverUrl}" />
                         <div class="result-info">
@@ -863,10 +864,10 @@ export class SarAuthorForm extends LitElement {
                         <button type="button">Select</button>
                       </div>
                     `
-                  )}
+        )}
                 </div>
               `
-            : ''}
+        : ''}
         </div>
 
         <div class="input-container">
@@ -878,34 +879,34 @@ export class SarAuthorForm extends LitElement {
             aria-label="Title"
             .value="${this.title || ''}"
             @input="${(e) => {
-              this.title = e.target.value;
-            }}"
+        this.title = e.target.value;
+      }}"
           />
         </div>
 
         <!-- Cover & Thumbnail Image Section -->
         <div class="cover-section">
           ${this.previewCover
-            ? html`
+        ? html`
                 <div class="image-preview-card">
                   <div class="image-preview-label">Cover (Review)</div>
                   <img class="cover-preview-img" src="${this.previewCover}" alt="Cover preview" />
                 </div>
               `
-            : ''}
+        : ''}
           ${this.previewThumbnail
-            ? html`
+        ? html`
                 <div class="image-preview-card">
                   <div class="image-preview-label">Thumbnail (Card)</div>
                   <img class="thumb-preview-img" src="${this.previewThumbnail}" alt="Thumbnail preview" />
                 </div>
               `
-            : ''}
+        : ''}
           <div class="cover-actions">
             <div class="cover-action-item">
               ${this.previewCover
-                ? html`<div class="cover-status">&#x2714; High-res cover ready</div>`
-                : ''}
+        ? html`<div class="cover-status">&#x2714; High-res cover ready</div>`
+        : ''}
               <input
                 type="file"
                 id="coverFileInput"
@@ -919,8 +920,8 @@ export class SarAuthorForm extends LitElement {
             </div>
             <div class="cover-action-item">
               ${this.previewThumbnail
-                ? html`<div class="cover-status">&#x2714; Thumbnail ready</div>`
-                : ''}
+        ? html`<div class="cover-status">&#x2714; Thumbnail ready</div>`
+        : ''}
               <input
                 type="file"
                 id="thumbnailFileInput"
@@ -942,8 +943,8 @@ export class SarAuthorForm extends LitElement {
           bind-value="${(this.genres || []).join(',')}"
           @input-changed="${this._genreInputChanged}"
           @bind-value-changed="${(e) => {
-            this.genres = e.detail.value;
-          }}"
+        this.genres = e.detail.value;
+      }}"
           multiple
           nonmatching
           unique
@@ -957,8 +958,8 @@ export class SarAuthorForm extends LitElement {
               value="dub"
               .checked="${this.viewMethod === 'dub'}"
               @change="${() => {
-                this.viewMethod = 'dub';
-              }}"
+        this.viewMethod = 'dub';
+      }}"
             />
             <span>Dub</span>
           </label>
@@ -969,8 +970,8 @@ export class SarAuthorForm extends LitElement {
               value="sub"
               .checked="${this.viewMethod === 'sub'}"
               @change="${() => {
-                this.viewMethod = 'sub';
-              }}"
+        this.viewMethod = 'sub';
+      }}"
             />
             <span>Sub</span>
           </label>
@@ -984,8 +985,8 @@ export class SarAuthorForm extends LitElement {
               value="movie"
               .checked="${this.showType === 'movie'}"
               @change="${() => {
-                this.showType = 'movie';
-              }}"
+        this.showType = 'movie';
+      }}"
             />
             <span>Movie</span>
           </label>
@@ -996,8 +997,8 @@ export class SarAuthorForm extends LitElement {
               value="series"
               .checked="${this.showType === 'series'}"
               @change="${() => {
-                this.showType = 'series';
-              }}"
+        this.showType = 'series';
+      }}"
             />
             <span>Series</span>
           </label>
@@ -1007,8 +1008,8 @@ export class SarAuthorForm extends LitElement {
           .rating="${this.rating}"
           rating="${this.rating}"
           @rating-changed="${(e) => {
-            this.rating = e.detail.value ?? e.target.rating;
-          }}"
+        this.rating = e.detail.value ?? e.target.rating;
+      }}"
         ></sar-rating-slider>
 
         <div class="input-container">
@@ -1020,15 +1021,15 @@ export class SarAuthorForm extends LitElement {
             rows="5"
             .value="${this.review || ''}"
             @input="${(e) => {
-              this.review = e.target.value;
-            }}"
+        this.review = e.target.value;
+      }}"
           ></textarea>
         </div>
         <br />
         <div class="reverse">
           <button type="button" @click="${this._onClick}">Submit</button>
         </div>
-      </paper-material>
+      </div>
       <paper-toast id="toast"></paper-toast>
     `;
   }
