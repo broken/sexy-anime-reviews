@@ -56,7 +56,7 @@ export class SarReview extends LitElement {
     }
     img {
       border: 0;
-      height: 512px;
+      height: 640px;
     }
     #cover {
       float: right;
@@ -141,7 +141,7 @@ export class SarReview extends LitElement {
       margin-top: 48px;
       margin-right: auto;
       margin-left: auto;
-      max-width: 720px;
+      max-width: 1024px;
       min-width: 40px;
       box-sizing: border-box;
       width: 100%;
