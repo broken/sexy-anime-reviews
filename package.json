@@ -6,7 +6,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite build --watch",
-    "start": ".venv/bin/python3 main.py",
+    "start": "npm run build && .venv/bin/python3 main.py",
     "deploy": "npm run build && gcloud app deploy --project=sexy-anime-reviews",
     "bump:patch": "npm version patch",
     "bump:minor": "npm version minor",
