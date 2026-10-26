@@ -372,7 +372,7 @@ export class SarAuthorForm extends LitElement {
       color: #aaa;
     }
     .cover-preview-img {
-      height: 420px;
+      height: 640px;
       border-radius: 4px;
       box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
       flex-shrink: 0;
@@ -540,6 +540,7 @@ export class SarAuthorForm extends LitElement {
       #card {
         padding: 20px 16px 32px;
         margin-bottom: 32px;
+        max-width: 1024px;
       }
       .autofill-box {
         padding: 12px 14px;
@@ -1398,7 +1399,7 @@ export class SarAuthorForm extends LitElement {
           <div class="genres-label">Genres</div>
           <div class="genres-wrapper">
             ${(this.genres || []).map(
-              (genre) => html`
+          (genre) => html`
                 <span class="genre-chip">
                   <span>${genre}</span>
                   <button
@@ -1411,7 +1412,7 @@ export class SarAuthorForm extends LitElement {
                   </button>
                 </span>
               `
-            )}
+        )}
             <input
               type="text"
               class="genre-input"
@@ -1423,24 +1424,24 @@ export class SarAuthorForm extends LitElement {
             />
           </div>
           ${this.genreSuggestions && this.genreSuggestions.length > 0
-            ? html`
+        ? html`
                 <div class="genre-suggestions">
                   ${this.genreSuggestions.map(
-                    (tag) => html`
+          (tag) => html`
                       <div
                         class="genre-suggestion-item"
                         @mousedown="${(e) => {
-                          e.preventDefault();
-                          this._addGenre(tag);
-                        }}"
+              e.preventDefault();
+              this._addGenre(tag);
+            }}"
                       >
                         ${tag}
                       </div>
                     `
-                  )}
+        )}
                 </div>
               `
-            : ''}
+        : ''}
         </div>
 
         <div class="horizontal radio-group" role="radiogroup">
