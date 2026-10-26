@@ -2,7 +2,7 @@
 Simple app engine app that utilizes polymer (edit: no longer) & firebase to display my anime reviews.
 Site: http://animereviews.link
 
-Few things I wanted to play with:
+I just wanted to make a sexy looking site with a few technologies I had been itching to play with:
 * complete project developement on a Chromebook (start to finish)
 * Polymer 1.0
 * Firebase
@@ -20,7 +20,18 @@ Here's hoping another many years pass without any need to look at this code. :D
 Added showType to distinguish between movies and series. Make sure to specify project `gcloud app deploy --project=sexy-anime-reviews` when deploying to prevent blowing away a different site. Oh, and the 'sexy' refers to the website design.
 
 ## 2026 Update
-I wanted to add a few things to make adding entries into the site easier. While everything was running correctly and fine still, it was on obsolete/deprecated components - polymer, link imports, etc. Thus I decided to update to something more modern - namely lit since it is so slim, making it easy to convert later if necessary, and I'm familiar with it. Anyway, changes I made were: pulling metadata from Crunchyroll when adding reviews, script for identifying orphaned images, mobile view, and dark mode.
+I wanted to add a few things to make adding entries into the site easier. While everything was running correctly and fine still, it was on obsolete/deprecated components - polymer, link imports, etc. Thus I decided to update to something more modern - namely lit since it is so slim, making it easy to convert later if necessary, and I'm familiar with it. Anyway, changes I made were: migration off of polymer & bower to lit element & npm, pulling metadata from Crunchyroll when adding reviews, script for identifying orphaned images, mobile view, support thumbnails, support spoilers, and dark mode. Here's to hoping for another many years of hands-off operation.
+
+## How to use
 
 To run locally: `.venv/bin/python3 main.py`
 To deploy: `gcloud app deploy --project=sexy-anime-reviews`
+Ratings histogram: `python3 rating_histogram.py`
+
+### Pages
+
+* '/' : list of all reviews
+* '/add' : form to add a new review
+* '/login' : login page for google accounts
+* '/[ID]' : page for a specific review
+* '/edit/[ID]' : edit a specific review
