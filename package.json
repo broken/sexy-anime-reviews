@@ -4,12 +4,15 @@
   "description": "Simple app to display my anime reviews. Site: http://animereviews.link",
   "main": "index.js",
   "scripts": {
-    "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview",
+    "dev": "vite build --watch",
+    "start": ".venv/bin/python3 main.py",
+    "deploy": "npm run build && gcloud app deploy --project=sexy-anime-reviews",
     "bump:patch": "npm version patch",
     "bump:minor": "npm version minor",
-    "bump:major": "npm version major"
+    "bump:major": "npm version major",
+    "histogram": ".venv/bin/python3 rating_histogram.py",
+    "find-orphans": ".venv/bin/python3 find_orphaned_images.py"
   },
   "repository": {
     "type": "git",
