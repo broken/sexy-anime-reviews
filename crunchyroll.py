@@ -97,10 +97,17 @@ def get_series_by_id(series_id, token):
       if items:
         item = items[0]
         meta = item.get('series_metadata') or {}
-        genres = meta.get('tenant_categories') or item.get('keywords') or []
+        raw_keywords = meta.get('keywords') or item.get('keywords') or []
+        genres = meta.get('tenant_categories') or [
+            k for k in raw_keywords if not k.startswith('type:') and k not in ('movie', 'series')
+        ]
         cover = pick_best_poster(item.get('images', {}))
         thumbnail = pick_thumbnail_poster(item.get('images', {}))
-        show_type = 'movie' if item.get('type') == 'movie_listing' else 'series'
+        is_movie = (
+            item.get('type') in ('movie', 'movie_listing')
+            or any(str(k).lower() in ('movie', 'type:movie') for k in raw_keywords)
+        )
+        show_type = 'movie' if is_movie else 'series'
         is_dubbed = meta.get('is_dubbed', False)
         view_method = 'dub' if is_dubbed else 'sub'
         return {
@@ -128,7 +135,7 @@ def search_crunchyroll(query):
     token = get_cr_token()
 
     # Check if a Crunchyroll URL with series ID is provided
-    m = re.search(r'/series/([A-Z0-9]+)', query)
+    m = re.search(r'/(?:series|movie|movie_listing)/([A-Z0-9]+)', query, re.IGNORECASE)
     if m:
       series_id = m.group(1)
       res = get_series_by_id(series_id, token)
@@ -153,12 +160,17 @@ def search_crunchyroll(query):
       data = json.loads(resp.read().decode('utf-8'))
       results = []
       for group in data.get('data', []):
+        group_type = group.get('type')
         for item in group.get('items', []):
           series_id = item.get('id')
           title = item.get('title')
           cover = pick_best_poster(item.get('images', {}))
           thumbnail = pick_thumbnail_poster(item.get('images', {}))
-          show_type = 'movie' if item.get('type') == 'movie_listing' else 'series'
+          is_movie = (
+              group_type == 'movie_listing'
+              or item.get('type') in ('movie', 'movie_listing')
+          )
+          show_type = 'movie' if is_movie else 'series'
           results.append({
               'id': series_id,
               'title': title,
@@ -168,12 +180,32 @@ def search_crunchyroll(query):
               'format': item.get('type'),
           })
 
+      # Sort results by match relevance to search query
+      def score_match(query_str, cand_title):
+        q = query_str.lower().strip()
+        t = (cand_title or '').lower().strip()
+        if q == t:
+          return 100
+        if t.startswith(q) or q.startswith(t):
+          return 80
+        q_words = set(re.findall(r'\w+', q))
+        t_words = set(re.findall(r'\w+', t))
+        if not q_words:
+          return 0
+        common = q_words.intersection(t_words)
+        ratio = len(common) / len(q_words)
+        first_bonus = 10 if (q.split() and t.split() and q.split()[0] == t.split()[0]) else 0
+        return ratio * 50 + first_bonus
+
+      results.sort(key=lambda r: score_match(search_term, r['title']), reverse=True)
+
       enriched = []
-      for r in results[:5]:
+      for r in results[:6]:
         details = get_series_by_id(r['id'], token)
         if details:
           r['genres'] = details.get('genres', [])
           r['viewMethod'] = details.get('viewMethod', 'sub')
+          r['showType'] = details.get('showType', r['showType'])
           if details.get('coverUrl'):
             r['coverUrl'] = details['coverUrl']
           if details.get('thumbnailUrl'):
