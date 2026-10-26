@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import { keyed } from 'lit/directives/keyed.js';
 import { parseSpoilers } from './util.js';
 
 function dbTitle(title) {
@@ -239,6 +240,7 @@ export class SarReview extends LitElement {
     isAdmin: { type: Boolean, attribute: 'is-admin' },
     elevation: { type: Number },
     keyEventTarget: { type: Object },
+    _loadedCoverSrc: { state: true },
   };
 
   constructor() {
@@ -248,6 +250,7 @@ export class SarReview extends LitElement {
     this.elevation = 4;
     this.keyEventTarget = typeof document !== 'undefined' ? document.body : null;
     this._revealedSpoilers = new Set();
+    this._loadedCoverSrc = null;
   }
 
   get $() {
@@ -395,6 +398,36 @@ export class SarReview extends LitElement {
     }, 0);
   }
 
+  willUpdate(changedProperties) {
+    super.willUpdate?.(changedProperties);
+    if (changedProperties.has('review')) {
+      this._revealedSpoilers.clear();
+      this._loadedCoverSrc = null;
+      this._preloadHighResCover();
+    }
+  }
+
+  _preloadHighResCover() {
+    const review = this.review;
+    if (!review) return;
+    const initialCover = review.thumbnail || review.cover || '';
+    const highResCover = review.cover;
+    if (highResCover && highResCover !== initialCover) {
+      const img = new Image();
+      img.src = highResCover;
+      const onLoaded = () => {
+        if (this.review === review && this.review?.cover === highResCover) {
+          this._loadedCoverSrc = highResCover;
+        }
+      };
+      if (typeof img.decode === 'function') {
+        img.decode().then(onLoaded).catch(onLoaded);
+      } else {
+        img.onload = onLoaded;
+      }
+    }
+  }
+
   updated(changedProperties) {
     super.updated?.(changedProperties);
     if (changedProperties.has('review')) {
@@ -466,7 +499,10 @@ export class SarReview extends LitElement {
 
   _computeCover(review) {
     if (!review) return '';
-    return review.cover || review.thumbnail || '';
+    if (this._loadedCoverSrc && this.review?.cover === this._loadedCoverSrc) {
+      return this._loadedCoverSrc;
+    }
+    return review.thumbnail || review.cover || '';
   }
 
   _createEditUrl(review) {
@@ -547,7 +583,16 @@ export class SarReview extends LitElement {
         </div>
         <section>
           <div id="cover">
-            <img src="${this._computeCover(review)}" alt="${review?.title ?? ''}" @click="${this._onClick}">
+            ${review
+              ? keyed(
+                  review.title || 'empty',
+                  html`<img
+                    src="${this._computeCover(review)}"
+                    alt="${review?.title ?? ''}"
+                    @click="${this._onClick}"
+                  >`
+                )
+              : ''}
           </div>
           <div class="article pre">${this._renderReviewContent(review?.review)}</div>
         </section>
