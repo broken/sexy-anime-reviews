@@ -26,6 +26,9 @@ export class SarReview extends LitElement {
       overscroll-behavior-y: contain;
       touch-action: manipulation;
     }
+    section {
+      margin-top: 20px;
+    }
     #close {
       position: relative;
       color: var(--secondary-text-color);
@@ -546,7 +549,6 @@ export class SarReview extends LitElement {
           <div id="cover">
             <img src="${this._computeCover(review)}" alt="${review?.title ?? ''}" @click="${this._onClick}">
           </div>
-          <br>
           <div class="article pre">${this._renderReviewContent(review?.review)}</div>
         </section>
       </div>
