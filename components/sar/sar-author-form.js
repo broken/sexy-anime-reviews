@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import './sar-rating-slider.js';
 import { cleanTitle, dbTitle, parseSpoilers, hasSpoilers, splitReview } from './util.js';
+import { articleStyles } from './article-styles.js';
 import {
   subscribeToReviews,
   saveReview,
@@ -11,7 +12,9 @@ import {
 } from '../../src/services/firebase.js';
 
 export class SarAuthorForm extends LitElement {
-  static styles = css`
+  static styles = [
+    articleStyles,
+    css`
     :host {
       justify-content: center;
       color: var(--primary-text-color);
@@ -264,77 +267,6 @@ export class SarAuthorForm extends LitElement {
       color: var(--primary-text-color);
       white-space: pre-wrap;
       word-break: break-word;
-    }
-    .synopsis {
-      position: relative;
-      margin: 0 0 20px 0;
-      padding: 12px 16px;
-      background: var(--synopsis-bg, rgba(186, 104, 200, 0.08));
-      border-left: 3px solid var(--synopsis-border, var(--default-primary-color, #BA68C8));
-      border-radius: 0 6px 6px 0;
-      white-space: normal;
-    }
-    .synopsis-label {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--default-primary-color, #BA68C8);
-      margin-bottom: 5px;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-    .synopsis-text {
-      font-size: 13.5px;
-      line-height: 1.5;
-      font-style: italic;
-      color: var(--synopsis-text, var(--primary-text-color));
-      user-select: text;
-      -webkit-user-select: text;
-    }
-    .review-body {
-      white-space: pre-wrap;
-      line-height: 1.6;
-      font-size: 13px;
-      user-select: text;
-      -webkit-user-select: text;
-    }
-    .spoiler {
-      display: inline;
-      background-color: var(--spoiler-bg, #09090d);
-      color: transparent;
-      text-shadow: none;
-      border-radius: 3px;
-      padding: 1px 6px;
-      margin: 0 1px;
-      cursor: pointer;
-      user-select: none;
-      -webkit-user-select: none;
-      transition: background-color 0.2s ease, color 0.15s ease, box-shadow 0.2s ease;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
-      vertical-align: baseline;
-      box-decoration-break: clone;
-      -webkit-box-decoration-break: clone;
-    }
-    .spoiler:hover:not(.revealed) {
-      background-color: var(--spoiler-hover-bg, #1c1c26);
-      box-shadow: 0 0 0 1px var(--default-primary-color, #BA68C8);
-    }
-    .spoiler:focus-visible {
-      outline: 2px solid var(--default-primary-color, #BA68C8);
-      outline-offset: 1px;
-    }
-    .spoiler.revealed {
-      background-color: var(--spoiler-revealed-bg, rgba(186, 104, 200, 0.14));
-      color: var(--primary-text-color);
-      user-select: text;
-      -webkit-user-select: text;
-      border-bottom: 2px solid var(--default-primary-color, #BA68C8);
-    }
-    .spoiler.revealed:hover {
-      background-color: var(--spoiler-revealed-hover-bg, rgba(186, 104, 200, 0.22));
     }
     .results-list {
       margin-top: 12px;
@@ -633,7 +565,7 @@ export class SarAuthorForm extends LitElement {
         bottom: calc(12px + env(safe-area-inset-bottom, 0px));
       }
     }
-  `;
+  `];
 
   static properties = {
     title: { type: String },
