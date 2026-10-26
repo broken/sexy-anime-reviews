@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
-import { parseSpoilers, dbTitle } from './util.js';
+import { parseSpoilers, dbTitle, splitReview } from './util.js';
 
 export class SarReview extends LitElement {
   static styles = css`
@@ -56,6 +56,8 @@ export class SarReview extends LitElement {
       height: 640px;
     }
     #cover {
+      position: relative;
+      z-index: 2;
       float: right;
       box-sizing: border-box;
       margin: 0 0 16px 20px;
@@ -187,6 +189,45 @@ export class SarReview extends LitElement {
     .spoiler.revealed:hover {
       background-color: var(--spoiler-revealed-hover-bg, rgba(186, 104, 200, 0.22));
     }
+    .synopsis {
+      display: flow-root;
+      position: relative;
+      margin: 0 0 20px 0;
+      padding: 12px 16px;
+      background: var(--synopsis-bg, rgba(186, 104, 200, 0.08));
+      border-left: 3px solid var(--synopsis-border, var(--default-primary-color, #BA68C8));
+      border-radius: 0 6px 6px 0;
+      white-space: normal;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+      box-sizing: border-box;
+    }
+    .synopsis-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--default-primary-color, #BA68C8);
+      margin-bottom: 5px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .synopsis-text {
+      font-size: 14px;
+      line-height: 1.5;
+      font-style: italic;
+      color: var(--synopsis-text, var(--primary-text-color));
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .review-body {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 14px;
+      user-select: text;
+      -webkit-user-select: text;
+      word-break: break-word;
+    }
     @media (max-width: 680px) {
       .paper-header {
         padding: 8px 16px;
@@ -218,7 +259,16 @@ export class SarReview extends LitElement {
         display: block;
         margin: 0 auto;
       }
-      .pre {
+      .synopsis {
+        margin: 0 0 10px 0;
+        padding: 6px 12px;
+      }
+      .synopsis-text {
+        font-size: 15px;
+        line-height: 1.6;
+      }
+      .pre,
+      .review-body {
         font-size: 15px;
         line-height: 1.65;
       }
@@ -523,9 +573,8 @@ export class SarReview extends LitElement {
     }
   }
 
-  _renderReviewContent(content) {
-    if (!content) return '';
-    const parts = parseSpoilers(content);
+  _renderParts(parts) {
+    if (!parts || !parts.length) return '';
     return parts.map((part) => {
       if (part.type === 'text') {
         return part.content;
@@ -542,6 +591,20 @@ export class SarReview extends LitElement {
         @keydown="${(e) => this._onSpoilerKeyDown(part.index, e)}"
       >${part.content}</span>`;
     });
+  }
+
+  _renderReviewContent(content) {
+    if (!content) return '';
+    const { synopsis, body } = splitReview(content);
+    if (!synopsis) {
+      const parts = parseSpoilers(body);
+      return html`<div class="review-body">${this._renderParts(parts)}</div>`;
+    }
+    const synopsisParts = parseSpoilers(synopsis, 0);
+    const spoilerCountInSynopsis = synopsisParts.filter((p) => p.type === 'spoiler').length;
+    const bodyParts = parseSpoilers(body, spoilerCountInSynopsis);
+
+    return html`<div class="synopsis pre" aria-label="Synopsis"><div class="synopsis-label">Synopsis</div><div class="synopsis-text">${this._renderParts(synopsisParts)}</div></div><div class="review-body">${this._renderParts(bodyParts)}</div>`;
   }
 
   render() {
@@ -577,17 +640,17 @@ export class SarReview extends LitElement {
         <section>
           <div id="cover">
             ${review
-              ? keyed(
-                  review.title || 'empty',
-                  html`<img
+        ? keyed(
+          review.title || 'empty',
+          html`<img
                     src="${this._computeCover(review)}"
                     alt="${review?.title ?? ''}"
                     @click="${this._onClick}"
                   >`
-                )
-              : ''}
+        )
+        : ''}
           </div>
-          <div class="article pre">${this._renderReviewContent(review?.review)}</div>
+          <div class="article">${this._renderReviewContent(review?.review)}</div>
         </section>
       </div>
     `;

@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import './sar-rating-slider.js';
-import { cleanTitle, dbTitle, parseSpoilers, hasSpoilers } from './util.js';
+import { cleanTitle, dbTitle, parseSpoilers, hasSpoilers, splitReview } from './util.js';
 import {
   subscribeToReviews,
   saveReview,
@@ -264,6 +264,41 @@ export class SarAuthorForm extends LitElement {
       color: var(--primary-text-color);
       white-space: pre-wrap;
       word-break: break-word;
+    }
+    .synopsis {
+      position: relative;
+      margin: 0 0 20px 0;
+      padding: 12px 16px;
+      background: var(--synopsis-bg, rgba(186, 104, 200, 0.08));
+      border-left: 3px solid var(--synopsis-border, var(--default-primary-color, #BA68C8));
+      border-radius: 0 6px 6px 0;
+      white-space: normal;
+    }
+    .synopsis-label {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--default-primary-color, #BA68C8);
+      margin-bottom: 5px;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .synopsis-text {
+      font-size: 13.5px;
+      line-height: 1.5;
+      font-style: italic;
+      color: var(--synopsis-text, var(--primary-text-color));
+      user-select: text;
+      -webkit-user-select: text;
+    }
+    .review-body {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      font-size: 13px;
+      user-select: text;
+      -webkit-user-select: text;
     }
     .spoiler {
       display: inline;
@@ -1056,9 +1091,8 @@ export class SarAuthorForm extends LitElement {
     }
   }
 
-  _renderReviewPreview(content) {
-    if (!content) return '';
-    const parts = parseSpoilers(content);
+  _renderPreviewParts(parts) {
+    if (!parts || !parts.length) return '';
     return parts.map((part) => {
       if (part.type === 'text') {
         return part.content;
@@ -1075,6 +1109,20 @@ export class SarAuthorForm extends LitElement {
         @keydown="${(e) => this._onPreviewSpoilerKeyDown(part.index, e)}"
       >${part.content}</span>`;
     });
+  }
+
+  _renderReviewPreview(content) {
+    if (!content) return '';
+    const { synopsis, body } = splitReview(content);
+    if (!synopsis) {
+      const parts = parseSpoilers(body);
+      return html`<div class="review-body">${this._renderPreviewParts(parts)}</div>`;
+    }
+    const synopsisParts = parseSpoilers(synopsis, 0);
+    const spoilerCount = synopsisParts.filter((p) => p.type === 'spoiler').length;
+    const bodyParts = parseSpoilers(body, spoilerCount);
+
+    return html`<div class="synopsis" aria-label="Synopsis"><div class="synopsis-label">Synopsis</div><div class="synopsis-text">${this._renderPreviewParts(synopsisParts)}</div></div><div class="review-body">${this._renderPreviewParts(bodyParts)}</div>`;
   }
 
   async _saveReviewInDb(review) {
@@ -1525,7 +1573,7 @@ export class SarAuthorForm extends LitElement {
           <textarea
             id="review"
             class="review-textarea"
-            placeholder="Write your review here... Wrap spoiler text in ||spoiler|| to black it out."
+            placeholder="First line is a single-sentence synopsis, followed by an empty line, then your review... Wrap spoiler text in ||spoiler|| to black it out."
             aria-label="Review"
             rows="6"
             .value="${this.review || ''}"
@@ -1536,7 +1584,7 @@ export class SarAuthorForm extends LitElement {
         </div>
 
         <div class="spoiler-hint">
-          Tip: Wrap text in <code>||spoiler text||</code> to black it out. Readers can click to reveal it.
+          Tip: First line followed by two newlines is formatted as a <code>Synopsis</code>. Wrap spoiler text in <code>||spoiler text||</code> to black it out.
         </div>
 
         ${hasSpoilers(this.review)
