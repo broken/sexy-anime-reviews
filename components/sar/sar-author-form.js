@@ -1507,7 +1507,7 @@ export class SarAuthorForm extends LitElement {
             class="review-textarea"
             placeholder="First line is a single-sentence synopsis, followed by an empty line, then your review... Wrap spoiler text in ||spoiler|| to black it out."
             aria-label="Review"
-            rows="6"
+            rows="18"
             .value="${this.review || ''}"
             @input="${(e) => {
         this.review = e.target.value;
