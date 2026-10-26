@@ -1,6 +1,6 @@
 {
   "name": "sexy-anime-reviews",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Simple app to display my anime reviews. Site: http://animereviews.link",
   "main": "index.js",
   "scripts": {
