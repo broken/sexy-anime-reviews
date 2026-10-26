@@ -931,9 +931,6 @@ export class SarAuthorForm extends LitElement {
     if (item.showType) {
       this.showType = item.showType;
     }
-    if (item.viewMethod) {
-      this.viewMethod = item.viewMethod;
-    }
     if (item.genres && item.genres.length) {
       this.genres = item.genres.map((g) => {
         const tag = g.trim().toLowerCase();
