@@ -175,14 +175,11 @@ export class SarReview extends LitElement {
         float: none;
         display: block;
         margin: 16px auto 20px auto;
-        max-width: 260px;
         text-align: center;
       }
       #cover img {
         width: 100%;
-        max-width: 260px;
         height: auto;
-        max-height: 380px;
         object-fit: contain;
         display: block;
         margin: 0 auto;

@@ -66,10 +66,7 @@ export class SarCard extends LitElement {
         margin-bottom: 12px;
       }
       #cover {
-        width: 100%;
-        height: auto;
-        aspect-ratio: 2 / 3;
-        display: flex;
+        height: 260px;
         justify-content: center;
         align-items: center;
         overflow: hidden;
