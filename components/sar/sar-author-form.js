@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import './sar-rating-slider.js';
-import { cleanTitle, dbTitle } from './util.js';
+import { cleanTitle, dbTitle, parseSpoilers, hasSpoilers } from './util.js';
 import {
   subscribeToReviews,
   saveReview,
@@ -162,6 +162,144 @@ export class SarAuthorForm extends LitElement {
     .review-textarea::placeholder {
       color: var(--secondary-text-color, #727272);
       opacity: 0.8;
+    }
+    .review-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      margin-bottom: 4px;
+    }
+    .review-section-label {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--secondary-text-color, #727272);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .spoiler-toolbar-btn {
+      background: var(--hover-overlay, rgba(255, 255, 255, 0.08));
+      color: var(--primary-text-color, #F1F1F5);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0.2px;
+      padding: 4px 10px;
+      min-height: 28px;
+      border: 1px solid var(--divider-color, #333344);
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .spoiler-toolbar-btn:hover:not(:disabled) {
+      background: var(--default-primary-color, #BA68C8);
+      color: #FFFFFF;
+      border-color: var(--default-primary-color, #BA68C8);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    .spoiler-toolbar-btn:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+    .spoiler-toolbar-btn svg {
+      width: 14px;
+      height: 14px;
+      fill: currentColor;
+    }
+    .review-input-container {
+      margin-top: 4px;
+      margin-bottom: 6px;
+    }
+    .spoiler-hint {
+      font-size: 12px;
+      color: var(--secondary-text-color, #727272);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+    .spoiler-hint code {
+      font-family: monospace;
+      padding: 1px 5px;
+      background: var(--hover-overlay, rgba(255, 255, 255, 0.08));
+      border-radius: 3px;
+      color: var(--default-primary-color, #BA68C8);
+      font-size: 12px;
+      border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.1));
+    }
+    .spoiler-preview-card {
+      margin: 12px 0 16px 0;
+      padding: 12px 14px;
+      background: var(--card-cover-bg, rgba(0, 0, 0, 0.25));
+      border: 1px solid var(--divider-color, #333344);
+      border-radius: 6px;
+    }
+    .spoiler-preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--divider-color, #333344);
+    }
+    .spoiler-preview-title {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--secondary-text-color, #727272);
+    }
+    .spoiler-preview-subtitle {
+      font-size: 11px;
+      color: var(--secondary-text-color, #727272);
+      font-style: italic;
+    }
+    .spoiler-preview-content {
+      font-size: 13px;
+      line-height: 1.6;
+      color: var(--primary-text-color);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .spoiler {
+      display: inline;
+      background-color: var(--spoiler-bg, #09090d);
+      color: transparent;
+      text-shadow: none;
+      border-radius: 3px;
+      padding: 1px 6px;
+      margin: 0 1px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background-color 0.2s ease, color 0.15s ease, box-shadow 0.2s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      vertical-align: baseline;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .spoiler:hover:not(.revealed) {
+      background-color: var(--spoiler-hover-bg, #1c1c26);
+      box-shadow: 0 0 0 1px var(--default-primary-color, #BA68C8);
+    }
+    .spoiler:focus-visible {
+      outline: 2px solid var(--default-primary-color, #BA68C8);
+      outline-offset: 1px;
+    }
+    .spoiler.revealed {
+      background-color: var(--spoiler-revealed-bg, rgba(186, 104, 200, 0.14));
+      color: var(--primary-text-color);
+      user-select: text;
+      -webkit-user-select: text;
+      border-bottom: 2px solid var(--default-primary-color, #BA68C8);
+    }
+    .spoiler.revealed:hover {
+      background-color: var(--spoiler-revealed-hover-bg, rgba(186, 104, 200, 0.22));
     }
     .results-list {
       margin-top: 12px;
@@ -514,6 +652,7 @@ export class SarAuthorForm extends LitElement {
     this._toastTimer = null;
     this.genreInputValue = '';
     this.genreSuggestions = [];
+    this._previewRevealedSpoilers = new Set();
   }
 
   showToast(text, duration = 3000) {
@@ -876,6 +1015,68 @@ export class SarAuthorForm extends LitElement {
       fileInput.value = '';
       fileInput.click();
     }
+  }
+
+  _insertSpoilerTag() {
+    const textarea = this.renderRoot?.querySelector('#review');
+    if (!textarea) return;
+    const start = textarea.selectionStart ?? 0;
+    const end = textarea.selectionEnd ?? 0;
+    const text = this.review || '';
+    const selected = text.substring(start, end);
+    const replacement = selected ? `||${selected}||` : '||spoiler||';
+    this.review = text.substring(0, start) + replacement + text.substring(end);
+    this.requestUpdate();
+
+    setTimeout(() => {
+      textarea.focus();
+      if (selected) {
+        textarea.setSelectionRange(start, start + replacement.length);
+      } else {
+        textarea.setSelectionRange(start + 2, start + 2 + 'spoiler'.length);
+      }
+    }, 0);
+  }
+
+  _togglePreviewSpoiler(index, event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    const next = new Set(this._previewRevealedSpoilers);
+    if (next.has(index)) {
+      next.delete(index);
+    } else {
+      next.add(index);
+    }
+    this._previewRevealedSpoilers = next;
+    this.requestUpdate();
+  }
+
+  _onPreviewSpoilerKeyDown(index, event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this._togglePreviewSpoiler(index, event);
+    }
+  }
+
+  _renderReviewPreview(content) {
+    if (!content) return '';
+    const parts = parseSpoilers(content);
+    return parts.map((part) => {
+      if (part.type === 'text') {
+        return part.content;
+      }
+      const isRevealed = this._previewRevealedSpoilers?.has(part.index);
+      return html`<span
+        class="spoiler ${isRevealed ? 'revealed' : ''}"
+        role="button"
+        tabindex="0"
+        aria-expanded="${isRevealed ? 'true' : 'false'}"
+        aria-label="${isRevealed ? 'Revealed spoiler' : 'Spoiler, click to reveal'}"
+        title="${isRevealed ? 'Spoiler (click to hide)' : 'Spoiler (click to reveal)'}"
+        @click="${(e) => this._togglePreviewSpoiler(part.index, e)}"
+        @keydown="${(e) => this._onPreviewSpoilerKeyDown(part.index, e)}"
+      >${part.content}</span>`;
+    });
   }
 
   async _saveReviewInDb(review) {
@@ -1307,19 +1508,53 @@ export class SarAuthorForm extends LitElement {
       }}"
         ></sar-rating-slider>
 
-        <div class="input-container">
+        <div class="review-header-row">
+          <label class="review-section-label" for="review">Review</label>
+          <button
+            type="button"
+            class="spoiler-toolbar-btn"
+            @click="${this._insertSpoilerTag}"
+            title="Wrap selected text in ||spoiler|| or insert spoiler tags"
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor">
+              <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zm0 12.5c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+            </svg>
+            Add Spoiler
+          </button>
+        </div>
+
+        <div class="input-container review-input-container">
           <textarea
             id="review"
             class="review-textarea"
-            placeholder="Review"
+            placeholder="Write your review here... Wrap spoiler text in ||spoiler|| to black it out."
             aria-label="Review"
-            rows="5"
+            rows="6"
             .value="${this.review || ''}"
             @input="${(e) => {
         this.review = e.target.value;
       }}"
           ></textarea>
         </div>
+
+        <div class="spoiler-hint">
+          Tip: Wrap text in <code>||spoiler text||</code> to black it out. Readers can click to reveal it.
+        </div>
+
+        ${hasSpoilers(this.review)
+        ? html`
+            <div class="spoiler-preview-card">
+              <div class="spoiler-preview-header">
+                <span class="spoiler-preview-title">Live Preview</span>
+                <span class="spoiler-preview-subtitle">Click blacked-out sections to test</span>
+              </div>
+              <div class="spoiler-preview-content pre">
+                ${this._renderReviewPreview(this.review)}
+              </div>
+            </div>
+          `
+        : ''}
+
         <br />
         <div class="reverse">
           <button type="button" @click="${this._onClick}">Submit</button>

@@ -1,4 +1,5 @@
 import { LitElement, html, css } from 'lit';
+import { parseSpoilers } from './util.js';
 
 function dbTitle(title) {
   if (typeof window !== 'undefined' && typeof window.dbTitle === 'function') {
@@ -153,6 +154,42 @@ export class SarReview extends LitElement {
       -webkit-user-select: text;
       word-break: break-word;
     }
+    .spoiler {
+      display: inline;
+      background-color: var(--spoiler-bg, #09090d);
+      color: transparent;
+      text-shadow: none;
+      border-radius: 3px;
+      padding: 1px 6px;
+      margin: 0 1px;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: background-color 0.2s ease, color 0.15s ease, box-shadow 0.2s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      vertical-align: baseline;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    .spoiler:hover:not(.revealed) {
+      background-color: var(--spoiler-hover-bg, #1c1c26);
+      box-shadow: 0 0 0 1px var(--default-primary-color, #BA68C8);
+    }
+    .spoiler:focus-visible {
+      outline: 2px solid var(--default-primary-color, #BA68C8);
+      outline-offset: 1px;
+    }
+    .spoiler.revealed {
+      background-color: var(--spoiler-revealed-bg, rgba(186, 104, 200, 0.14));
+      color: var(--primary-text-color);
+      user-select: text;
+      -webkit-user-select: text;
+      border-bottom: 2px solid var(--default-primary-color, #BA68C8);
+    }
+    .spoiler.revealed:hover {
+      background-color: var(--spoiler-revealed-hover-bg, rgba(186, 104, 200, 0.22));
+    }
     @media (max-width: 680px) {
       .paper-header {
         padding: 8px 16px;
@@ -207,6 +244,7 @@ export class SarReview extends LitElement {
     this.isAdmin = false;
     this.elevation = 4;
     this.keyEventTarget = typeof document !== 'undefined' ? document.body : null;
+    this._revealedSpoilers = new Set();
   }
 
   get $() {
@@ -356,6 +394,9 @@ export class SarReview extends LitElement {
 
   updated(changedProperties) {
     super.updated?.(changedProperties);
+    if (changedProperties.has('review')) {
+      this._revealedSpoilers.clear();
+    }
     if (this._animationConfig) {
       const article = this.renderRoot?.querySelectorAll('.article');
       const articleArray = article ? Array.from(article) : [];
@@ -430,6 +471,47 @@ export class SarReview extends LitElement {
     return `/edit/${encodeURIComponent(dbTitle(review.title))}`;
   }
 
+  _toggleSpoiler(index, event) {
+    event?.preventDefault?.();
+    event?.stopPropagation?.();
+    const next = new Set(this._revealedSpoilers);
+    if (next.has(index)) {
+      next.delete(index);
+    } else {
+      next.add(index);
+    }
+    this._revealedSpoilers = next;
+    this.requestUpdate();
+  }
+
+  _onSpoilerKeyDown(index, event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this._toggleSpoiler(index, event);
+    }
+  }
+
+  _renderReviewContent(content) {
+    if (!content) return '';
+    const parts = parseSpoilers(content);
+    return parts.map((part) => {
+      if (part.type === 'text') {
+        return part.content;
+      }
+      const isRevealed = this._revealedSpoilers?.has(part.index);
+      return html`<span
+        class="spoiler ${isRevealed ? 'revealed' : ''}"
+        role="button"
+        tabindex="0"
+        aria-expanded="${isRevealed ? 'true' : 'false'}"
+        aria-label="${isRevealed ? 'Revealed spoiler' : 'Spoiler, click to reveal'}"
+        title="${isRevealed ? 'Spoiler (click to hide)' : 'Spoiler (click to reveal)'}"
+        @click="${(e) => this._toggleSpoiler(part.index, e)}"
+        @keydown="${(e) => this._onSpoilerKeyDown(part.index, e)}"
+      >${part.content}</span>`;
+    });
+  }
+
   render() {
     const review = this.review;
     const genres = this._getGenreArray(review);
@@ -465,7 +547,7 @@ export class SarReview extends LitElement {
             <img src="${this._computeCover(review)}" alt="${review?.title ?? ''}" @click="${this._onClick}">
           </div>
           <br>
-          <div class="article pre">${review?.review ?? ''}</div>
+          <div class="article pre">${this._renderReviewContent(review?.review)}</div>
         </section>
       </div>
     `;

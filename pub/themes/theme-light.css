@@ -26,5 +26,9 @@
   --switch-thumb-bg: #FFFFFF;
   --switch-thumb-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   --switch-glow: rgba(245, 158, 11, 0.3);
+  --spoiler-bg: #212121;
+  --spoiler-hover-bg: #373737;
+  --spoiler-revealed-bg: rgba(156, 39, 176, 0.1);
+  --spoiler-revealed-hover-bg: rgba(156, 39, 176, 0.18);
   color-scheme: light;
 }
