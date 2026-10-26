@@ -1087,28 +1087,28 @@ export class SarAuthorForm extends LitElement {
       }
       console.log('Synchronization succeeded');
       this.showToast('Review saved successfully.');
+      this.title = '';
+      this.rating = '';
+      this.cover = '';
+      this.coverImg = null;
+      this.thumbnail = '';
+      this.thumbnailImg = null;
+      this.previewCover = '';
+      this.previewThumbnail = '';
+      this.genres = [];
+      this.genreInputValue = '';
+      this.genreSuggestions = [];
+      this.viewMethod = '';
+      this.showType = '';
+      this.review = '';
+      this.searchQuery = '';
+      this.searchResults = [];
       window.location.href = '/a/' + cleanTitle(review.title);
     } catch (error) {
       console.warn('Synchronization failed');
       this.showToast('Failed to save review.');
       console.error(error);
     }
-    this.title = '';
-    this.rating = '';
-    this.cover = '';
-    this.coverImg = null;
-    this.thumbnail = '';
-    this.thumbnailImg = null;
-    this.previewCover = '';
-    this.previewThumbnail = '';
-    this.genres = [];
-    this.genreInputValue = '';
-    this.genreSuggestions = [];
-    this.viewMethod = '';
-    this.showType = '';
-    this.review = '';
-    this.searchQuery = '';
-    this.searchResults = [];
   }
 
   async _saveReview(authInfo) {

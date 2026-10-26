@@ -35,9 +35,8 @@ export const auth = getAuth(app);
 export const db = getDatabase(app);
 export const storage = getStorage(app);
 
-// Title sanitization utilities (matching Polymer app logic)
-export const cleanTitle = (title) => (title ? title.replace(/[^a-zA-Z0-9]/g, '') : '');
-export const dbTitle = (title) => (title ? title.replace(/\//g, '') : '');
+import { cleanTitle, dbTitle } from '../../components/sar/util.js';
+export { cleanTitle, dbTitle };
 
 /**
  * Authentication helpers

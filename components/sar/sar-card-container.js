@@ -1,5 +1,6 @@
 import { LitElement, html, css } from 'lit';
-import { subscribeToReviews, cleanTitle as fbCleanTitle, app } from '../../src/services/firebase.js';
+import { subscribeToReviews, app } from '../../src/services/firebase.js';
+import { cleanTitle } from './util.js';
 
 const RATING_VALUES = {
   epic: 10,
@@ -35,13 +36,6 @@ function genreMatch(searchGenre, review) {
     if (genres[i] === searchGenre) return true;
   }
   return false;
-}
-
-function cleanTitle(title) {
-  if (typeof window !== 'undefined' && typeof window.cleanTitle === 'function') {
-    return window.cleanTitle(title);
-  }
-  return fbCleanTitle(title);
 }
 
 export class SarCardContainer extends LitElement {

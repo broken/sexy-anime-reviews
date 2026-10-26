@@ -1,13 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { keyed } from 'lit/directives/keyed.js';
-import { parseSpoilers } from './util.js';
-
-function dbTitle(title) {
-  if (typeof window !== 'undefined' && typeof window.dbTitle === 'function') {
-    return window.dbTitle(title);
-  }
-  return (title || '').replace(/\//g, '');
-}
+import { parseSpoilers, dbTitle } from './util.js';
 
 export class SarReview extends LitElement {
   static styles = css`

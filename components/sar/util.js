@@ -1,5 +1,5 @@
 export const cleanTitle = (title) => (title ? title.replace(/[^a-zA-Z0-9]/g, '') : '');
-export const dbTitle = (title) => (title ? title.replace(/\//g, '') : '');
+export const dbTitle = (title) => (title ? title.replace(/[\/.$#\[\]]/g, '') : '');
 
 /**
  * Parses a review text string into an array of text and spoiler parts.
