@@ -766,6 +766,7 @@ export class SarCardContainer extends LitElement {
                   <span class="toggle-text">Series</span>
                 </label>
               </div>
+            </div>
             <div class="spacer"></div>
             <div class="filter-rating">
               <sar-rating-slider
