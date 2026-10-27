@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { subscribeToReviews, app } from '../../src/services/firebase.js';
 import { cleanTitle } from './util.js';
+import './sar-rating-slider.js';
 
 const RATING_VALUES = {
   epic: 10,
@@ -195,23 +196,9 @@ export class SarCardContainer extends LitElement {
     .toggle-text {
       font-size: 13px;
     }
-    .sliderContainer {
-      width: 170px;
-    }
-    .rating-range-slider {
-      height: 4px;
-      margin: 6px 0 2px 10px;
-      accent-color: var(--default-primary-color, #9C27B0);
-      cursor: pointer;
-      touch-action: manipulation;
-    }
-    #minRatingText {
-      text-align: right;
-      margin-right: 4px;
-      margin-top: 2px;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--secondary-text-color, #727272);
+    .filter-rating {
+      display: flex;
+      align-items: center;
     }
     .search-input-container,
     .dropdown-container {
@@ -319,17 +306,9 @@ export class SarCardContainer extends LitElement {
       .filter-rating {
         order: 4;
         flex: 1 1 100%;
-      }
-      .rating-row {
         width: 100%;
-        display: flex;
-        align-items: center;
       }
-      .sliderContainer {
-        flex: 1;
-        width: auto;
-      }
-      .rating-range-slider {
+      .filter-rating sar-rating-slider {
         width: 100%;
       }
       .cards {
@@ -651,24 +630,6 @@ export class SarCardContainer extends LitElement {
     });
   }
 
-  _immediateMinRatingChanged(e) {
-    const slider = e?.target || this.$.minRatingSlider;
-    const val = slider ? Number(slider.value) : this.minRating;
-    this.minRating = val;
-    if (this.ratingValuesInverted?.[val]) {
-      this.minRatingText = this.ratingValuesInverted[val];
-    }
-  }
-
-  _minRatingChanged(e) {
-    const slider = e?.target || this.$.minRatingSlider;
-    const val = slider ? Number(slider.value) : this.minRating;
-    this.minRating = val;
-    if (this.ratingValuesInverted?.[val]) {
-      this.minRatingText = this.ratingValuesInverted[val];
-    }
-  }
-
   _cleanTitle(title) {
     return cleanTitle(title);
   }
@@ -805,26 +766,16 @@ export class SarCardContainer extends LitElement {
                   <span class="toggle-text">Series</span>
                 </label>
               </div>
-            </div>
             <div class="spacer"></div>
-            <div class="vertical filter-rating">
-              <div class="horizontal rating-row">
-                <div class="filter-label">Min rating</div>
-                <div class="vertical sliderContainer">
-                  <input
-                    type="range"
-                    id="minRatingSlider"
-                    class="rating-range-slider"
-                    .value="${this.minRating || 1}"
-                    min="1"
-                    max="10"
-                    step="1"
-                    @input="${this._immediateMinRatingChanged}"
-                    @change="${this._minRatingChanged}"
-                  />
-                  <div id="minRatingText">${this.minRatingText}</div>
-                </div>
-              </div>
+            <div class="filter-rating">
+              <sar-rating-slider
+                id="minRatingSlider"
+                label="Min rating"
+                .ratingNum="${this.minRating || 1}"
+                @rating-changed="${(e) => {
+                  this.minRating = e.detail.ratingNum ?? (RATING_VALUES[e.detail.value] || 1);
+                }}"
+              ></sar-rating-slider>
             </div>
             <div class="spacer"></div>
             <div class="search-input-container">
