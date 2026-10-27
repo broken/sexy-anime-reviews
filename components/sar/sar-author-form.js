@@ -1229,11 +1229,10 @@ export class SarAuthorForm extends LitElement {
         .then((blob) => {
           const safeTitle = cleanTitle(item.title || 'cover');
           const file = new File([blob], safeTitle, { type: blob.type || 'image/jpeg' });
-          this._processCoverImage(file, item.title).then((processedCover) => {
-            if (!item.thumbnailUrl) {
-              this._generateClientThumbnail(processedCover, item.title);
-            }
-          });
+          this._processCoverImage(file, item.title);
+          if (!item.thumbnailUrl) {
+            this._generateClientThumbnail(file, item.title);
+          }
         })
         .catch((err) => {
           console.warn('Could not load blob directly, fallback to cover URL:', err);
@@ -1573,9 +1572,8 @@ export class SarAuthorForm extends LitElement {
   _uploadCover(e) {
     const valid = e.detail?.valid || (e.target?.files ? Array.from(e.target.files) : null);
     if (valid && valid.length) {
-      this._processCoverImage(valid[0], this.title).then((processedCover) => {
-        this._generateClientThumbnail(processedCover, this.title);
-      });
+      this._processCoverImage(valid[0], this.title);
+      this._generateClientThumbnail(valid[0], this.title);
     }
   }
 
