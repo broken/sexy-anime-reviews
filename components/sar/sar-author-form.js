@@ -108,13 +108,66 @@ export class SarAuthorForm extends LitElement {
       margin-top: 10px;
       margin-bottom: 24px;
     }
+    .autofill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
     .autofill-title {
       font-size: 13px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: #aaa;
-      margin-bottom: 6px;
+    }
+    .source-selector {
+      display: inline-flex;
+      align-items: center;
+      gap: 16px;
+    }
+    .source-radio-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+      user-select: none;
+      color: var(--secondary-text-color, #aaa);
+      transition: color 0.2s;
+    }
+    .source-radio-label.active {
+      color: var(--primary-text-color, #fff);
+      font-weight: 600;
+    }
+    .source-radio-label input[type="radio"] {
+      margin: 0;
+      accent-color: var(--default-primary-color, #9C27B0);
+      cursor: pointer;
+    }
+    .result-badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 1px 5px;
+      border-radius: 3px;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+    .result-badge.crunchyroll {
+      background: rgba(244, 117, 33, 0.2);
+      color: #f47521;
+      border: 1px solid rgba(244, 117, 33, 0.5);
+    }
+    .result-badge.tmdb {
+      background: rgba(1, 180, 228, 0.2);
+      color: #01b4e4;
+      border: 1px solid rgba(1, 180, 228, 0.5);
     }
     .autofill-row {
       display: flex;
@@ -577,6 +630,7 @@ export class SarAuthorForm extends LitElement {
     previewCover: { type: String },
     previewThumbnail: { type: String },
     searchQuery: { type: String },
+    searchSource: { type: String },
     isSearching: { type: Boolean },
     searchResults: { type: Array },
     genres: { type: Array },
@@ -604,6 +658,7 @@ export class SarAuthorForm extends LitElement {
     this.previewCover = '';
     this.previewThumbnail = '';
     this.searchQuery = '';
+    this.searchSource = 'crunchyroll';
     this.isSearching = false;
     this.searchResults = [];
     this.genres = [];
@@ -860,12 +915,19 @@ export class SarAuthorForm extends LitElement {
   _searchAnime() {
     const query = (this.searchQuery || '').trim();
     if (!query) {
-      this.showToast('Please enter an anime title or Crunchyroll URL.');
+      this.showToast('Please enter an anime title, Crunchyroll, or TMDb URL.');
       return;
+    }
+    // Auto-detect URL source if pasted
+    if (query.includes('themoviedb.org')) {
+      this.searchSource = 'tmdb';
+    } else if (query.includes('crunchyroll.com')) {
+      this.searchSource = 'crunchyroll';
     }
     this.isSearching = true;
     this.searchResults = [];
-    const url = '/api/anime/search?q=' + encodeURIComponent(query);
+    const sourceParam = encodeURIComponent(this.searchSource || 'crunchyroll');
+    const url = `/api/anime/search?q=${encodeURIComponent(query)}&source=${sourceParam}`;
     fetch(url)
       .then((res) => res.json())
       .then((data) => {
@@ -898,6 +960,9 @@ export class SarAuthorForm extends LitElement {
     this.title = item.title || item.romajiTitle || '';
     if (item.showType) {
       this.showType = item.showType;
+    }
+    if (item.viewMethod) {
+      this.viewMethod = item.viewMethod;
     }
     if (item.genres && item.genres.length) {
       this.genres = item.genres.map((g) => {
@@ -1268,18 +1333,46 @@ export class SarAuthorForm extends LitElement {
       <div id="card">
         <!-- Auto-Fill Section -->
         <div class="autofill-box">
-          <div class="autofill-title">Auto-Fill Anime Info & Vertical Banner</div>
+          <div class="autofill-header">
+            <div class="autofill-title">Auto-Fill Anime Info & Vertical Banner</div>
+            <div class="source-selector" role="radiogroup" aria-label="Metadata Source">
+              <label class="source-radio-label ${this.searchSource === 'crunchyroll' ? 'active' : ''}">
+                <input
+                  type="radio"
+                  name="searchSource"
+                  value="crunchyroll"
+                  .checked="${this.searchSource === 'crunchyroll'}"
+                  @change="${() => {
+                    this.searchSource = 'crunchyroll';
+                  }}"
+                />
+                <span>Crunchyroll</span>
+              </label>
+              <label class="source-radio-label ${this.searchSource === 'tmdb' ? 'active' : ''}">
+                <input
+                  type="radio"
+                  name="searchSource"
+                  value="tmdb"
+                  .checked="${this.searchSource === 'tmdb'}"
+                  @change="${() => {
+                    this.searchSource = 'tmdb';
+                  }}"
+                />
+                <span>TMDb</span>
+              </label>
+            </div>
+          </div>
           <div class="autofill-row">
             <input
               type="text"
               id="searchQuery"
               class="autofill-input"
-              placeholder="Search title or paste Crunchyroll URL"
-              aria-label="Search title or paste Crunchyroll URL"
+              placeholder="${this.searchSource === 'tmdb' ? 'Search title or paste TMDb URL' : 'Search title or paste Crunchyroll URL'}"
+              aria-label="${this.searchSource === 'tmdb' ? 'Search title or paste TMDb URL' : 'Search title or paste Crunchyroll URL'}"
               .value="${this.searchQuery || ''}"
               @input="${(e) => {
-        this.searchQuery = e.target.value;
-      }}"
+                this.searchQuery = e.target.value;
+              }}"
               @keydown="${this._onSearchKeydown}"
             />
             <button type="button" @click="${this._searchAnime}" ?disabled="${this.isSearching}">
@@ -1288,25 +1381,32 @@ export class SarAuthorForm extends LitElement {
           </div>
 
           ${this._hasSearchResults(this.searchResults)
-        ? html`
+            ? html`
                 <div class="results-list">
                   ${this.searchResults.map(
-          (item) => html`
+                    (item) => html`
                       <div class="result-card" @click="${(e) => this._selectSearchResult(e, item)}">
-                        <img class="result-thumb" src="${item.coverUrl}" />
+                        <img class="result-thumb" src="${item.thumbnailUrl || item.coverUrl}" />
                         <div class="result-info">
-                          <div class="result-name">${item.title}</div>
+                          <div class="result-name">
+                            <span class="result-badge ${item.source === 'tmdb' ? 'tmdb' : 'crunchyroll'}">
+                              ${item.source === 'tmdb' ? 'TMDb' : 'Crunchyroll'}
+                            </span>
+                            ${item.title}
+                          </div>
                           <div class="result-meta">
-                            ${item.romajiTitle} &bull; ${item.format} &bull; ${this._joinGenres(item.genres)}
+                            ${item.romajiTitle ? html`${item.romajiTitle} &bull; ` : ''}
+                            ${item.format || item.showType} &bull;
+                            ${this._joinGenres(item.genres)}
                           </div>
                         </div>
                         <button type="button">Select</button>
                       </div>
                     `
-        )}
+                  )}
                 </div>
               `
-        : ''}
+            : ''}
         </div>
 
         <div class="input-container">

@@ -2,5 +2,6 @@ bower_components/
 node_modules/
 pub/dist/
 .venv/
+.env
 __pycache__/
 **/.DS_Store

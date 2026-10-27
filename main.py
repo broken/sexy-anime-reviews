@@ -16,6 +16,7 @@ except ImportError:
   wrap_wsgi_app = None
 
 from crunchyroll import search_crunchyroll
+from tmdb import search_tmdb
 
 app = Bottle()
 
@@ -65,87 +66,35 @@ def pub(filepath):
 @app.route('/api/anime/search')
 def api_anime_search():
   query = request.query.get('q', '').strip()
+  source = request.query.get('source', '').strip().lower()
+
+  # Auto-detect source if a direct provider URL is pasted
+  if 'themoviedb.org' in query.lower():
+    source = 'tmdb'
+  elif 'crunchyroll.com' in query.lower():
+    source = 'crunchyroll'
+
   if not query:
     response.content_type = 'application/json'
     return json.dumps({'error': 'Query parameter q is required', 'results': []})
 
-  try:
-    # 1. Primary: Search Crunchyroll for official metadata & logo covers
-    cr_results = search_crunchyroll(query)
-    if cr_results:
-      response.content_type = 'application/json'
-      return json.dumps({'success': True, 'results': cr_results, 'source': 'crunchyroll'})
-  except Exception as e:
-    print(f'Crunchyroll search error: {e}')
+  if not source or source not in ('crunchyroll', 'tmdb'):
+    response.content_type = 'application/json'
+    return json.dumps({
+        'error': 'Valid source parameter is required ("crunchyroll" or "tmdb")',
+        'results': []
+    })
 
-  # 2. Fallback: AniList search
-  search_term = query
-  if 'crunchyroll.com' in query:
-    m = re.search(r'/series/[^/]+/([^/?#]+)', query)
-    if m:
-      search_term = ' '.join(m.group(1).replace('-', ' ').split())
+  try:
+    if source == 'tmdb':
+      results = search_tmdb(query)
     else:
-      parts = [p for p in urllib.parse.urlparse(query).path.split('/') if p]
-      if parts:
-        search_term = ' '.join(parts[-1].replace('-', ' ').split())
+      results = search_crunchyroll(query)
 
-  try:
-    graphql = '''{
-      Page(page: 1, perPage: 6) {
-        media(search: %s, type: ANIME) {
-          id
-          title {
-            romaji
-            english
-          }
-          format
-          genres
-          coverImage {
-            extraLarge
-            large
-            medium
-          }
-        }
-      }
-    }''' % json.dumps(search_term)
-
-    payload = json.dumps({'query': graphql}).encode('utf-8')
-    req = urllib.request.Request(
-        'https://graphql.anilist.co',
-        data=payload,
-        headers={
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0'
-        }
-    )
-    with urllib.request.urlopen(req, timeout=10) as resp:
-      data = json.loads(resp.read().decode('utf-8'))
-      media_items = data.get('data', {}).get('Page', {}).get('media', [])
-      results = []
-      for item in media_items:
-        title_en = item.get('title', {}).get('english') or item.get('title', {}).get('romaji') or ''
-        title_romaji = item.get('title', {}).get('romaji') or ''
-        fmt = item.get('format', '')
-        show_type = 'movie' if fmt == 'MOVIE' else 'series'
-        cover_img = item.get('coverImage', {})
-        cover_url = cover_img.get('extraLarge') or cover_img.get('large') or cover_img.get('medium') or ''
-        thumbnail_url = cover_img.get('medium') or cover_img.get('large') or cover_url
-        genres = item.get('genres') or []
-        results.append({
-            'id': item.get('id'),
-            'title': title_en,
-            'romajiTitle': title_romaji,
-            'showType': show_type,
-            'genres': genres,
-            'coverUrl': cover_url,
-            'thumbnailUrl': thumbnail_url,
-            'format': fmt,
-            'viewMethod': 'sub'
-        })
-      response.content_type = 'application/json'
-      return json.dumps({'success': True, 'results': results, 'source': 'anilist'})
+    response.content_type = 'application/json'
+    return json.dumps({'success': True, 'results': results, 'source': source})
   except Exception as e:
+    print(f'Search error for source "{source}": {e}')
     response.content_type = 'application/json'
     return json.dumps({'error': str(e), 'results': []})
 
