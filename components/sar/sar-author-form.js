@@ -823,6 +823,7 @@ export class SarAuthorForm extends LitElement {
   _populateFromReview(val) {
     if (!val) return;
     this.title = val.title || '';
+    this.searchQuery = val.title || '';
     this.rating = val.rating || '';
     this.viewMethod = val.viewMethod || '';
     this.showType = val.showType || '';
