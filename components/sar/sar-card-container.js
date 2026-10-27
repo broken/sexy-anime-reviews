@@ -136,6 +136,7 @@ export class SarCardContainer extends LitElement {
       height: 16px;
     }
     .filter-label {
+      align-self: flex-start;
       user-select: none;
     }
     .toggle-row {
@@ -709,7 +710,7 @@ export class SarCardContainer extends LitElement {
             </div>
             <div class="spacer"></div>
             <div class="horizontal filter-show">
-              <div class="filter-label">Show</div>
+              <div class="filter-label">Filter</div>
               <div class="vertical">
                 <label class="toggle-row">
                   <span class="toggle-switch">

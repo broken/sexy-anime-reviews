@@ -12,6 +12,7 @@ export class SarRatingSlider extends LitElement {
     .slider-label {
       user-select: none;
       white-space: nowrap;
+      align-self: flex-start;
     }
     #ratingText {
       text-align: right;
