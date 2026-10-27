@@ -539,8 +539,8 @@ export class SarReview extends LitElement {
         : ''}
         </div>
         <div class="article row">
-          ${this._renderViewMethodIcon(review)}
           <div class="meta">${review?.rating ?? ''}</div>
+          ${this._renderViewMethodIcon(review)}
           ${genres.map(item => html`<div class="meta">${item}</div>`)}
         </div>
         <section>
