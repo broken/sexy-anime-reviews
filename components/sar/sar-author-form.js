@@ -123,51 +123,10 @@ export class SarAuthorForm extends LitElement {
       letter-spacing: 0.5px;
       color: #aaa;
     }
-    .source-selector {
-      display: inline-flex;
-      align-items: center;
-      gap: 16px;
-    }
-    .source-radio-label {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 500;
-      user-select: none;
-      color: var(--secondary-text-color, #aaa);
-      transition: color 0.2s;
-    }
-    .source-radio-label.active {
-      color: var(--primary-text-color, #fff);
-      font-weight: 600;
-    }
-    .source-radio-label input[type="radio"] {
-      margin: 0;
-      accent-color: var(--default-primary-color, #9C27B0);
-      cursor: pointer;
-    }
-    .result-badge {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 1px 5px;
-      border-radius: 3px;
-      margin-right: 6px;
-      vertical-align: middle;
-    }
-    .result-badge.crunchyroll {
-      background: rgba(244, 117, 33, 0.2);
-      color: #f47521;
-      border: 1px solid rgba(244, 117, 33, 0.5);
-    }
-    .result-badge.tmdb {
-      background: rgba(1, 180, 228, 0.2);
-      color: #01b4e4;
-      border: 1px solid rgba(1, 180, 228, 0.5);
+    .autofill-hint {
+      font-size: 11px;
+      color: var(--secondary-text-color, #888);
+      margin-top: 3px;
     }
     .autofill-row {
       display: flex;
@@ -321,52 +280,259 @@ export class SarAuthorForm extends LitElement {
       white-space: pre-wrap;
       word-break: break-word;
     }
-    .results-list {
-      margin-top: 12px;
+    .results-comparison-box {
+      margin-top: 16px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 14px 16px;
+      animation: fadeInResults 0.2s ease-out;
+    }
+    @keyframes fadeInResults {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .results-top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .results-top-title-group {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      max-height: 260px;
+      gap: 2px;
+    }
+    .results-top-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary-text-color, #fff);
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+    .results-top-subtitle {
+      font-size: 12px;
+      color: var(--secondary-text-color, #aaa);
+    }
+    .dismiss-btn {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--primary-text-color, #eee);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 12px;
+      font-weight: 600;
+      padding: 6px 14px;
+      min-height: 32px;
+      border-radius: 4px;
+      cursor: pointer;
+      text-transform: none;
+      letter-spacing: normal;
+      box-shadow: none;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .dismiss-btn:hover {
+      background: rgba(244, 67, 54, 0.15);
+      border-color: rgba(244, 67, 54, 0.4);
+      color: #ff8a80;
+    }
+    .results-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .results-column {
+      display: flex;
+      flex-direction: column;
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .results-column.crunchyroll-column {
+      border-top: 3px solid #f47521;
+    }
+    .results-column.tmdb-column {
+      border-top: 3px solid #01b4e4;
+    }
+    .column-header {
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.03);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .source-badge {
+      display: inline-flex;
+      align-items: center;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .source-badge.crunchyroll {
+      color: #f47521;
+    }
+    .source-badge.tmdb {
+      color: #01b4e4;
+    }
+    .column-count {
+      font-size: 11px;
+      color: var(--secondary-text-color, #888);
+      font-weight: 500;
+    }
+    .column-body {
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 440px;
       overflow-y: auto;
+    }
+    .no-results-msg {
+      padding: 32px 12px;
+      text-align: center;
+      color: var(--secondary-text-color, #777);
+      font-size: 12px;
+      font-style: italic;
     }
     .result-card {
       display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      background: rgba(0, 0, 0, 0.25);
+      flex-direction: row;
+      align-items: stretch;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 4px;
+      border-radius: 6px;
+      transition: transform 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+      gap: 14px;
       cursor: pointer;
-      transition: background 0.15s ease-in-out;
     }
     .result-card:hover {
-      background: rgba(255, 255, 255, 0.12);
+      background: rgba(255, 255, 255, 0.07);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .result-card.crunchyroll-card:hover {
+      border-color: rgba(244, 117, 33, 0.4);
+    }
+    .result-card.tmdb-card:hover {
+      border-color: rgba(1, 180, 228, 0.4);
     }
     .result-thumb {
-      width: 44px;
-      height: 62px;
+      width: 90px;
+      height: 132px;
       object-fit: cover;
-      border-radius: 3px;
-      margin-right: 14px;
-      background: #222;
+      border-radius: 4px;
+      background: #111;
       flex-shrink: 0;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
-    .result-info {
+    .result-thumb-placeholder {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      color: #666;
+      border: 1px dashed rgba(255, 255, 255, 0.15);
+    }
+    .result-details {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
     }
-    .result-name {
+    .result-meta-top {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .result-title {
       font-weight: 600;
-      color: #fff;
+      color: var(--primary-text-color, #fff);
       font-size: 14px;
+      line-height: 1.3;
+      word-break: break-word;
+    }
+    .result-romaji {
+      font-size: 11px;
+      color: var(--secondary-text-color, #888);
+      font-style: italic;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
-    .result-meta {
-      font-size: 12px;
-      color: #999;
+    .result-tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px;
       margin-top: 3px;
+    }
+    .meta-chip {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      padding: 1px 6px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      color: #ccc;
+    }
+    .meta-chip.type-chip {
+      background: rgba(156, 39, 176, 0.2);
+      color: #ce93d8;
+    }
+    .meta-chip.view-chip {
+      background: rgba(3, 169, 244, 0.2);
+      color: #81d4fa;
+    }
+    .result-genres-row {
+      font-size: 11px;
+      color: var(--secondary-text-color, #999);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .result-card-action {
+      display: flex;
+      margin-top: auto;
+      padding-top: 6px;
+    }
+    .apply-card-btn {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 12px;
+      min-height: 28px;
+      border-radius: 4px;
+      width: 100%;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+    .apply-card-btn.crunchyroll-btn {
+      background: rgba(244, 117, 33, 0.15);
+      color: #f47521;
+      border: 1px solid rgba(244, 117, 33, 0.4);
+    }
+    .apply-card-btn.crunchyroll-btn:hover {
+      background: #f47521;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(244, 117, 33, 0.4);
+    }
+    .apply-card-btn.tmdb-btn {
+      background: rgba(1, 180, 228, 0.15);
+      color: #01b4e4;
+      border: 1px solid rgba(1, 180, 228, 0.4);
+    }
+    .apply-card-btn.tmdb-btn:hover {
+      background: #01b4e4;
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(1, 180, 228, 0.4);
     }
     .cover-section {
       margin: 16px 0;
@@ -574,6 +740,17 @@ export class SarAuthorForm extends LitElement {
         width: 100%;
         min-height: 44px;
       }
+      .results-columns {
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+      .column-body {
+        max-height: 320px;
+      }
+      .result-thumb {
+        width: 76px;
+        height: 112px;
+      }
       .autofill-input,
       .title-input,
       .review-textarea,
@@ -630,7 +807,9 @@ export class SarAuthorForm extends LitElement {
     previewCover: { type: String },
     previewThumbnail: { type: String },
     searchQuery: { type: String },
-    searchSource: { type: String },
+    crunchyrollResults: { type: Array },
+    tmdbResults: { type: Array },
+    hasSearched: { type: Boolean },
     isSearching: { type: Boolean },
     searchResults: { type: Array },
     genres: { type: Array },
@@ -658,7 +837,9 @@ export class SarAuthorForm extends LitElement {
     this.previewCover = '';
     this.previewThumbnail = '';
     this.searchQuery = '';
-    this.searchSource = 'crunchyroll';
+    this.crunchyrollResults = [];
+    this.tmdbResults = [];
+    this.hasSearched = false;
     this.isSearching = false;
     this.searchResults = [];
     this.genres = [];
@@ -887,7 +1068,7 @@ export class SarAuthorForm extends LitElement {
   }
 
   _computeSearchButtonText(isSearching) {
-    return isSearching ? 'Fetching...' : 'Fetch Info';
+    return isSearching ? 'Searching...' : 'Search Metadata';
   }
 
   _computeUploadButtonText(previewCover) {
@@ -898,8 +1079,11 @@ export class SarAuthorForm extends LitElement {
     return previewThumbnail ? 'Change Thumbnail Image' : 'Upload Thumbnail Image';
   }
 
-  _hasSearchResults(results) {
-    return results && results.length > 0;
+  _hasSearchResults() {
+    return this.hasSearched && (
+      (this.crunchyrollResults && this.crunchyrollResults.length > 0) ||
+      (this.tmdbResults && this.tmdbResults.length > 0)
+    );
   }
 
   _joinGenres(genres) {
@@ -913,48 +1097,100 @@ export class SarAuthorForm extends LitElement {
     }
   }
 
-  _searchAnime() {
+  async _searchAnime() {
     const query = (this.searchQuery || '').trim();
     if (!query) {
       this.showToast('Please enter an anime title, Crunchyroll, or TMDb URL.');
       return;
     }
-    // Auto-detect URL source if pasted
-    if (query.includes('themoviedb.org')) {
-      this.searchSource = 'tmdb';
-    } else if (query.includes('crunchyroll.com')) {
-      this.searchSource = 'crunchyroll';
-    }
+
+    const isCrUrl = query.toLowerCase().includes('crunchyroll.com');
+    const isTmdbUrl = query.toLowerCase().includes('themoviedb.org');
+
     this.isSearching = true;
     this.searchResults = [];
-    const sourceParam = encodeURIComponent(this.searchSource || 'crunchyroll');
-    const url = `/api/anime/search?q=${encodeURIComponent(query)}&source=${sourceParam}`;
-    fetch(url)
-      .then((res) => res.json())
-      .then((data) => {
-        this.isSearching = false;
-        if (data.results && data.results.length > 0) {
-          if (data.results.length === 1) {
-            this._applyAnimeResult(data.results[0]);
-          } else {
-            this.searchResults = data.results;
-          }
-        } else {
-          this.showToast('No anime found. Try another search term.');
+    this.crunchyrollResults = [];
+    this.tmdbResults = [];
+    this.hasSearched = false;
+
+    try {
+      const promises = [];
+
+      if (isCrUrl) {
+        promises.push(
+          fetch(`/api/anime/search?q=${encodeURIComponent(query)}&source=crunchyroll`)
+            .then((r) => r.json())
+            .then((data) => ({ source: 'crunchyroll', data }))
+            .catch((err) => ({ source: 'crunchyroll', error: err }))
+        );
+      } else if (isTmdbUrl) {
+        promises.push(
+          fetch(`/api/anime/search?q=${encodeURIComponent(query)}&source=tmdb`)
+            .then((r) => r.json())
+            .then((data) => ({ source: 'tmdb', data }))
+            .catch((err) => ({ source: 'tmdb', error: err }))
+        );
+      } else {
+        promises.push(
+          fetch(`/api/anime/search?q=${encodeURIComponent(query)}&source=crunchyroll`)
+            .then((r) => r.json())
+            .then((data) => ({ source: 'crunchyroll', data }))
+            .catch((err) => ({ source: 'crunchyroll', error: err })),
+          fetch(`/api/anime/search?q=${encodeURIComponent(query)}&source=tmdb`)
+            .then((r) => r.json())
+            .then((data) => ({ source: 'tmdb', data }))
+            .catch((err) => ({ source: 'tmdb', error: err }))
+        );
+      }
+
+      const settled = await Promise.all(promises);
+
+      let crResults = [];
+      let tmResults = [];
+
+      for (const res of settled) {
+        if (res.source === 'crunchyroll' && res.data?.results) {
+          crResults = res.data.results.map((item) => ({ ...item, source: 'crunchyroll' }));
+        } else if (res.source === 'tmdb' && res.data?.results) {
+          tmResults = res.data.results.map((item) => ({ ...item, source: 'tmdb' }));
         }
-      })
-      .catch((err) => {
-        this.isSearching = false;
-        console.error(err);
-        this.showToast('Failed to fetch anime info.');
-      });
+      }
+
+      this.crunchyrollResults = crResults;
+      this.tmdbResults = tmResults;
+      this.searchResults = [...crResults, ...tmResults];
+      this.hasSearched = true;
+
+      if (crResults.length === 0 && tmResults.length === 0) {
+        this.showToast('No anime found on Crunchyroll or TMDb. Try another search term.');
+      }
+    } catch (err) {
+      console.error(err);
+      this.showToast('Failed to fetch anime info.');
+    } finally {
+      this.isSearching = false;
+    }
   }
 
   _selectSearchResult(e, item) {
+    if (e) {
+      e.stopPropagation();
+    }
     const selectedItem = item || e?.model?.item;
     if (selectedItem) {
       this._applyAnimeResult(selectedItem);
     }
+  }
+
+  _dismissSearchResults(e) {
+    if (e) {
+      e.stopPropagation();
+    }
+    this.crunchyrollResults = [];
+    this.tmdbResults = [];
+    this.searchResults = [];
+    this.hasSearched = false;
+    this.showToast('Search results dismissed without applying.');
   }
 
   _applyAnimeResult(item) {
@@ -978,6 +1214,9 @@ export class SarAuthorForm extends LitElement {
       });
     }
     this.searchResults = [];
+    this.crunchyrollResults = [];
+    this.tmdbResults = [];
+    this.hasSearched = false;
 
     if (item.coverUrl) {
       this.previewCover = item.coverUrl;
@@ -1027,7 +1266,56 @@ export class SarAuthorForm extends LitElement {
         });
     }
 
-    this.showToast('Loaded info for ' + (item.title || item.romajiTitle));
+    const sourceName = item.source === 'tmdb' ? 'TMDb' : 'Crunchyroll';
+    this.showToast('Applied ' + sourceName + ' metadata for ' + (item.title || item.romajiTitle));
+  }
+
+  _renderResultCard(item, source) {
+    const isCr = source === 'crunchyroll';
+    return html`
+      <div
+        class="result-card ${isCr ? 'crunchyroll-card' : 'tmdb-card'}"
+        @click="${(e) => this._selectSearchResult(e, item)}"
+      >
+        ${item.thumbnailUrl || item.coverUrl
+          ? html`<img class="result-thumb" src="${item.thumbnailUrl || item.coverUrl}" alt="${item.title || ''}" />`
+          : html`<div class="result-thumb result-thumb-placeholder">No Cover</div>`}
+        <div class="result-details">
+          <div class="result-meta-top">
+            <div class="result-title" title="${item.title || ''}">${item.title}</div>
+            ${item.romajiTitle && item.romajiTitle !== item.title
+              ? html`<div class="result-romaji" title="${item.romajiTitle}">${item.romajiTitle}</div>`
+              : ''}
+
+            <div class="result-tags-row">
+              ${item.showType || item.format
+                ? html`<span class="meta-chip type-chip">${item.showType || item.format}</span>`
+                : ''}
+              ${item.viewMethod
+                ? html`<span class="meta-chip view-chip">${item.viewMethod}</span>`
+                : ''}
+            </div>
+
+            ${item.genres && item.genres.length
+              ? html`
+                  <div class="result-genres-row" title="${this._joinGenres(item.genres)}">
+                    ${this._joinGenres(item.genres)}
+                  </div>
+                `
+              : ''}
+          </div>
+          <div class="result-card-action">
+            <button
+              type="button"
+              class="apply-card-btn ${isCr ? 'crunchyroll-btn' : 'tmdb-btn'}"
+              @click="${(e) => this._selectSearchResult(e, item)}"
+            >
+              Apply ${isCr ? 'Crunchyroll' : 'TMDb'} Info
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
   }
 
   _triggerCoverUpload() {
@@ -1149,6 +1437,9 @@ export class SarAuthorForm extends LitElement {
       this.review = '';
       this.searchQuery = '';
       this.searchResults = [];
+      this.crunchyrollResults = [];
+      this.tmdbResults = [];
+      this.hasSearched = false;
       window.location.href = '/a/' + cleanTitle(review.title);
     } catch (error) {
       console.warn('Synchronization failed');
@@ -1335,32 +1626,9 @@ export class SarAuthorForm extends LitElement {
         <!-- Auto-Fill Section -->
         <div class="autofill-box">
           <div class="autofill-header">
-            <div class="autofill-title">Auto-Fill Anime Info & Vertical Banner</div>
-            <div class="source-selector" role="radiogroup" aria-label="Metadata Source">
-              <label class="source-radio-label ${this.searchSource === 'crunchyroll' ? 'active' : ''}">
-                <input
-                  type="radio"
-                  name="searchSource"
-                  value="crunchyroll"
-                  .checked="${this.searchSource === 'crunchyroll'}"
-                  @change="${() => {
-                    this.searchSource = 'crunchyroll';
-                  }}"
-                />
-                <span>Crunchyroll</span>
-              </label>
-              <label class="source-radio-label ${this.searchSource === 'tmdb' ? 'active' : ''}">
-                <input
-                  type="radio"
-                  name="searchSource"
-                  value="tmdb"
-                  .checked="${this.searchSource === 'tmdb'}"
-                  @change="${() => {
-                    this.searchSource = 'tmdb';
-                  }}"
-                />
-                <span>TMDb</span>
-              </label>
+            <div>
+              <div class="autofill-title">Auto-Fill Anime Info & Vertical Banner</div>
+              <div class="autofill-hint">Search Crunchyroll and TMDb simultaneously for metadata and cover art</div>
             </div>
           </div>
           <div class="autofill-row">
@@ -1368,8 +1636,8 @@ export class SarAuthorForm extends LitElement {
               type="text"
               id="searchQuery"
               class="autofill-input"
-              placeholder="${this.searchSource === 'tmdb' ? 'Search title or paste TMDb URL' : 'Search title or paste Crunchyroll URL'}"
-              aria-label="${this.searchSource === 'tmdb' ? 'Search title or paste TMDb URL' : 'Search title or paste Crunchyroll URL'}"
+              placeholder="Search anime title or paste Crunchyroll/TMDb URL"
+              aria-label="Search anime title or paste Crunchyroll/TMDb URL"
               .value="${this.searchQuery || ''}"
               @input="${(e) => {
                 this.searchQuery = e.target.value;
@@ -1381,30 +1649,56 @@ export class SarAuthorForm extends LitElement {
             </button>
           </div>
 
-          ${this._hasSearchResults(this.searchResults)
+          ${this._hasSearchResults()
             ? html`
-                <div class="results-list">
-                  ${this.searchResults.map(
-                    (item) => html`
-                      <div class="result-card" @click="${(e) => this._selectSearchResult(e, item)}">
-                        <img class="result-thumb" src="${item.thumbnailUrl || item.coverUrl}" />
-                        <div class="result-info">
-                          <div class="result-name">
-                            <span class="result-badge ${item.source === 'tmdb' ? 'tmdb' : 'crunchyroll'}">
-                              ${item.source === 'tmdb' ? 'TMDb' : 'Crunchyroll'}
-                            </span>
-                            ${item.title}
-                          </div>
-                          <div class="result-meta">
-                            ${item.romajiTitle ? html`${item.romajiTitle} &bull; ` : ''}
-                            ${item.format || item.showType} &bull;
-                            ${this._joinGenres(item.genres)}
-                          </div>
-                        </div>
-                        <button type="button">Select</button>
+                <div class="results-comparison-box">
+                  <div class="results-top-bar">
+                    <div class="results-top-title-group">
+                      <div class="results-top-title">Compare & Choose Metadata</div>
+                      <div class="results-top-subtitle">
+                        Select one source to apply, or dismiss to keep your current information.
                       </div>
-                    `
-                  )}
+                    </div>
+                    <button
+                      type="button"
+                      class="dismiss-btn"
+                      @click="${this._dismissSearchResults}"
+                    >
+                      ✕ Dismiss (Apply None)
+                    </button>
+                  </div>
+
+                  <div class="results-columns">
+                    <!-- Crunchyroll Column -->
+                    <div class="results-column crunchyroll-column">
+                      <div class="column-header">
+                        <span class="source-badge crunchyroll">Crunchyroll</span>
+                        <span class="column-count">
+                          ${this.crunchyrollResults.length} ${this.crunchyrollResults.length === 1 ? 'result' : 'results'}
+                        </span>
+                      </div>
+                      <div class="column-body">
+                        ${this.crunchyrollResults.length > 0
+                          ? this.crunchyrollResults.map((item) => this._renderResultCard(item, 'crunchyroll'))
+                          : html`<div class="no-results-msg">No Crunchyroll results found.</div>`}
+                      </div>
+                    </div>
+
+                    <!-- TMDb Column -->
+                    <div class="results-column tmdb-column">
+                      <div class="column-header">
+                        <span class="source-badge tmdb">TMDb</span>
+                        <span class="column-count">
+                          ${this.tmdbResults.length} ${this.tmdbResults.length === 1 ? 'result' : 'results'}
+                        </span>
+                      </div>
+                      <div class="column-body">
+                        ${this.tmdbResults.length > 0
+                          ? this.tmdbResults.map((item) => this._renderResultCard(item, 'tmdb'))
+                          : html`<div class="no-results-msg">No TMDb results found.</div>`}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               `
             : ''}
