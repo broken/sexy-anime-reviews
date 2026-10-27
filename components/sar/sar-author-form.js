@@ -1227,15 +1227,13 @@ export class SarAuthorForm extends LitElement {
           return res.blob();
         })
         .then((blob) => {
-          const ext = blob.type.indexOf('png') !== -1 ? 'png' : 'jpg';
           const safeTitle = cleanTitle(item.title || 'cover');
-          const filename = safeTitle + '.' + ext;
-          const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
-          this.coverImg = file;
-          this.previewCover = window.URL.createObjectURL(blob);
-          if (!item.thumbnailUrl) {
-            this._generateClientThumbnail(file);
-          }
+          const file = new File([blob], safeTitle, { type: blob.type || 'image/jpeg' });
+          this._processCoverImage(file, item.title).then((processedCover) => {
+            if (!item.thumbnailUrl) {
+              this._generateClientThumbnail(processedCover, item.title);
+            }
+          });
         })
         .catch((err) => {
           console.warn('Could not load blob directly, fallback to cover URL:', err);
@@ -1253,12 +1251,9 @@ export class SarAuthorForm extends LitElement {
           return res.blob();
         })
         .then((blob) => {
-          const ext = blob.type.indexOf('png') !== -1 ? 'png' : 'jpg';
           const safeTitle = cleanTitle(item.title || 'cover');
-          const filename = safeTitle + '_thumb.' + ext;
-          const file = new File([blob], filename, { type: blob.type || 'image/jpeg' });
-          this.thumbnailImg = file;
-          this.previewThumbnail = window.URL.createObjectURL(blob);
+          const file = new File([blob], safeTitle + '_thumb', { type: blob.type || 'image/jpeg' });
+          this._generateClientThumbnail(file, item.title);
         })
         .catch((err) => {
           console.warn('Could not load thumbnail blob directly, fallback to thumbnail URL:', err);
@@ -1578,42 +1573,118 @@ export class SarAuthorForm extends LitElement {
   _uploadCover(e) {
     const valid = e.detail?.valid || (e.target?.files ? Array.from(e.target.files) : null);
     if (valid && valid.length) {
-      this.coverImg = valid[0];
-      this.previewCover = window.URL.createObjectURL(valid[0]);
-      this._generateClientThumbnail(valid[0]);
+      this._processCoverImage(valid[0], this.title).then((processedCover) => {
+        this._generateClientThumbnail(processedCover, this.title);
+      });
     }
   }
 
   _uploadThumbnail(e) {
     const valid = e.detail?.valid || (e.target?.files ? Array.from(e.target.files) : null);
     if (valid && valid.length) {
-      this.thumbnailImg = valid[0];
-      this.previewThumbnail = window.URL.createObjectURL(valid[0]);
+      this._generateClientThumbnail(valid[0], this.title);
     }
   }
 
-  _generateClientThumbnail(file) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const targetWidth = 480;
-        const targetHeight = Math.round(targetWidth * (img.height / img.width));
-        canvas.width = targetWidth;
-        canvas.height = targetHeight;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-        canvas.toBlob((blob) => {
-          if (blob) {
-            this.thumbnailImg = new File([blob], 'thumb_' + file.name, { type: blob.type || 'image/jpeg' });
-            this.previewThumbnail = window.URL.createObjectURL(blob);
+  _processCoverImage(file, title = '') {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let targetWidth = img.width;
+          let targetHeight = img.height;
+          const maxHeight = 1800;
+
+          if (targetHeight > maxHeight) {
+            targetWidth = Math.round(targetWidth * (maxHeight / targetHeight));
+            targetHeight = maxHeight;
           }
-        }, 'image/jpeg', 0.85);
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const safeTitle = cleanTitle(title || this.title || 'cover');
+              const processedFile = new File([blob], `${safeTitle}.webp`, { type: 'image/webp' });
+              this.coverImg = processedFile;
+              this.previewCover = window.URL.createObjectURL(blob);
+              resolve(processedFile);
+            } else {
+              this.coverImg = file;
+              this.previewCover = window.URL.createObjectURL(file);
+              resolve(file);
+            }
+          }, 'image/webp', 0.88);
+        };
+        img.onerror = () => {
+          this.coverImg = file;
+          this.previewCover = window.URL.createObjectURL(file);
+          resolve(file);
+        };
+        img.src = e.target.result;
       };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      reader.onerror = () => {
+        this.coverImg = file;
+        this.previewCover = window.URL.createObjectURL(file);
+        resolve(file);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  _generateClientThumbnail(file, title = '') {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let targetWidth = img.width;
+          let targetHeight = img.height;
+          const maxHeight = 720;
+
+          if (targetHeight > maxHeight) {
+            targetWidth = Math.round(targetWidth * (maxHeight / targetHeight));
+            targetHeight = maxHeight;
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = targetWidth;
+          canvas.height = targetHeight;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+          canvas.toBlob((blob) => {
+            if (blob) {
+              const safeTitle = cleanTitle(title || this.title || 'cover');
+              const processedThumb = new File([blob], `${safeTitle}_thumb.webp`, { type: 'image/webp' });
+              this.thumbnailImg = processedThumb;
+              this.previewThumbnail = window.URL.createObjectURL(blob);
+              resolve(processedThumb);
+            } else {
+              this.thumbnailImg = file;
+              this.previewThumbnail = window.URL.createObjectURL(file);
+              resolve(file);
+            }
+          }, 'image/webp', 0.85);
+        };
+        img.onerror = () => {
+          this.thumbnailImg = file;
+          this.previewThumbnail = window.URL.createObjectURL(file);
+          resolve(file);
+        };
+        img.src = e.target.result;
+      };
+      reader.onerror = () => {
+        this.thumbnailImg = file;
+        this.previewThumbnail = window.URL.createObjectURL(file);
+        resolve(file);
+      };
+      reader.readAsDataURL(file);
+    });
   }
 
   render() {
