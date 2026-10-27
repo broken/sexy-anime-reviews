@@ -490,6 +490,10 @@ export class SarAuthorForm extends LitElement {
       background: rgba(3, 169, 244, 0.2);
       color: #81d4fa;
     }
+    .meta-chip.res-chip {
+      background: rgba(76, 175, 80, 0.2);
+      color: #81c784;
+    }
     .result-genres-row {
       font-size: 11px;
       color: var(--secondary-text-color, #999);
@@ -1287,6 +1291,9 @@ export class SarAuthorForm extends LitElement {
                 : ''}
               ${item.viewMethod
                 ? html`<span class="meta-chip view-chip">${item.viewMethod}</span>`
+                : ''}
+              ${item.coverWidth && item.coverHeight
+                ? html`<span class="meta-chip res-chip" title="Cover resolution: ${item.coverWidth}×${item.coverHeight}">${item.coverWidth}×${item.coverHeight}</span>`
                 : ''}
             </div>
 

@@ -41,7 +41,7 @@ def pick_best_poster(images_dict):
   """Finds the highest quality vertical poster with the official title logo."""
   posters = images_dict.get('poster_tall', [])
   if not posters:
-    return ''
+    return '', 0, 0
 
   flat = []
   for item in posters:
@@ -51,14 +51,14 @@ def pick_best_poster(images_dict):
       flat.append(item)
 
   if not flat:
-    return ''
+    return '', 0, 0
 
   flat.sort(key=lambda x: x.get('width', 0), reverse=True)
   # Prefer ~1200x1800 if available, otherwise the highest resolution
   for p in flat:
     if p.get('width') == 1200:
-      return p.get('source')
-  return flat[0].get('source')
+      return p.get('source', ''), p.get('width', 0), p.get('height', 0)
+  return flat[0].get('source', ''), flat[0].get('width', 0), flat[0].get('height', 0)
 
 
 def pick_thumbnail_poster(images_dict, target_width=480):
@@ -101,7 +101,7 @@ def get_series_by_id(series_id, token):
         genres = meta.get('tenant_categories') or [
             k for k in raw_keywords if not k.startswith('type:') and k not in ('movie', 'series')
         ]
-        cover = pick_best_poster(item.get('images', {}))
+        cover, cover_w, cover_h = pick_best_poster(item.get('images', {}))
         thumbnail = pick_thumbnail_poster(item.get('images', {}))
         is_movie = (
             item.get('type') in ('movie', 'movie_listing')
@@ -116,6 +116,8 @@ def get_series_by_id(series_id, token):
             'showType': show_type,
             'genres': genres,
             'coverUrl': cover,
+            'coverWidth': cover_w,
+            'coverHeight': cover_h,
             'thumbnailUrl': thumbnail,
             'format': item.get('type'),
             'viewMethod': view_method
@@ -164,7 +166,7 @@ def search_crunchyroll(query):
         for item in group.get('items', []):
           series_id = item.get('id')
           title = item.get('title')
-          cover = pick_best_poster(item.get('images', {}))
+          cover, cover_w, cover_h = pick_best_poster(item.get('images', {}))
           thumbnail = pick_thumbnail_poster(item.get('images', {}))
           is_movie = (
               group_type == 'movie_listing'
@@ -176,6 +178,8 @@ def search_crunchyroll(query):
               'title': title,
               'showType': show_type,
               'coverUrl': cover,
+              'coverWidth': cover_w,
+              'coverHeight': cover_h,
               'thumbnailUrl': thumbnail,
               'format': item.get('type'),
           })
@@ -208,6 +212,10 @@ def search_crunchyroll(query):
           r['showType'] = details.get('showType', r['showType'])
           if details.get('coverUrl'):
             r['coverUrl'] = details['coverUrl']
+          if details.get('coverWidth'):
+            r['coverWidth'] = details['coverWidth']
+          if details.get('coverHeight'):
+            r['coverHeight'] = details['coverHeight']
           if details.get('thumbnailUrl'):
             r['thumbnailUrl'] = details['thumbnailUrl']
         else:

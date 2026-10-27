@@ -65,7 +65,7 @@ def get_best_poster_path(media_type, media_id, default_poster_path=None):
     data = tmdb_request(f'{media_type}/{media_id}/images', {'include_image_language': 'en,ja,null'})
     posters = data.get('posters', [])
     if not posters:
-      return default_poster_path
+      return default_poster_path, 0, 0
 
     # First priority: English posters (these almost always feature the official English logo)
     en_posters = [p for p in posters if p.get('iso_639_1') == 'en']
@@ -74,17 +74,19 @@ def get_best_poster_path(media_type, media_id, default_poster_path=None):
           key=lambda x: (x.get('vote_average', 0), x.get('vote_count', 0), x.get('width', 0)),
           reverse=True
       )
-      return en_posters[0].get('file_path') or default_poster_path
+      best = en_posters[0]
+      return best.get('file_path') or default_poster_path, best.get('width', 0), best.get('height', 0)
 
     # Second priority: Any poster sorted by vote and resolution
     posters.sort(
         key=lambda x: (x.get('vote_average', 0), x.get('vote_count', 0), x.get('width', 0)),
         reverse=True
     )
-    return posters[0].get('file_path') or default_poster_path
+    best = posters[0]
+    return best.get('file_path') or default_poster_path, best.get('width', 0), best.get('height', 0)
   except Exception as e:
     print(f'Error fetching TMDb images for {media_type}/{media_id}: {e}')
-    return default_poster_path
+    return default_poster_path, 0, 0
 
 
 def fetch_anilist_details(title_query, orig_title=None, media_type=None):
@@ -176,7 +178,7 @@ def get_tmdb_item_details(media_type, media_id):
     data = tmdb_request(f'{media_type}/{media_id}', {'append_to_response': 'keywords,credits'})
     title = data.get('name') if media_type == 'tv' else data.get('title')
     orig_title = data.get('original_name') if media_type == 'tv' else data.get('original_title')
-    poster_path = get_best_poster_path(media_type, media_id, data.get('poster_path'))
+    poster_path, cover_w, cover_h = get_best_poster_path(media_type, media_id, data.get('poster_path'))
 
     cover_url = f'https://image.tmdb.org/t/p/original{poster_path}' if poster_path else ''
     thumb_url = f'https://image.tmdb.org/t/p/w500{poster_path}' if poster_path else ''
@@ -203,6 +205,8 @@ def get_tmdb_item_details(media_type, media_id):
         'genres': genres,
         'viewMethod': 'sub',
         'coverUrl': cover_url,
+        'coverWidth': cover_w,
+        'coverHeight': cover_h,
         'thumbnailUrl': thumb_url,
         'source': 'tmdb'
     }
