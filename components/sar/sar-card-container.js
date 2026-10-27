@@ -74,7 +74,6 @@ export class SarCardContainer extends LitElement {
       overflow-y: auto;
       -webkit-overflow-scrolling: touch;
       box-sizing: border-box;
-      overscroll-behavior-y: contain;
     }
     .paper-header {
       padding: 0 6%;
@@ -774,8 +773,8 @@ export class SarCardContainer extends LitElement {
                 label="Min rating"
                 .ratingNum="${this.minRating || 1}"
                 @rating-changed="${(e) => {
-                  this.minRating = e.detail.ratingNum ?? (RATING_VALUES[e.detail.value] || 1);
-                }}"
+        this.minRating = e.detail.ratingNum ?? (RATING_VALUES[e.detail.value] || 1);
+      }}"
               ></sar-rating-slider>
             </div>
             <div class="spacer"></div>
