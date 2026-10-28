@@ -315,6 +315,79 @@ export class SarCardContainer extends LitElement {
         gap: 12px;
         justify-content: space-between;
       }
+      .scroll-to-top {
+        position: absolute;
+        bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+        right: calc(16px + env(safe-area-inset-right, 0px));
+        width: 44px;
+        height: 44px;
+      }
+      .scroll-to-top svg {
+        width: 22px;
+        height: 22px;
+      }
+    }
+    .scroll-to-top {
+      position: absolute;
+      bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      right: calc(28px + env(safe-area-inset-right, 0px));
+      z-index: 99;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--card-cover-bg, #1B1B22);
+      color: var(--primary-text-color, #F1F1F5);
+      border: 1px solid var(--divider-color, rgba(255, 255, 255, 0.12));
+      box-shadow: var(--card-shadow, 0 4px 12px rgba(0, 0, 0, 0.3));
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      outline: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(16px) scale(0.85);
+      transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  visibility 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+                  background-color 0.2s,
+                  border-color 0.2s,
+                  box-shadow 0.2s,
+                  color 0.2s;
+    }
+    .scroll-to-top.visible {
+      opacity: 0.65;
+      visibility: visible;
+      pointer-events: auto;
+      transform: translateY(0) scale(1);
+    }
+    .scroll-to-top:hover {
+      opacity: 1;
+      color: var(--default-primary-color, #BA68C8);
+      border-color: var(--default-primary-color, #BA68C8);
+      box-shadow: var(--card-shadow-hover, 0 8px 20px rgba(0, 0, 0, 0.4));
+      transform: translateY(-3px) scale(1.05);
+    }
+    .scroll-to-top:focus-visible {
+      outline: 2px solid var(--default-primary-color, #BA68C8);
+      outline-offset: 3px;
+    }
+    .scroll-to-top:active {
+      transform: translateY(0) scale(0.95);
+    }
+    .scroll-to-top svg {
+      width: 24px;
+      height: 24px;
+      fill: currentColor;
+      transition: transform 0.2s ease;
+    }
+    .scroll-to-top:hover svg {
+      transform: translateY(-2px);
     }
   `;
 
@@ -330,6 +403,7 @@ export class SarCardContainer extends LitElement {
     minRating: { type: Number },
     minRatingText: { type: String },
     genresAndCounts: { type: Array },
+    _showScrollTop: { state: true },
   };
 
   constructor() {
@@ -345,6 +419,7 @@ export class SarCardContainer extends LitElement {
     this.minRating = 0;
     this.minRatingText = 'abysmal';
     this.genresAndCounts = [];
+    this._showScrollTop = false;
   }
 
   get ratingValuesInverted() {
@@ -364,6 +439,7 @@ export class SarCardContainer extends LitElement {
       genreSearch: this.renderRoot?.querySelector('#genreSearch'),
       scrollContainer: this.renderRoot?.querySelector('#scrollContainer') || this.renderRoot?.querySelector('.scroll-container'),
       scrollHeaderPanel: this.renderRoot?.querySelector('#scrollContainer') || this.renderRoot?.querySelector('.scroll-container'),
+      scrollToTop: this.renderRoot?.querySelector('#scrollToTop'),
     };
   }
 
@@ -525,6 +601,50 @@ export class SarCardContainer extends LitElement {
     if (changedProperties.has('reviews') && window.location.pathname.length > 3) {
       this._domChanged();
     }
+    if (
+      changedProperties.has('reviews') ||
+      changedProperties.has('searchString') ||
+      changedProperties.has('searchGenre') ||
+      changedProperties.has('minRating') ||
+      changedProperties.has('showDub') ||
+      changedProperties.has('showSub') ||
+      changedProperties.has('showMovie') ||
+      changedProperties.has('showSeries')
+    ) {
+      this._checkScrollPosition();
+    }
+  }
+
+  _checkScrollPosition() {
+    const scrollContainer = this.$.scrollContainer;
+    if (scrollContainer) {
+      const shouldShow = scrollContainer.scrollTop > 300;
+      if (this._showScrollTop !== shouldShow) {
+        this._showScrollTop = shouldShow;
+      }
+    }
+  }
+
+  _onScroll(e) {
+    const scrollTop = e?.target ? e.target.scrollTop : (this.$.scrollContainer?.scrollTop || 0);
+    const shouldShow = scrollTop > 300;
+    if (this._showScrollTop !== shouldShow) {
+      this._showScrollTop = shouldShow;
+    }
+  }
+
+  _scrollToTop() {
+    const scrollContainer = this.$.scrollContainer;
+    if (scrollContainer) {
+      const prefersReducedMotion =
+        typeof window !== 'undefined' &&
+        window.matchMedia &&
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      scrollContainer.scrollTo({
+        top: 0,
+        behavior: prefersReducedMotion ? 'auto' : 'smooth',
+      });
+    }
   }
 
   _updateGenresAndCounts() {
@@ -672,7 +792,7 @@ export class SarCardContainer extends LitElement {
 
   render() {
     return html`
-      <div id="scrollContainer" class="scroll-container">
+      <div id="scrollContainer" class="scroll-container" @scroll="${this._onScroll}">
         <div class="paper-header">
           <div id="header">Spoiler Free Anime Reviews</div>
         </div>
@@ -826,6 +946,19 @@ export class SarCardContainer extends LitElement {
           </div>
         </div>
       </div>
+      <button
+        id="scrollToTop"
+        type="button"
+        class="scroll-to-top ${this._showScrollTop ? 'visible' : ''}"
+        @click="${this._scrollToTop}"
+        aria-label="Scroll to top"
+        title="Scroll to top"
+        tabindex="${this._showScrollTop ? '0' : '-1'}"
+      >
+        <svg viewBox="0 0 24 24" width="24" height="24" fill="currentColor" aria-hidden="true">
+          <path d="M4 12l1.41 1.41L11 7.83V20h2V7.83l5.58 5.59L20 12l-8-8-8 8z"/>
+        </svg>
+      </button>
     `;
   }
 }
