@@ -1194,7 +1194,7 @@ export class SarAuthorForm extends LitElement {
     this.tmdbResults = [];
     this.searchResults = [];
     this.hasSearched = false;
-    this.showToast('Search results dismissed without applying.');
+    this.showToast('Search results dismissed.');
   }
 
   _applyAnimeResult(item) {
@@ -1217,10 +1217,6 @@ export class SarAuthorForm extends LitElement {
         return tag;
       });
     }
-    this.searchResults = [];
-    this.crunchyrollResults = [];
-    this.tmdbResults = [];
-    this.hasSearched = false;
 
     if (item.coverUrl) {
       this.previewCover = item.coverUrl;
@@ -1732,7 +1728,7 @@ export class SarAuthorForm extends LitElement {
                     <div class="results-top-title-group">
                       <div class="results-top-title">Compare & Choose Metadata</div>
                       <div class="results-top-subtitle">
-                        Select one source to apply, or dismiss to keep your current information.
+                        Select a source to apply, or dismiss to close results.
                       </div>
                     </div>
                     <button
@@ -1740,7 +1736,7 @@ export class SarAuthorForm extends LitElement {
                       class="dismiss-btn"
                       @click="${this._dismissSearchResults}"
                     >
-                      ✕ Dismiss (Apply None)
+                      ✕ Dismiss
                     </button>
                   </div>
 
