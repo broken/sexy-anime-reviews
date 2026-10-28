@@ -371,7 +371,7 @@ export class SarCardContainer extends LitElement {
       color: var(--default-primary-color, #BA68C8);
       border-color: var(--default-primary-color, #BA68C8);
       box-shadow: var(--card-shadow-hover, 0 8px 20px rgba(0, 0, 0, 0.4));
-      transform: translateY(-3px) scale(1.05);
+      transform: translateY(0) scale(1.05);
     }
     .scroll-to-top:focus-visible {
       outline: 2px solid var(--default-primary-color, #BA68C8);
@@ -387,7 +387,7 @@ export class SarCardContainer extends LitElement {
       transition: transform 0.2s ease;
     }
     .scroll-to-top:hover svg {
-      transform: translateY(-2px);
+      transform: translateY(0);
     }
   `;
 
