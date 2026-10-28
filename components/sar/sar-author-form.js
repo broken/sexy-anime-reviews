@@ -620,13 +620,55 @@ export class SarAuthorForm extends LitElement {
       position: relative;
       margin: 16px 0;
     }
+    .genres-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+      flex-wrap: wrap;
+    }
     .genres-label {
       font-size: 11px;
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.5px;
       color: var(--secondary-text-color, #727272);
-      margin-bottom: 6px;
+    }
+    .genre-search-btn {
+      background: var(--hover-overlay, rgba(255, 255, 255, 0.08));
+      color: var(--primary-text-color, #F1F1F5);
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0.2px;
+      padding: 4px 10px;
+      min-height: 28px;
+      border: 1px solid var(--divider-color, #333344);
+      border-radius: 4px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: none;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .genre-search-btn:hover:not(:disabled) {
+      background: var(--default-primary-color, #BA68C8);
+      color: #FFFFFF;
+      border-color: var(--default-primary-color, #BA68C8);
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    }
+    .genre-search-btn:active:not(:disabled) {
+      transform: scale(0.96);
+    }
+    .genre-search-btn svg {
+      width: 13px;
+      height: 13px;
+      flex-shrink: 0;
     }
     .genres-wrapper {
       display: flex;
@@ -926,6 +968,17 @@ export class SarAuthorForm extends LitElement {
     setTimeout(() => {
       this.genreSuggestions = [];
     }, 200);
+  }
+
+  _searchGoogleGenre() {
+    const rawTitle = (this.title || this.renderRoot?.querySelector('#title')?.value || this.searchQuery || '').trim();
+    if (!rawTitle) {
+      this.showToast('Please enter an anime title first');
+      return;
+    }
+    const query = `${rawTitle} anime genre`;
+    const url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    window.open(url, '_blank', 'noopener,noreferrer');
   }
 
   get firebase() {
@@ -1843,7 +1896,21 @@ export class SarAuthorForm extends LitElement {
         </div>
 
         <div id="genresSelect" class="genres-container">
-          <div class="genres-label">Genres</div>
+          <div class="genres-header-row">
+            <div class="genres-label">Genres</div>
+            <button
+              type="button"
+              class="genre-search-btn"
+              @click="${this._searchGoogleGenre}"
+              title="${(this.title || this.searchQuery || '').trim() ? `Search Google for &quot;${(this.title || this.searchQuery).trim()} anime genre&quot;` : 'Search Google for anime genre'}"
+            >
+              <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"></circle>
+                <line x1="21" y1="21" x2="16" y2="16"></line>
+              </svg>
+              <span>Search Google for Genres</span>
+            </button>
+          </div>
           <div class="genres-wrapper">
             ${(this.genres || []).map(
           (genre) => html`
