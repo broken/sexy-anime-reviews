@@ -2,6 +2,7 @@
 Crunchyroll API client helper for fetching official anime metadata and high-resolution covers.
 """
 
+from concurrent.futures import ThreadPoolExecutor
 import json
 import re
 import time
@@ -110,8 +111,11 @@ def get_series_by_id(series_id, token):
         show_type = 'movie' if is_movie else 'series'
         is_dubbed = meta.get('is_dubbed', False)
         view_method = 'dub' if is_dubbed else 'sub'
+        slug = item.get('slug_title') or item.get('slug') or ''
+        series_id = item.get('id')
+        cr_url = f'https://www.crunchyroll.com/series/{series_id}' + (f'/{slug}' if slug else '')
         return {
-            'id': item.get('id'),
+            'id': series_id,
             'title': item.get('title'),
             'showType': show_type,
             'genres': genres,
@@ -120,7 +124,9 @@ def get_series_by_id(series_id, token):
             'coverHeight': cover_h,
             'thumbnailUrl': thumbnail,
             'format': item.get('type'),
-            'viewMethod': view_method
+            'viewMethod': view_method,
+            'slugTitle': slug,
+            'url': cr_url,
         }
   except Exception as e:
     print(f'Error fetching series object {series_id}: {e}')
@@ -173,6 +179,8 @@ def search_crunchyroll(query):
               or item.get('type') in ('movie', 'movie_listing')
           )
           show_type = 'movie' if is_movie else 'series'
+          slug = item.get('slug_title') or item.get('slug') or ''
+          cr_url = f'https://www.crunchyroll.com/series/{series_id}' + (f'/{slug}' if slug else '')
           results.append({
               'id': series_id,
               'title': title,
@@ -182,6 +190,8 @@ def search_crunchyroll(query):
               'coverHeight': cover_h,
               'thumbnailUrl': thumbnail,
               'format': item.get('type'),
+              'slugTitle': slug,
+              'url': cr_url,
           })
 
       # Sort results by match relevance to search query
@@ -203,8 +213,7 @@ def search_crunchyroll(query):
 
       results.sort(key=lambda r: score_match(search_term, r['title']), reverse=True)
 
-      enriched = []
-      for r in results[:6]:
+      def enrich(r):
         details = get_series_by_id(r['id'], token)
         if details:
           r['genres'] = details.get('genres', [])
@@ -218,10 +227,17 @@ def search_crunchyroll(query):
             r['coverHeight'] = details['coverHeight']
           if details.get('thumbnailUrl'):
             r['thumbnailUrl'] = details['thumbnailUrl']
+          if details.get('url'):
+            r['url'] = details['url']
+          if details.get('slugTitle'):
+            r['slugTitle'] = details['slugTitle']
         else:
           r['genres'] = []
           r['viewMethod'] = 'sub'
-        enriched.append(r)
+        return r
+
+      with ThreadPoolExecutor(max_workers=6) as executor:
+        enriched = list(executor.map(enrich, results[:6]))
       return enriched
 
   except Exception as e:

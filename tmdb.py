@@ -3,6 +3,7 @@ TMDb (The Movie Database) API client helper for fetching official anime metadata
 high-resolution English-logo posters, and show details.
 """
 
+from concurrent.futures import ThreadPoolExecutor
 import json
 import os
 import re
@@ -208,7 +209,8 @@ def get_tmdb_item_details(media_type, media_id):
         'coverWidth': cover_w,
         'coverHeight': cover_h,
         'thumbnailUrl': thumb_url,
-        'source': 'tmdb'
+        'source': 'tmdb',
+        'url': f'https://www.themoviedb.org/{media_type}/{media_id}/images/posters?image_language=en&image_sort=resolution.desc'
     }
   except Exception as e:
     print(f'Error fetching TMDb item {media_type}/{media_id}: {e}')
@@ -263,13 +265,12 @@ def search_tmdb(query):
         reverse=True
     )
 
-    enriched = []
-    for r, _ in candidates[:6]:
-      m_type = r.get('media_type')
-      m_id = r.get('id')
-      details = get_tmdb_item_details(m_type, m_id)
-      if details and details.get('coverUrl'):
-        enriched.append(details)
+    def fetch_cand(pair):
+      r = pair[0]
+      return get_tmdb_item_details(r.get('media_type'), r.get('id'))
+
+    with ThreadPoolExecutor(max_workers=6) as executor:
+      enriched = [d for d in executor.map(fetch_cand, candidates[:6]) if d and d.get('coverUrl')]
 
     return enriched
   except Exception as e:

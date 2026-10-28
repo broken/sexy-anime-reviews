@@ -407,20 +407,17 @@ export class SarAuthorForm extends LitElement {
       background: rgba(255, 255, 255, 0.03);
       border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 6px;
-      transition: transform 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+      transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
       gap: 14px;
-      cursor: pointer;
     }
     .result-card:hover {
-      background: rgba(255, 255, 255, 0.07);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      background: rgba(255, 255, 255, 0.05);
     }
     .result-card.crunchyroll-card:hover {
-      border-color: rgba(244, 117, 33, 0.4);
+      border-color: rgba(244, 117, 33, 0.35);
     }
     .result-card.tmdb-card:hover {
-      border-color: rgba(1, 180, 228, 0.4);
+      border-color: rgba(1, 180, 228, 0.35);
     }
     .result-thumb {
       width: 90px;
@@ -458,6 +455,46 @@ export class SarAuthorForm extends LitElement {
       font-size: 14px;
       line-height: 1.3;
       word-break: break-word;
+    }
+    .result-title-row {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 2px;
+    }
+    .result-title-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: inherit;
+      text-decoration: none;
+      cursor: pointer;
+      min-width: 0;
+      word-break: break-word;
+    }
+    .result-title-link:hover .result-title {
+      text-decoration: underline;
+    }
+    .result-card.crunchyroll-card .result-title-link:hover .result-title {
+      color: #f47521;
+    }
+    .result-card.tmdb-card .result-title-link:hover .result-title {
+      color: #01b4e4;
+    }
+    .result-title-link:hover .external-title-icon {
+      opacity: 1;
+      transform: translate(1px, -1px);
+    }
+    .external-title-icon {
+      opacity: 0.65;
+      flex-shrink: 0;
+      transition: opacity 0.15s, transform 0.15s;
+      vertical-align: middle;
+    }
+    .result-card.crunchyroll-card .external-title-icon {
+      color: #f47521;
+    }
+    .result-card.tmdb-card .external-title-icon {
+      color: #01b4e4;
     }
     .result-romaji {
       font-size: 11px;
@@ -1317,19 +1354,68 @@ export class SarAuthorForm extends LitElement {
     this.showToast('Applied ' + sourceName + ' metadata for ' + (item.title || item.romajiTitle));
   }
 
+  _getResultUrl(item, source) {
+    if (source === 'tmdb' || item?.source === 'tmdb') {
+      let mediaType = item.mediaType;
+      let tmdbId = item.tmdbId;
+      if (!mediaType || !tmdbId) {
+        if (typeof item.id === 'string' && item.id.startsWith('tmdb:')) {
+          const parts = item.id.split(':');
+          mediaType = mediaType || parts[1];
+          tmdbId = tmdbId || parts[2];
+        }
+      }
+      mediaType = mediaType || (item.showType === 'movie' ? 'movie' : 'tv');
+      if (tmdbId) {
+        return `https://www.themoviedb.org/${mediaType}/${tmdbId}/images/posters?image_language=en&image_sort=resolution.desc`;
+      }
+      if (item.url) {
+        return item.url;
+      }
+      return `https://www.themoviedb.org/search?query=${encodeURIComponent(item.title || '')}`;
+    }
+
+    if (item?.url) {
+      return item.url;
+    }
+    if (item?.id) {
+      const slug = item.slugTitle ? `/${item.slugTitle}` : '';
+      return `https://www.crunchyroll.com/series/${item.id}${slug}`;
+    }
+    return `https://www.crunchyroll.com/search?q=${encodeURIComponent(item?.title || '')}`;
+  }
+
   _renderResultCard(item, source) {
     const isCr = source === 'crunchyroll';
+    const siteUrl = this._getResultUrl(item, source);
+    const siteTooltip = isCr
+      ? `View on Crunchyroll (opens in a new tab)`
+      : `View posters on TMDb (opens in a new tab)`;
+
     return html`
-      <div
-        class="result-card ${isCr ? 'crunchyroll-card' : 'tmdb-card'}"
-        @click="${(e) => this._selectSearchResult(e, item)}"
-      >
+      <div class="result-card ${isCr ? 'crunchyroll-card' : 'tmdb-card'}">
         ${item.thumbnailUrl || item.coverUrl
           ? html`<img class="result-thumb" src="${item.thumbnailUrl || item.coverUrl}" alt="${item.title || ''}" />`
           : html`<div class="result-thumb result-thumb-placeholder">No Cover</div>`}
         <div class="result-details">
           <div class="result-meta-top">
-            <div class="result-title" title="${item.title || ''}">${item.title}</div>
+            <div class="result-title-row">
+              <a
+                class="result-title-link"
+                href="${siteUrl}"
+                target="_blank"
+                rel="noopener noreferrer"
+                @click="${(e) => e.stopPropagation()}"
+                title="${siteTooltip}"
+              >
+                <span class="result-title" title="${item.title || ''}">${item.title}</span>
+                <svg class="external-title-icon" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+              </a>
+            </div>
             ${item.romajiTitle && item.romajiTitle !== item.title
               ? html`<div class="result-romaji" title="${item.romajiTitle}">${item.romajiTitle}</div>`
               : ''}
