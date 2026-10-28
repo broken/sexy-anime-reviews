@@ -1,4 +1,5 @@
 import json
+import os
 import re
 import urllib.parse
 import urllib.request
@@ -22,6 +23,18 @@ app = Bottle()
 
 # Note: We don't need to call run() since our application is embedded within
 # the App Engine WSGI application server.
+
+
+def get_app_version():
+  try:
+    pkg_path = os.path.join(os.path.dirname(__file__), 'package.json')
+    with open(pkg_path, 'r', encoding='utf-8') as f:
+      return json.load(f).get('version', '1.0.0')
+  except Exception:
+    return '1.0.0'
+
+
+APP_VERSION = get_app_version()
 
 
 def is_admin_user():
@@ -48,7 +61,11 @@ def login():
 @app.route('/')
 @app.route('/a/<name>')
 def main(name=''):
-  return template('views/main.html', is_admin=('true' if is_admin_user() else 'false'))
+  return template(
+      'views/main.html',
+      is_admin=('true' if is_admin_user() else 'false'),
+      app_version=APP_VERSION
+  )
 
 @app.route('/components/sar/<filepath:path>')
 def sar(filepath):
@@ -57,7 +74,7 @@ def sar(filepath):
 @app.route('/add')
 @app.route('/edit/<name>')
 def add(name=''):
-  return static_file('add.html', root='views')
+  return template('views/add.html', app_version=APP_VERSION)
 
 @app.route('/pub/<filepath:path>')
 def pub(filepath):

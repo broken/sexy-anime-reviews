@@ -14,8 +14,8 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/pub/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="/pub/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="/pub/favicon-16x16.png">
-  <link rel="stylesheet" href="/pub/themes/theme-dark.css">
-  <link rel="stylesheet" href="/pub/themes/theme-light.css">
+  <link rel="stylesheet" href="/pub/themes/theme-dark.css?v=${app_version}">
+  <link rel="stylesheet" href="/pub/themes/theme-light.css?v=${app_version}">
   <script>
     (function () {
       try {
@@ -87,8 +87,8 @@
   <div class="theme-switch-wrapper">
     <sar-theme-switch id="themeSwitch"></sar-theme-switch>
   </div>
-  <script type="module" src="/components/sar/sar-theme-switch.js"></script>
-  <script type="module" src="/pub/dist/add.bundle.js"></script>
+  <script type="module" src="/components/sar/sar-theme-switch.js?v=${app_version}"></script>
+  <script type="module" src="/pub/dist/add.bundle.js?v=${app_version}"></script>
   <sar-author-form></sar-author-form>
 </body>
 
