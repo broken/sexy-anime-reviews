@@ -848,7 +848,7 @@ export class SarAuthorForm extends LitElement {
     this.searchResults = [];
     this.genres = [];
     this.viewMethod = '';
-    this.showType = 'series';
+    this.showType = '';
     this.review = '';
     this.reviews = {};
     this.tags = [];
@@ -1199,10 +1199,10 @@ export class SarAuthorForm extends LitElement {
 
   _applyAnimeResult(item) {
     this.title = item.title || item.romajiTitle || '';
-    if (item.showType) {
+    if (item.showType && !this.showType) {
       this.showType = item.showType;
     }
-    if (item.viewMethod) {
+    if (item.viewMethod && !this.viewMethod) {
       this.viewMethod = item.viewMethod;
     }
     if (item.genres && item.genres.length) {
