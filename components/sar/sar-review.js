@@ -83,6 +83,7 @@ export class SarReview extends LitElement {
       font-weight: 600;
       line-height: 1.25;
       word-break: break-word;
+      user-select: text;
     }
     .row {
       display: flex;
