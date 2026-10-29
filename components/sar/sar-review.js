@@ -3,6 +3,8 @@ import { keyed } from 'lit/directives/keyed.js';
 import { parseSpoilers, dbTitle, splitReview } from './util.js';
 import { articleStyles } from './article-styles.js';
 
+const SYNOPSIS_STORAGE_KEY = 'sar-synopsis-open';
+
 export class SarReview extends LitElement {
   static styles = [
     articleStyles,
@@ -148,6 +150,94 @@ export class SarReview extends LitElement {
       min-width: 40px;
       box-sizing: border-box;
       width: 100%;
+    }
+    .synopsis {
+      transition: background-color 0.2s ease, padding 0.25s ease, margin-bottom 0.25s ease, box-shadow 0.2s ease;
+    }
+    .synopsis.zipped {
+      padding: 8px 16px;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+    .synopsis.zipped:hover {
+      background: var(--synopsis-hover-bg, rgba(186, 104, 200, 0.12));
+    }
+    .synopsis-header {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      -webkit-user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      gap: 8px;
+    }
+    .synopsis-header:focus-visible {
+      outline: 2px solid var(--default-primary-color, #BA68C8);
+      outline-offset: 2px;
+      border-radius: 4px;
+    }
+    .synopsis-header .synopsis-label {
+      margin-bottom: 0;
+      cursor: pointer;
+    }
+    .synopsis-title-group {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex: 1;
+    }
+    .synopsis-hint {
+      font-size: 11px;
+      font-style: italic;
+      color: var(--secondary-text-color, #888);
+      opacity: 0.85;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: opacity 0.2s ease;
+    }
+    .synopsis-toggle-btn {
+      opacity: 0.5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      color: var(--default-primary-color, #BA68C8);
+      border-radius: 50%;
+      flex-shrink: 0;
+      transition: background-color 0.15s ease;
+    }
+    .synopsis-header:hover .synopsis-toggle-btn {
+      background-color: rgba(186, 104, 200, 0.15);
+    }
+    .synopsis-chevron {
+      display: block;
+      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .synopsis.zipped .synopsis-chevron {
+      transform: rotate(-90deg);
+    }
+    .synopsis.open .synopsis-chevron {
+      transform: rotate(0deg);
+    }
+    .synopsis-content {
+      overflow: hidden;
+      transition: max-height 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.25s ease, margin-top 0.25s ease;
+    }
+    .synopsis.open .synopsis-content {
+      max-height: 1000px;
+      opacity: 1;
+      margin-top: 6px;
+    }
+    .synopsis.zipped .synopsis-content {
+      max-height: 0;
+      opacity: 0;
+      margin-top: 0;
+      pointer-events: none;
+    }
     @media (max-width: 680px) {
       .paper-header {
         padding: 8px 16px;
@@ -182,6 +272,13 @@ export class SarReview extends LitElement {
       .row {
         gap: 6px;
       }
+      .synopsis.zipped {
+        padding: 7px 14px;
+        margin-bottom: 14px;
+      }
+      .synopsis-hint {
+        font-size: 10px;
+      }
     }
   `];
 
@@ -191,6 +288,7 @@ export class SarReview extends LitElement {
     elevation: { type: Number },
     keyEventTarget: { type: Object },
     _loadedCoverSrc: { state: true },
+    _synopsisOpen: { state: true },
   };
 
   constructor() {
@@ -201,6 +299,7 @@ export class SarReview extends LitElement {
     this.keyEventTarget = typeof document !== 'undefined' ? document.body : null;
     this._revealedSpoilers = new Set();
     this._loadedCoverSrc = null;
+    this._synopsisOpen = this._getInitialSynopsisOpen();
   }
 
   get $() {
@@ -354,6 +453,7 @@ export class SarReview extends LitElement {
       this._revealedSpoilers.clear();
       this._loadedCoverSrc = null;
       this._preloadHighResCover();
+      this._synopsisOpen = this._getInitialSynopsisOpen();
     }
   }
 
@@ -500,6 +600,45 @@ export class SarReview extends LitElement {
     });
   }
 
+  _getInitialSynopsisOpen() {
+    try {
+      const stored = localStorage.getItem(SYNOPSIS_STORAGE_KEY);
+      if (stored !== null) {
+        return stored === 'true';
+      }
+    } catch (e) { }
+    return true;
+  }
+
+  _toggleSynopsis(event) {
+    if (event) {
+      event.preventDefault();
+    }
+    this._synopsisOpen = !this._synopsisOpen;
+    try {
+      localStorage.setItem(SYNOPSIS_STORAGE_KEY, String(this._synopsisOpen));
+    } catch (e) { }
+  }
+
+  _onSynopsisClick(event) {
+    if (!this._synopsisOpen) {
+      this._toggleSynopsis(event);
+    }
+  }
+
+  _onSynopsisHeaderClick(event) {
+    event.stopPropagation();
+    this._toggleSynopsis(event);
+  }
+
+  _onSynopsisHeaderKeyDown(event) {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      event.stopPropagation();
+      this._toggleSynopsis(event);
+    }
+  }
+
   _renderReviewContent(content) {
     if (!content) return '';
     const { synopsis, body } = splitReview(content);
@@ -511,7 +650,40 @@ export class SarReview extends LitElement {
     const spoilerCountInSynopsis = synopsisParts.filter((p) => p.type === 'spoiler').length;
     const bodyParts = parseSpoilers(body, spoilerCountInSynopsis);
 
-    return html`<div class="synopsis pre" aria-label="Synopsis"><div class="synopsis-label">Synopsis</div><div class="synopsis-text">${this._renderParts(synopsisParts)}</div></div><div class="review-body">${this._renderParts(bodyParts)}</div>`;
+    const isOpen = this._synopsisOpen;
+
+    return html`
+      <div
+        class="synopsis pre ${isOpen ? 'open' : 'zipped'}"
+        aria-label="Synopsis"
+        @click="${this._onSynopsisClick}"
+      >
+        <div
+          class="synopsis-header"
+          role="button"
+          tabindex="0"
+          aria-expanded="${isOpen ? 'true' : 'false'}"
+          aria-label="${isOpen ? 'Zip up synopsis' : 'Expand synopsis'}"
+          title="${isOpen ? 'Click to zip up synopsis' : 'Click to expand synopsis'}"
+          @click="${this._onSynopsisHeaderClick}"
+          @keydown="${this._onSynopsisHeaderKeyDown}"
+        >
+          <div class="synopsis-title-group">
+            <span class="synopsis-label">Synopsis</span>
+            ${!isOpen ? html`<span class="synopsis-hint">(click to expand)</span>` : ''}
+          </div>
+          <div class="synopsis-toggle-btn" aria-hidden="true">
+            <svg class="synopsis-chevron" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
+              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
+            </svg>
+          </div>
+        </div>
+        <div class="synopsis-content">
+          <div class="synopsis-text">${this._renderParts(synopsisParts)}</div>
+        </div>
+      </div>
+      <div class="review-body">${this._renderParts(bodyParts)}</div>
+    `;
   }
 
   render() {

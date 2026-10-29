@@ -32,6 +32,7 @@
   --spoiler-revealed-bg: rgba(186, 104, 200, 0.14);
   --spoiler-revealed-hover-bg: rgba(186, 104, 200, 0.22);
   --synopsis-bg: rgba(186, 104, 200, 0.08);
+  --synopsis-hover-bg: rgba(186, 104, 200, 0.14);
   --synopsis-border: var(--default-primary-color, #BA68C8);
   --synopsis-text: var(--primary-text-color, #F1F1F5);
   --toggle-thumb-bg: black;
