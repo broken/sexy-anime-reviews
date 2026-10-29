@@ -389,7 +389,7 @@ export class SarAuthorForm extends LitElement {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      max-height: 440px;
+      max-height: 590px;
       overflow-y: auto;
     }
     .no-results-msg {
@@ -420,8 +420,8 @@ export class SarAuthorForm extends LitElement {
       border-color: rgba(1, 180, 228, 0.35);
     }
     .result-thumb {
-      width: 90px;
-      height: 132px;
+      width: 180px;
+      height: 264px;
       object-fit: cover;
       border-radius: 4px;
       background: #111;
@@ -828,11 +828,11 @@ export class SarAuthorForm extends LitElement {
         gap: 12px;
       }
       .column-body {
-        max-height: 320px;
+        max-height: 384px;
       }
       .result-thumb {
-        width: 76px;
-        height: 112px;
+        width: 110px;
+        height: 162px;
       }
       .autofill-input,
       .title-input,
