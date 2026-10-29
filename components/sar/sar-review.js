@@ -199,7 +199,7 @@ export class SarReview extends LitElement {
       transition: opacity 0.2s ease;
     }
     .synopsis-toggle-btn {
-      opacity: 0.5;
+      opacity: 0;
       display: flex;
       align-items: center;
       justify-content: center;
