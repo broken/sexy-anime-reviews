@@ -1395,8 +1395,8 @@ export class SarAuthorForm extends LitElement {
     return html`
       <div class="result-card ${isCr ? 'crunchyroll-card' : 'tmdb-card'}">
         ${item.thumbnailUrl || item.coverUrl
-          ? html`<img class="result-thumb" src="${item.thumbnailUrl || item.coverUrl}" alt="${item.title || ''}" />`
-          : html`<div class="result-thumb result-thumb-placeholder">No Cover</div>`}
+        ? html`<img class="result-thumb" src="${item.thumbnailUrl || item.coverUrl}" alt="${item.title || ''}" />`
+        : html`<div class="result-thumb result-thumb-placeholder">No Cover</div>`}
         <div class="result-details">
           <div class="result-meta-top">
             <div class="result-title-row">
@@ -1417,28 +1417,28 @@ export class SarAuthorForm extends LitElement {
               </a>
             </div>
             ${item.romajiTitle && item.romajiTitle !== item.title
-              ? html`<div class="result-romaji" title="${item.romajiTitle}">${item.romajiTitle}</div>`
-              : ''}
+        ? html`<div class="result-romaji" title="${item.romajiTitle}">${item.romajiTitle}</div>`
+        : ''}
 
             <div class="result-tags-row">
               ${item.showType || item.format
-                ? html`<span class="meta-chip type-chip">${item.showType || item.format}</span>`
-                : ''}
+        ? html`<span class="meta-chip type-chip">${item.showType || item.format}</span>`
+        : ''}
               ${item.viewMethod
-                ? html`<span class="meta-chip view-chip">${item.viewMethod}</span>`
-                : ''}
+        ? html`<span class="meta-chip view-chip">${item.viewMethod}</span>`
+        : ''}
               ${item.coverWidth && item.coverHeight
-                ? html`<span class="meta-chip res-chip" title="Cover resolution: ${item.coverWidth}×${item.coverHeight}">${item.coverWidth}×${item.coverHeight}</span>`
-                : ''}
+        ? html`<span class="meta-chip res-chip" title="Cover resolution: ${item.coverWidth}×${item.coverHeight}">${item.coverWidth}×${item.coverHeight}</span>`
+        : ''}
             </div>
 
             ${item.genres && item.genres.length
-              ? html`
+        ? html`
                   <div class="result-genres-row" title="${this._joinGenres(item.genres)}">
                     ${this._joinGenres(item.genres)}
                   </div>
                 `
-              : ''}
+        : ''}
           </div>
           <div class="result-card-action">
             <button
@@ -1851,8 +1851,8 @@ export class SarAuthorForm extends LitElement {
               aria-label="Search anime title or paste Crunchyroll/TMDb URL"
               .value="${this.searchQuery || ''}"
               @input="${(e) => {
-                this.searchQuery = e.target.value;
-              }}"
+        this.searchQuery = e.target.value;
+      }}"
               @keydown="${this._onSearchKeydown}"
             />
             <button type="button" @click="${this._searchAnime}" ?disabled="${this.isSearching}">
@@ -1861,7 +1861,7 @@ export class SarAuthorForm extends LitElement {
           </div>
 
           ${this._hasSearchResults()
-            ? html`
+        ? html`
                 <div class="results-comparison-box">
                   <div class="results-top-bar">
                     <div class="results-top-title-group">
@@ -1890,8 +1890,8 @@ export class SarAuthorForm extends LitElement {
                       </div>
                       <div class="column-body">
                         ${this.crunchyrollResults.length > 0
-                          ? this.crunchyrollResults.map((item) => this._renderResultCard(item, 'crunchyroll'))
-                          : html`<div class="no-results-msg">No Crunchyroll results found.</div>`}
+            ? this.crunchyrollResults.map((item) => this._renderResultCard(item, 'crunchyroll'))
+            : html`<div class="no-results-msg">No Crunchyroll results found.</div>`}
                       </div>
                     </div>
 
@@ -1905,14 +1905,14 @@ export class SarAuthorForm extends LitElement {
                       </div>
                       <div class="column-body">
                         ${this.tmdbResults.length > 0
-                          ? this.tmdbResults.map((item) => this._renderResultCard(item, 'tmdb'))
-                          : html`<div class="no-results-msg">No TMDb results found.</div>`}
+            ? this.tmdbResults.map((item) => this._renderResultCard(item, 'tmdb'))
+            : html`<div class="no-results-msg">No TMDb results found.</div>`}
                       </div>
                     </div>
                   </div>
                 </div>
               `
-            : ''}
+        : ''}
         </div>
 
         <div class="input-container">
