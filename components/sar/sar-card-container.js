@@ -794,7 +794,7 @@ export class SarCardContainer extends LitElement {
     return html`
       <div id="scrollContainer" class="scroll-container" @scroll="${this._onScroll}">
         <div class="paper-header">
-          <div id="header">Spoiler Free Anime Reviews</div>
+          <div id="header">Dogatech's Anime Reviews</div>
         </div>
         <div class="content">
           <div class="horizontal" id="filters">
