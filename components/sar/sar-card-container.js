@@ -222,6 +222,9 @@ export class SarCardContainer extends LitElement {
       transition: border-color 0.2s;
       touch-action: manipulation;
     }
+    .title-search-input {
+      padding-right: 22px;
+    }
     .genre-select {
       padding-right: 24px;
       cursor: pointer;
@@ -231,6 +234,9 @@ export class SarCardContainer extends LitElement {
       background-image: var(--dropdown-arrow, url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6"><polygon points="0,0 10,0 5,6" fill="%23727272"/></svg>'));
       background-repeat: no-repeat;
       background-position: right 6px center;
+    }
+    .genre-select.has-value {
+      padding-right: 44px;
     }
     .title-search-input:focus,
     .genre-select:focus {
@@ -253,6 +259,49 @@ export class SarCardContainer extends LitElement {
     .genre-select option[value=""],
     .genre-select option:not([value]) {
       color: var(--secondary-text-color, #727272);
+    }
+    .clear-btn {
+      position: absolute;
+      right: 2px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+      padding: 0;
+      border: none;
+      border-radius: 50%;
+      background: transparent;
+      color: var(--secondary-text-color, #727272);
+      cursor: pointer;
+      outline: none;
+      opacity: 0.7;
+      transition: opacity 0.15s ease, color 0.15s ease, background-color 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      z-index: 2;
+    }
+    .clear-btn::after {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: -6px;
+      right: -6px;
+      bottom: -6px;
+    }
+    .clear-btn:hover {
+      opacity: 1;
+      color: var(--primary-text-color, #F1F1F5);
+      background-color: var(--hover-overlay, rgba(255, 255, 255, 0.1));
+    }
+    .clear-btn:focus-visible {
+      opacity: 1;
+      outline: 1px solid var(--default-primary-color, #BA68C8);
+    }
+    .clear-btn.genre-clear-btn {
+      right: 20px;
     }
     @media (max-width: 768px) {
       .paper-header {
@@ -293,7 +342,15 @@ export class SarCardContainer extends LitElement {
         width: 100%;
         min-width: 0;
         font-size: 16px; /* Prevents auto-zoom on iOS */
-        padding: 6px 0;
+      }
+      .title-search-input {
+        padding: 6px 22px 6px 0;
+      }
+      .genre-select {
+        padding: 6px 24px 6px 0;
+      }
+      .genre-select.has-value {
+        padding-right: 44px;
       }
       .filter-order {
         order: 2;
@@ -759,6 +816,34 @@ export class SarCardContainer extends LitElement {
     return `${item.genre} (${item.count})`;
   }
 
+  _clearTitleSearch(e) {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    const input = this.$.titleSearch;
+    const wasFocused = input && this.renderRoot?.activeElement === input;
+    this.searchString = '';
+    if (input) {
+      input.value = '';
+      if (wasFocused) {
+        input.focus();
+      }
+    }
+  }
+
+  _clearGenreSearch(e) {
+    if (e) {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    this.searchGenre = '';
+    const select = this.$.genreSearch;
+    if (select) {
+      select.value = '';
+    }
+  }
+
   get filteredReviews() {
     if (!this.reviews || !this.reviews.length) {
       return [];
@@ -910,13 +995,37 @@ export class SarCardContainer extends LitElement {
                 @input="${(e) => {
         this.searchString = e.target.value;
       }}"
+                @keydown="${(e) => {
+        if (e.key === 'Escape') {
+          this._clearTitleSearch(e);
+        }
+      }}"
               />
+              ${this.searchString
+                ? html`
+                    <button
+                      type="button"
+                      class="clear-btn"
+                      aria-label="Clear title search"
+                      title="Clear search"
+                      @mousedown="${(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}"
+                      @click="${this._clearTitleSearch}"
+                    >
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                      </svg>
+                    </button>
+                  `
+                : ''}
             </div>
             <div class="spacer"></div>
             <div class="dropdown-container">
               <select
                 id="genreSearch"
-                class="genre-select"
+                class="genre-select ${this.searchGenre ? 'has-value' : ''}"
                 aria-label="Search by genre"
                 .value="${this.searchGenre}"
                 @change="${(e) => {
@@ -931,6 +1040,25 @@ export class SarCardContainer extends LitElement {
                   `
       )}
               </select>
+              ${this.searchGenre
+                ? html`
+                    <button
+                      type="button"
+                      class="clear-btn genre-clear-btn"
+                      aria-label="Clear genre search"
+                      title="Clear genre"
+                      @mousedown="${(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                      }}"
+                      @click="${this._clearGenreSearch}"
+                    >
+                      <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
+                        <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                      </svg>
+                    </button>
+                  `
+                : ''}
             </div>
           </div>
           <div class="cards">
