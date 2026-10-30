@@ -152,32 +152,30 @@ export class SarReview extends LitElement {
       width: 100%;
     }
     .synopsis {
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
       transition: background-color 0.2s ease, padding 0.25s ease, margin-bottom 0.25s ease, box-shadow 0.2s ease;
+    }
+    .synopsis:hover {
+      background: var(--synopsis-hover-bg, rgba(186, 104, 200, 0.12));
+    }
+    .synopsis:focus-visible {
+      outline: 2px solid var(--default-primary-color, #BA68C8);
+      outline-offset: 2px;
+      border-radius: 4px;
     }
     .synopsis.zipped {
       padding: 8px 16px;
       margin-bottom: 16px;
-      cursor: pointer;
-    }
-    .synopsis.zipped:hover {
-      background: var(--synopsis-hover-bg, rgba(186, 104, 200, 0.12));
     }
     .synopsis-header {
       display: flex;
       flex-direction: row;
       align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
       user-select: none;
       -webkit-user-select: none;
-      touch-action: manipulation;
-      -webkit-tap-highlight-color: transparent;
       gap: 8px;
-    }
-    .synopsis-header:focus-visible {
-      outline: 2px solid var(--default-primary-color, #BA68C8);
-      outline-offset: 2px;
-      border-radius: 4px;
     }
     .synopsis-header .synopsis-label {
       margin-bottom: 0;
@@ -197,31 +195,6 @@ export class SarReview extends LitElement {
       user-select: none;
       -webkit-user-select: none;
       transition: opacity 0.2s ease;
-    }
-    .synopsis-toggle-btn {
-      opacity: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 24px;
-      height: 24px;
-      color: var(--default-primary-color, #BA68C8);
-      border-radius: 50%;
-      flex-shrink: 0;
-      transition: background-color 0.15s ease;
-    }
-    .synopsis-header:hover .synopsis-toggle-btn {
-      background-color: rgba(186, 104, 200, 0.15);
-    }
-    .synopsis-chevron {
-      display: block;
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .synopsis.zipped .synopsis-chevron {
-      transform: rotate(-90deg);
-    }
-    .synopsis.open .synopsis-chevron {
-      transform: rotate(0deg);
     }
     .synopsis-content {
       overflow: hidden;
@@ -621,20 +594,16 @@ export class SarReview extends LitElement {
   }
 
   _onSynopsisClick(event) {
-    if (!this._synopsisOpen) {
-      this._toggleSynopsis(event);
+    const selection = typeof window !== 'undefined' ? window.getSelection()?.toString() : '';
+    if (selection && selection.trim().length > 0) {
+      return;
     }
-  }
-
-  _onSynopsisHeaderClick(event) {
-    event.stopPropagation();
     this._toggleSynopsis(event);
   }
 
-  _onSynopsisHeaderKeyDown(event) {
+  _onSynopsisKeyDown(event) {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      event.stopPropagation();
       this._toggleSynopsis(event);
     }
   }
@@ -655,27 +624,18 @@ export class SarReview extends LitElement {
     return html`
       <div
         class="synopsis pre ${isOpen ? 'open' : 'zipped'}"
-        aria-label="Synopsis"
+        role="button"
+        tabindex="0"
+        aria-expanded="${isOpen ? 'true' : 'false'}"
+        aria-label="${isOpen ? 'Click to close synopsis' : 'Click to expand synopsis'}"
+        title="${isOpen ? 'Click to close synopsis' : 'Click to expand synopsis'}"
         @click="${this._onSynopsisClick}"
+        @keydown="${this._onSynopsisKeyDown}"
       >
-        <div
-          class="synopsis-header"
-          role="button"
-          tabindex="0"
-          aria-expanded="${isOpen ? 'true' : 'false'}"
-          aria-label="${isOpen ? 'Zip up synopsis' : 'Expand synopsis'}"
-          title="${isOpen ? 'Click to zip up synopsis' : 'Click to expand synopsis'}"
-          @click="${this._onSynopsisHeaderClick}"
-          @keydown="${this._onSynopsisHeaderKeyDown}"
-        >
+        <div class="synopsis-header">
           <div class="synopsis-title-group">
             <span class="synopsis-label">Synopsis</span>
             ${!isOpen ? html`<span class="synopsis-hint">(click to expand)</span>` : ''}
-          </div>
-          <div class="synopsis-toggle-btn" aria-hidden="true">
-            <svg class="synopsis-chevron" viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
-              <path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"/>
-            </svg>
           </div>
         </div>
         <div class="synopsis-content">
