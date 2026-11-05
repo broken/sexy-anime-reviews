@@ -110,7 +110,8 @@ export class SarReview extends LitElement {
       margin: 0 5px;
       color: var(--secondary-text-color, #727272);
     }
-    #view_method {
+    #view_method,
+    #show_status {
       height: 16px;
       width: 16px;
       display: inline-flex;
@@ -515,8 +516,21 @@ export class SarReview extends LitElement {
   }
 
   _renderStatus(review) {
-    if (!review?.showStatus) return '';
-    return html`<div class="meta">${review.showStatus}</div>`;
+    const s = review?.showStatus;
+    if (s === 'ongoing') {
+      return html`
+        <svg id="show_status" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" title="Ongoing">
+          <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
+        </svg>
+      `;
+    } else if (s === 'incomplete') {
+      return html`
+        <svg id="show_status" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" title="Incomplete">
+          <path d="M12 2c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm0 15c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
+        </svg>
+      `;
+    }
+    return '';
   }
 
   _getGenreArray(review) {
