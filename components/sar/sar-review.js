@@ -497,19 +497,22 @@ export class SarReview extends LitElement {
   _renderViewMethodIcon(review) {
     if (review?.viewMethod === 'dub') {
       return html`
-        <svg id="view_method" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" title="Dub">
+        <svg id="view_method" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <title>Dub</title>
           <path d="M12 14c1.66 0 2.99-1.34 2.99-3L15 5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3zm5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
         </svg>
       `;
     } else if (review?.viewMethod === 'sub') {
       return html`
-        <svg id="view_method" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" title="Sub">
+        <svg id="view_method" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <title>Sub</title>
           <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM4 12h4v2H4v-2zm10 6H4v-2h10v2zm6 0h-4v-2h4v2zm0-4H10v-2h10v2z"/>
         </svg>
       `;
     }
     return html`
       <svg id="view_method" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+        <title>Audio: Not specified</title>
         <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8 0-1.85.63-3.55 1.69-4.9L16.9 18.31C15.55 19.37 13.85 20 12 20zm6.31-3.1L7.1 5.69C8.45 4.63 10.15 4 12 4c4.42 0 8 3.58 8 8 0 1.85-.63 3.55-1.69 4.9z"/>
       </svg>
     `;
@@ -519,13 +522,15 @@ export class SarReview extends LitElement {
     const s = review?.showStatus;
     if (s === 'ongoing') {
       return html`
-        <svg id="show_status" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" title="Ongoing">
+        <svg id="show_status" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <title>Ongoing</title>
           <path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/>
         </svg>
       `;
     } else if (s === 'incomplete') {
       return html`
-        <svg id="show_status" viewBox="0 0 24 24" width="16" height="16" fill="currentColor" title="Incomplete">
+        <svg id="show_status" viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+          <title>Incomplete</title>
           <path d="M12 2c1.1 0 2 .9 2 2v9c0 1.1-.9 2-2 2s-2-.9-2-2V4c0-1.1.9-2 2-2zm0 15c1.1 0 2 .9 2 2s-.9 2-2 2-2-.9-2-2 .9-2 2-2z"/>
         </svg>
       `;
