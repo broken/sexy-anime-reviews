@@ -115,6 +115,7 @@ def fetch_anilist_details(title_query, orig_title=None, media_type=None):
             }
             genres
             format
+            status
           }
         }
       }''' % (json.dumps(q), format_filter)
@@ -137,7 +138,8 @@ def fetch_anilist_details(title_query, orig_title=None, media_type=None):
               'romajiTitle': m.get('title', {}).get('romaji') or '',
               'englishTitle': m.get('title', {}).get('english') or '',
               'genres': m.get('genres') or [],
-              'format': m.get('format') or ''
+              'format': m.get('format') or '',
+              'status': m.get('status') or ''
           }
     except Exception as e:
       print(f'AniList lookup error for "{q}": {e}')
@@ -195,6 +197,24 @@ def get_tmdb_item_details(media_type, media_id):
     show_type = 'movie' if is_movie else 'series'
     format_type = 'movie' if is_movie else 'series'
 
+    al_status = (al.get('status') or '').upper() if al else ''
+    tmdb_status = (data.get('status') or '').lower()
+    anime_status = ''
+    if is_movie:
+      anime_status = 'ended'
+    elif al_status in ('RELEASING', 'NOT_YET_RELEASED'):
+      anime_status = 'ongoing'
+    elif al_status == 'FINISHED':
+      anime_status = 'ended'
+    elif al_status in ('CANCELLED', 'HIATUS'):
+      anime_status = 'incomplete'
+    elif tmdb_status in ('returning series', 'in production', 'planned'):
+      anime_status = 'ongoing'
+    elif tmdb_status in ('ended'):
+      anime_status = 'ended'
+    elif tmdb_status in ('canceled', 'cancelled'):
+      anime_status = 'incomplete'
+
     return {
         'id': f'tmdb:{media_type}:{media_id}',
         'tmdbId': media_id,
@@ -203,6 +223,7 @@ def get_tmdb_item_details(media_type, media_id):
         'romajiTitle': romaji_title,
         'showType': show_type,
         'format': format_type,
+        'showStatus': anime_status,
         'genres': genres,
         'viewMethod': 'sub',
         'coverUrl': cover_url,

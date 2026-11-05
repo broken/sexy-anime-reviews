@@ -138,6 +138,9 @@ export class SarCardContainer extends LitElement {
       align-self: flex-start;
       user-select: none;
     }
+    .filter-show {
+      align-items: flex-start;
+    }
     .toggle-row {
       display: flex;
       flex-direction: row;
@@ -359,6 +362,8 @@ export class SarCardContainer extends LitElement {
       .filter-show {
         order: 3;
         flex: 1 1 auto;
+        flex-wrap: wrap;
+        gap: 4px 6px;
       }
       .filter-rating {
         order: 4;
@@ -455,6 +460,9 @@ export class SarCardContainer extends LitElement {
     showSub: { type: Boolean },
     showMovie: { type: Boolean },
     showSeries: { type: Boolean },
+    showOngoing: { type: Boolean },
+    showIncomplete: { type: Boolean },
+    showEnded: { type: Boolean },
     searchString: { type: String },
     searchGenre: { type: String },
     minRating: { type: Number },
@@ -471,6 +479,9 @@ export class SarCardContainer extends LitElement {
     this.showSub = true;
     this.showMovie = true;
     this.showSeries = true;
+    this.showOngoing = true;
+    this.showIncomplete = true;
+    this.showEnded = true;
     this.searchString = '';
     this.searchGenre = '';
     this.minRating = 0;
@@ -852,6 +863,9 @@ export class SarCardContainer extends LitElement {
     const showSub = this.showSub;
     const showMovie = this.showMovie;
     const showSeries = this.showSeries;
+    const showOngoing = this.showOngoing;
+    const showIncomplete = this.showIncomplete;
+    const showEnded = this.showEnded;
     const minRating = this.minRating;
     const searchString = this.searchString;
     const searchGenre = this.searchGenre;
@@ -861,6 +875,9 @@ export class SarCardContainer extends LitElement {
       if (!showSub && x.viewMethod === 'sub') return false;
       if (!showMovie && x.showType === 'movie') return false;
       if (!showSeries && x.showType === 'series') return false;
+      if (!showOngoing && x.showStatus === 'ongoing') return false;
+      if (!showIncomplete && x.showStatus === 'incomplete') return false;
+      if (!showEnded && x.showStatus === 'ended') return false;
       if (minRating > (RATING_VALUES[x.rating] || 0)) return false;
       if (searchString && !(x.title || '').toLowerCase().includes(searchString.toLowerCase())) return false;
       if (searchGenre && !genreMatch(searchGenre, x)) return false;
@@ -971,6 +988,47 @@ export class SarCardContainer extends LitElement {
                   <span class="toggle-text">Series</span>
                 </label>
               </div>
+              <div class="vertical">
+                <label class="toggle-row" title="Ongoing (new seasons upcoming)">
+                  <span class="toggle-switch">
+                    <input
+                      type="checkbox"
+                      .checked="${this.showOngoing}"
+                      @change="${(e) => {
+        this.showOngoing = e.target.checked;
+      }}"
+                    />
+                    <span class="toggle-slider"></span>
+                  </span>
+                  <span class="toggle-text">Ongoing</span>
+                </label>
+                <label class="toggle-row" title="Incomplete (no new seasons upcoming, but didn't end)">
+                  <span class="toggle-switch">
+                    <input
+                      type="checkbox"
+                      .checked="${this.showIncomplete}"
+                      @change="${(e) => {
+        this.showIncomplete = e.target.checked;
+      }}"
+                    />
+                    <span class="toggle-slider"></span>
+                  </span>
+                  <span class="toggle-text">Incomplete</span>
+                </label>
+                <label class="toggle-row" title="Ended (no new seasons and it ended)">
+                  <span class="toggle-switch">
+                    <input
+                      type="checkbox"
+                      .checked="${this.showEnded}"
+                      @change="${(e) => {
+        this.showEnded = e.target.checked;
+      }}"
+                    />
+                    <span class="toggle-slider"></span>
+                  </span>
+                  <span class="toggle-text">Ended</span>
+                </label>
+              </div>
             </div>
             <div class="spacer"></div>
             <div class="filter-rating">
@@ -1002,16 +1060,16 @@ export class SarCardContainer extends LitElement {
       }}"
               />
               ${this.searchString
-                ? html`
+        ? html`
                     <button
                       type="button"
                       class="clear-btn"
                       aria-label="Clear title search"
                       title="Clear search"
                       @mousedown="${(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}"
+            e.preventDefault();
+            e.stopPropagation();
+          }}"
                       @click="${this._clearTitleSearch}"
                     >
                       <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
@@ -1019,7 +1077,7 @@ export class SarCardContainer extends LitElement {
                       </svg>
                     </button>
                   `
-                : ''}
+        : ''}
             </div>
             <div class="spacer"></div>
             <div class="dropdown-container">
@@ -1041,16 +1099,16 @@ export class SarCardContainer extends LitElement {
       )}
               </select>
               ${this.searchGenre
-                ? html`
+        ? html`
                     <button
                       type="button"
                       class="clear-btn genre-clear-btn"
                       aria-label="Clear genre search"
                       title="Clear genre"
                       @mousedown="${(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}"
+            e.preventDefault();
+            e.stopPropagation();
+          }}"
                       @click="${this._clearGenreSearch}"
                     >
                       <svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" aria-hidden="true">
@@ -1058,19 +1116,19 @@ export class SarCardContainer extends LitElement {
                       </svg>
                     </button>
                   `
-                : ''}
+        : ''}
             </div>
           </div>
           <div class="cards">
             ${this.filteredReviews.map(
-        (item) => html`
+          (item) => html`
                 <sar-card
                   .review="${item}"
                   @card-click="${this._onCardClick}"
                   id="${this._cleanTitle(item.title)}"
                 ></sar-card>
               `
-      )}
+        )}
           </div>
         </div>
       </div>

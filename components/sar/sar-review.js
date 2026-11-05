@@ -514,6 +514,11 @@ export class SarReview extends LitElement {
     `;
   }
 
+  _renderStatus(review) {
+    if (!review?.showStatus) return '';
+    return html`<div class="meta">${review.showStatus}</div>`;
+  }
+
   _getGenreArray(review) {
     if (!review) return [];
     const genres = review.genres || {};
@@ -674,6 +679,7 @@ export class SarReview extends LitElement {
         <div class="article row">
           <div class="meta">${review?.rating ?? ''}</div>
           ${this._renderViewMethodIcon(review)}
+          ${this._renderStatus(review)}
           ${genres.map(item => html`<div class="meta">${item}</div>`)}
         </div>
         <section>

@@ -523,6 +523,10 @@ export class SarAuthorForm extends LitElement {
       background: rgba(156, 39, 176, 0.2);
       color: #ce93d8;
     }
+    .meta-chip.status-chip {
+      background: rgba(255, 152, 0, 0.2);
+      color: #ffb74d;
+    }
     .meta-chip.view-chip {
       background: rgba(3, 169, 244, 0.2);
       color: #81d4fa;
@@ -898,6 +902,7 @@ export class SarAuthorForm extends LitElement {
     genres: { type: Array },
     viewMethod: { type: String },
     showType: { type: String },
+    showStatus: { type: String },
     review: { type: String },
     reviews: { type: Object },
     tags: { type: Array },
@@ -928,6 +933,7 @@ export class SarAuthorForm extends LitElement {
     this.genres = [];
     this.viewMethod = '';
     this.showType = '';
+    this.showStatus = '';
     this.review = '';
     this.reviews = {};
     this.tags = [];
@@ -1102,6 +1108,7 @@ export class SarAuthorForm extends LitElement {
     this.rating = val.rating || '';
     this.viewMethod = val.viewMethod || '';
     this.showType = val.showType || '';
+    this.showStatus = val.showStatus || '';
     this.review = val.review || '';
     if (val.genres) {
       this.genres = Array.isArray(val.genres) ? val.genres : Object.values(val.genres);
@@ -1295,6 +1302,9 @@ export class SarAuthorForm extends LitElement {
     if (item.viewMethod && !this.viewMethod) {
       this.viewMethod = item.viewMethod;
     }
+    if (item.showStatus && !this.showStatus) {
+      this.showStatus = item.showStatus;
+    }
     if (item.genres && item.genres.length) {
       this.genres = item.genres.map((g) => {
         const tag = g.trim().toLowerCase();
@@ -1423,6 +1433,9 @@ export class SarAuthorForm extends LitElement {
             <div class="result-tags-row">
               ${item.showType || item.format
         ? html`<span class="meta-chip type-chip">${item.showType || item.format}</span>`
+        : ''}
+              ${item.showStatus
+        ? html`<span class="meta-chip status-chip">${item.showStatus}</span>`
         : ''}
               ${item.viewMethod
         ? html`<span class="meta-chip view-chip">${item.viewMethod}</span>`
@@ -1570,6 +1583,7 @@ export class SarAuthorForm extends LitElement {
       this.genreSuggestions = [];
       this.viewMethod = '';
       this.showType = '';
+      this.showStatus = '';
       this.review = '';
       this.searchQuery = '';
       this.searchResults = [];
@@ -1597,6 +1611,7 @@ export class SarAuthorForm extends LitElement {
       genres: genresObj,
       viewMethod: this.viewMethod,
       showType: this.showType,
+      showStatus: this.showStatus,
       review: this.review,
     };
 
@@ -2095,6 +2110,45 @@ export class SarAuthorForm extends LitElement {
       }}"
             />
             <span>Series</span>
+          </label>
+        </div>
+
+        <div class="horizontal radio-group" role="radiogroup" aria-label="Status">
+          <label class="radio-label" title="Ongoing (new seasons upcoming)">
+            <input
+              type="radio"
+              name="showStatus"
+              value="ongoing"
+              .checked="${this.showStatus === 'ongoing'}"
+              @change="${() => {
+        this.showStatus = 'ongoing';
+      }}"
+            />
+            <span>Ongoing</span>
+          </label>
+          <label class="radio-label" title="Incomplete (no new seasons upcoming, but didn't end)">
+            <input
+              type="radio"
+              name="showStatus"
+              value="incomplete"
+              .checked="${this.showStatus === 'incomplete'}"
+              @change="${() => {
+        this.showStatus = 'incomplete';
+      }}"
+            />
+            <span>Incomplete</span>
+          </label>
+          <label class="radio-label" title="Ended (no new seasons and it ended)">
+            <input
+              type="radio"
+              name="showStatus"
+              value="ended"
+              .checked="${this.showStatus === 'ended'}"
+              @change="${() => {
+        this.showStatus = 'ended';
+      }}"
+            />
+            <span>Ended</span>
           </label>
         </div>
 
