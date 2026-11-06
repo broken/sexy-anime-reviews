@@ -20,7 +20,19 @@ Here's hoping another many years pass without any need to look at this code. :D
 Added showType to distinguish between movies and series.
 
 ## 2026 Update
-I wanted to add a few things to make adding entries into the site easier. While everything was running correctly and fine still, it was on obsolete/deprecated components - polymer, link imports, etc. Thus I decided to update to something more modern - namely lit since it is so slim, making it easy to convert later if necessary, and I'm familiar with it. Anyway, I made a number of changes: migration off of polymer & bower to lit element & npm, pulling metadata from Crunchyroll & TMDb when adding reviews, script for identifying orphaned images, mobile view, support thumbnails, support for spoilers, styling of sinopsis, anime status (ongoing, incomplete, or ended), backups with github actions, and dark mode. Here's to hoping for another many years of hands-off operation.
+I wanted to add a few things to make adding entries into the site easier. While everything was running correctly and fine still, it was on obsolete/deprecated components - polymer, link imports, etc. Thus, I decided to update to modern tools and frameworks. I decided on lit since it is so slim, a descendant of polymer, and I'm familiar with it, making it easy to convert now and later if necessary. Anyway, I made a number of changes:
+* migration off of polymer & bower to lit element & npm
+* pulling metadata from Crunchyroll & TMDb when adding reviews
+* script for identifying orphaned images
+* mobile view
+* support thumbnails
+* support for spoilers
+* styling of sinopsis
+* added anime status (ongoing, incomplete, or ended)
+* backups with github actions
+* dark mode
+
+lol. Seems like a change (or more) is done every 3 years. See ya in 2029!
 
 
 ## How to use
