@@ -1,6 +1,6 @@
-# sexy-anime-reviews
+# Anime Review Site
 Simple app engine app that utilizes ~~polymer~~ & firebase to display my anime reviews.
-Site: http://animereviews.link
+Site: http://anime.dogatech.com
 
 I just wanted to make a sexy looking site with a few technologies I had been itching to play with:
 * complete project developement on a Chromebook (start to finish)
@@ -17,7 +17,7 @@ Wow; the last time I deployed this was Jan 2017. I've been able to update review
 Here's hoping another many years pass without any need to look at this code. :D
 
 ## 2023 Update
-Added showType to distinguish between movies and series. Make sure to specify project ~~`gcloud app deploy --project=sexy-anime-reviews`~~ when deploying to prevent blowing away a different site. Oh, and the 'sexy' refers to the website design.
+Added showType to distinguish between movies and series.
 
 ## 2026 Update
 I wanted to add a few things to make adding entries into the site easier. While everything was running correctly and fine still, it was on obsolete/deprecated components - polymer, link imports, etc. Thus I decided to update to something more modern - namely lit since it is so slim, making it easy to convert later if necessary, and I'm familiar with it. Anyway, I made a number of changes: migration off of polymer & bower to lit element & npm, pulling metadata from Crunchyroll & TMDb when adding reviews, script for identifying orphaned images, mobile view, support thumbnails, support for spoilers, styling of sinopsis, anime status (ongoing, incomplete, or ended), backups with github actions, and dark mode. Here's to hoping for another many years of hands-off operation.
